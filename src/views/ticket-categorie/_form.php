@@ -19,12 +19,34 @@ use open20\amos\core\helpers\Html;
 use open20\amos\ticket\AmosTicket;
 use open20\amos\ticket\utility\TicketUtility;
 use yii\helpers\ArrayHelper;
+use yii\web\View;
 
 /**
  * @var yii\web\View $this
  * @var open20\amos\ticket\models\TicketCategorie $model
  * @var yii\widgets\ActiveForm $form
  */
+
+$tecnicaFieldName = Html::getInputName($model, 'tecnica');
+
+$js = <<<JS
+
+function showHideTechnicalAssistanceDescription() {
+    if ($("input:radio[name='$tecnicaFieldName']:checked").val() === "1") {
+        $('#technical-assistance-description-container-id').show();
+    } else {
+        $('#technical-assistance-description-container-id').hide();
+    }
+}
+
+showHideTechnicalAssistanceDescription();
+
+$("input:radio[name='$tecnicaFieldName']").change(function() {
+    showHideTechnicalAssistanceDescription();
+});
+
+JS;
+$this->registerJs($js, View::POS_READY);
 
 ?>
 
@@ -115,6 +137,11 @@ use yii\helpers\ArrayHelper;
         ?>
         <div class="col-lg-6 col-sm-6">
             <?= $form->field($model, 'email_tecnica')->textInput(['maxlength' => true]) ?>
+        </div>
+    </div>
+    <div class="row" id="technical-assistance-description-container-id">
+        <div class="col-xs-12">
+            <?= $form->field($model, 'technical_assistance_description')->textarea(['rows' => 5]) ?>
         </div>
     </div>
     <div class="row">

@@ -90,6 +90,7 @@ return [
     'Sottotitolo' => 'Sottotitolo',
     'Status' => 'Stato',
     'Tabella' => 'Tabella',
+    'Technical Assistance Description' => "Descrizione per l'assistenza tecnica",
     'Tecnica' => 'Tecnica',
     '#ticket_category_changed' => 'Categoria del ticket modificata',
     '#ticket_category_field_placeholder' => 'Seleziona..',

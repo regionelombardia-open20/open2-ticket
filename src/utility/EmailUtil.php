@@ -279,6 +279,7 @@ class EmailUtil
         $body[] = $creatorUser->getAttributeLabel('email') . ': ' . $creatorEmail;
 
         $body[] = $ticket->getAttributeLabel('descrizione') . ': ' . $ticket->descrizione;
+        $body[] = $model_ticket_categoria->getAttributeLabel('technical_assistance_description') . ': ' . ($model_ticket_categoria->technical_assistance_description ? $model_ticket_categoria->technical_assistance_description : '-');
         $body[] = AmosTicket::t('amosticket', 'Questo ticket ci risulta di vostra competenza.');
         $body[] = '<strong>' . Html::a(
                 AmosTicket::t('amosticket', 'Clicca qui per visualizzarlo.'),

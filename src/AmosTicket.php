@@ -15,6 +15,7 @@ use open20\amos\core\interfaces\CmsModuleInterface;
 use open20\amos\core\interfaces\SearchModuleInterface;
 use open20\amos\core\module\AmosModule;
 use open20\amos\core\module\ModuleInterface;
+use open20\amos\core\user\User;
 use open20\amos\ticket\models\search\TicketFaqSearch;
 use open20\amos\ticket\models\TicketFaq;
 use open20\amos\ticket\widgets\icons\WidgetIconTicketAdminFaq;
@@ -25,6 +26,7 @@ use open20\amos\ticket\widgets\icons\WidgetIconTicketDashboard;
 use open20\amos\ticket\widgets\icons\WidgetIconTicketFaq;
 use open20\amos\ticket\widgets\icons\WidgetIconTicketProcessing;
 use open20\amos\ticket\widgets\icons\WidgetIconTicketWaiting;
+use open20\amos\ticket\models\Ticket;
 use Yii;
 
 /**
@@ -147,4 +149,41 @@ class AmosTicket extends AmosModule implements ModuleInterface, SearchModuleInte
     {
         return TicketFaqSearch::className();
     }
+
+    public static function createTicket($model, $data, $post)
+    {
+        /*
+	print_r($post['RecordDynamicModel']['email']);
+        die();
+        */
+       $user = User::findByUsername($post['RecordDynamicModel']['email']);
+
+        //$titolo = $model->oggetto;
+        $categoria_id = intval($post['RecordDynamicModel']['categoria']);
+	$messageText = $post['RecordDynamicModel']['messaggio'];
+	$styledMessageText = AmosTicket::createMessage($messageText);
+
+       $ticket = new Ticket();
+       $ticket->ticket_categoria_id = $categoria_id;
+       $ticket->titolo = $post['RecordDynamicModel']['oggetto'];
+       $ticket->descrizione = $styledMessageText;
+       $ticket->created_by = $user->id;
+
+       //print_r(\Yii::$app->request->post());
+       //die();
+
+       $ticket->save(false);
+
+
+    }
+
+    public static function createMessage($messageText){
+
+	$styledMessageText = '<p>'.$messageText.'</p>';
+
+	return $styledMessageText;
+
+    }
+
+
 }

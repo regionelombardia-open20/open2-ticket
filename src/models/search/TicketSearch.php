@@ -1,5 +1,4 @@
 <?php
-
 /**
  * Aria S.p.A.
  * OPEN 2.0
@@ -50,7 +49,7 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
                 'created_by',
                 'updated_by',
                 'deleted_by'
-            ], 'integer'],
+                ], 'integer'],
             [[
                 'general',
                 'titolo',
@@ -62,7 +61,7 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
                 'created_at',
                 'updated_at',
                 'deleted_at'
-            ], 'safe'],
+                ], 'safe'],
         ];
     }
 
@@ -91,30 +90,30 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
     public function applySearchFilters($query)
     {
         $query->andFilterWhere([
-            static::tableName() . '.id' => $this->id,
-            static::tableName() . '.closed_by' => $this->closed_by,
-            static::tableName() . '.closed_at' => $this->closed_at,
-            static::tableName() . '.ticket_categoria_id' => $this->ticket_categoria_id,
-            static::tableName() . '.version' => $this->version,
-            static::tableName() . '.created_at' => $this->created_at,
-            static::tableName() . '.updated_at' => $this->updated_at,
-            static::tableName() . '.deleted_at' => $this->deleted_at,
-            static::tableName() . '.created_by' => $this->created_by,
-            static::tableName() . '.updated_by' => $this->updated_by,
-            static::tableName() . '.deleted_by' => $this->deleted_by,
+            static::tableName().'.id' => $this->id,
+            static::tableName().'.closed_by' => $this->closed_by,
+            static::tableName().'.closed_at' => $this->closed_at,
+            static::tableName().'.ticket_categoria_id' => $this->ticket_categoria_id,
+            static::tableName().'.version' => $this->version,
+            static::tableName().'.created_at' => $this->created_at,
+            static::tableName().'.updated_at' => $this->updated_at,
+            static::tableName().'.deleted_at' => $this->deleted_at,
+            static::tableName().'.created_by' => $this->created_by,
+            static::tableName().'.updated_by' => $this->updated_by,
+            static::tableName().'.deleted_by' => $this->deleted_by,
         ]);
 
-        $query->andFilterWhere(['like', static::tableName() . '.titolo', $this->titolo])
-            ->andFilterWhere(['like', static::tableName() . '.status', $this->statusSearch]);
-        $query->andFilterWhere(['like', static::tableName() . '.phone', $this->phone]);
-        $query->andFilterWhere(['like', static::tableName() . '.dossier_id', $this->dossier_id]);
+        $query->andFilterWhere(['like', static::tableName().'.titolo', $this->titolo])
+            ->andFilterWhere(['like', static::tableName().'.status', $this->statusSearch]);
+        $query->andFilterWhere(['like', static::tableName().'.phone', $this->phone]);
+        $query->andFilterWhere(['like', static::tableName().'.dossier_id', $this->dossier_id]);
 
         $query->andFilterWhere(['OR',
-            ['like', static::tableName() . '.titolo', $this->general],
-            ['like', static::tableName() . '.descrizione', $this->general],
-            ['like', static::tableName() . '.descrizione_breve', $this->general],
-            ['like', static::tableName() . '.forward_message', $this->general],
-            ['like', static::tableName() . '.partnership_type', $this->general],
+            ['like', static::tableName().'.titolo', $this->general],
+            ['like', static::tableName().'.descrizione', $this->general],
+            ['like', static::tableName().'.descrizione_breve', $this->general],
+            ['like', static::tableName().'.forward_message', $this->general],
+            ['like', static::tableName().'.partnership_type', $this->general],
         ]);
 
         return $query;
@@ -217,13 +216,13 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
                 $abilita_per_community = true;
 
                 $query->andFilterWhere([
-                    TicketCategorie::tableName() . '.community_id' => $scope['community'],
+                    TicketCategorie::tableName().'.community_id' => $scope['community'],
                 ]);
             }
         }
 
         $query->andFilterWhere([
-            TicketCategorie::tableName() . '.abilita_per_community' => $abilita_per_community,
+            TicketCategorie::tableName().'.abilita_per_community' => $abilita_per_community,
         ]);
 
         $query->limit($limit);
@@ -272,9 +271,9 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
      */
     public function buildQuery($params, $queryType, $onlyStatus = false)
     {
-        $query = $this->baseSearch($params);
-        $classname = \open20\amos\ticket\models\Ticket::className();
-        $moduleCwh = \Yii::$app->getModule('cwh');
+        $query          = $this->baseSearch($params);
+        $classname      = \open20\amos\ticket\models\Ticket::className();
+        $moduleCwh      = \Yii::$app->getModule('cwh');
         $cwhActiveQuery = null;
 
         $isSetCwh = !is_null($moduleCwh) && in_array($classname, $moduleCwh->modelsEnabled);
@@ -294,12 +293,12 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
                     $query = $cwhActiveQuery->getQueryCwhOwn();
                 } else {
                     $query->andFilterWhere([
-                        static::tableName() . '.created_by' => Yii::$app->getUser()->id
+                        static::tableName().'.created_by' => Yii::$app->getUser()->id
                     ]);
                 }
                 if ($onlyStatus) {
                     $query->andWhere([
-                        static::tableName() . '.status' => $onlyStatus
+                        static::tableName().'.status' => $onlyStatus
                     ]);
                 }
                 break;
@@ -307,13 +306,19 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
                 /* if ($isSetCwh) {
 
                   } else { */
-                $userProfileId = Yii::$app->getUser()->id;
-                $query->innerJoin(TicketCategorieUsersMm::tableName(), 'ticket.ticket_categoria_id = ' . TicketCategorieUsersMm::tableName() . '.ticket_categoria_id'
-                    . ' AND ' . TicketCategorieUsersMm::tableName() . '.user_profile_id = ' . $userProfileId);
+                $userProfileId = 0;
+                $userProfile   = \open20\amos\admin\models\UserProfile::find()->andWhere(['user_id' => \Yii::$app->user->id])->one();
+                if (!empty($userProfile)) {
+                    $userProfileId = $userProfile->id;
+                }
+                $query->innerJoin(TicketCategorieUsersMm::tableName(),
+                    'ticket.ticket_categoria_id = '.TicketCategorieUsersMm::tableName().'.ticket_categoria_id'
+                    .' AND '.TicketCategorieUsersMm::tableName().'.user_profile_id = '.$userProfileId);
+                //}
                 //}
                 if ($onlyStatus) {
                     $query->andWhere([
-                        static::tableName() . '.status' => $onlyStatus
+                        static::tableName().'.status' => $onlyStatus
                     ]);
                 }
                 break;
@@ -323,12 +328,12 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
                 } else {
                     if ($onlyStatus) {
                         $tmp = [
-                            static::tableName() . '.status' => $onlyStatus
+                            static::tableName().'.status' => $onlyStatus
                         ];
                         //pr($tmp);
                         //print "onlyStatus222: $onlyStatus.<br />";exit;
                         $query->andWhere([
-                            static::tableName() . '.status' => $onlyStatus
+                            static::tableName().'.status' => $onlyStatus
                         ]);
                     }
                 }
@@ -371,7 +376,7 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
     {
         $params = array_merge($params, Yii::$app->request->get());
         $this->load($params);
-        $query = $this->buildQuery($params, 'all');
+        $query  = $this->buildQuery($params, 'all');
         $this->applySearchFilters($query);
 
         $dataProvider = new ActiveDataProvider([
@@ -391,7 +396,7 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
         if (!empty($params["conditionSearch"])) {
             $commands = explode(";", $params["conditionSearch"]);
             foreach ($commands as $command) {
-                $query->andWhere(eval("return " . $command . ";"));
+                $query->andWhere(eval("return ".$command.";"));
             }
         }
         return $dataProvider;
@@ -418,7 +423,8 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
         $viewFields = [];
         //$this->attributeLabels()["titolo"];
         array_push($viewFields, new CmsField("titolo", "TEXT", 'amosticket', $this->attributeLabels()["titolo"]));
-        array_push($viewFields, new CmsField("descrizione", "TEXT", 'amosticket', $this->attributeLabels()['descrizione']));
+        array_push($viewFields,
+            new CmsField("descrizione", "TEXT", 'amosticket', $this->attributeLabels()['descrizione']));
         return $viewFields;
     }
 
@@ -495,7 +501,8 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
             ->innerJoin('ticket_categorie c', 't.ticket_categoria_id = c.id')
             ->innerJoin('user u', 't.created_by = u.id')
             ->innerJoin('user_profile p', 'p.user_id = u.id')
-            ->leftJoin('comment cm', "t.id = cm.context_id and cm.context = 'open20\\\\amos\\\\ticket\\\\models\\\\Ticket'")
+            ->leftJoin('comment cm',
+                "t.id = cm.context_id and cm.context = 'open20\\\\amos\\\\ticket\\\\models\\\\Ticket'")
             ->leftJoin('comment_reply cr', 'cm.id = cr.comment_id')
             ->leftJoin('organizations o', 'p.prevalent_partnership_id = o.id')
             ->groupBy('t.id');
@@ -503,7 +510,7 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
         // If scope set, filter categories for cwh
         $isCommunity = false;
         /** @var \open20\amos\cwh\AmosCwh $moduleCwh */
-        $moduleCwh = \Yii::$app->getModule('cwh');
+        $moduleCwh   = \Yii::$app->getModule('cwh');
 
         if (!is_null($moduleCwh)) {
             $scope = $moduleCwh->getCwhScope();

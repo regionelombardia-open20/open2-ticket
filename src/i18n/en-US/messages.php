@@ -90,6 +90,7 @@ return [
     'Status' => 'Status',
     'Tabella' => 'Table',
     'Tecnica' => 'Tecnic',
+    'Technical Assistance Description' => 'Technical Assistance Description',
     '#ticket_category_changed' => 'Ticket category changed',
     '#ticket_category_field_placeholder' => 'Select..',
     'Ticket category successfully deleted' => 'Category successfully deleted',

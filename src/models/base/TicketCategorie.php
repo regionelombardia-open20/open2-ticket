@@ -27,13 +27,6 @@ use yii\helpers\ArrayHelper;
  * @property string $sottotitolo
  * @property string $descrizione_breve
  * @property string $descrizione
- * @property string $created_at
- * @property string $updated_at
- * @property string $deleted_at
- * @property integer $created_by
- * @property integer $updated_by
- * @property integer $deleted_by
- * @property integer $version
  * @property integer $abilita_ticket
  * @property integer $attiva
  * @property integer $tecnica
@@ -42,7 +35,16 @@ use yii\helpers\ArrayHelper;
  * @property boolean $abilita_per_community
  * @property boolean $enable_dossier_id
  * @property boolean $enable_phone
+ * @property string $technical_assistance_description
  * @property integer $community_id
+ * @property boolean $filemanager_mediafile_id
+ * @property string $created_at
+ * @property string $updated_at
+ * @property string $deleted_at
+ * @property integer $created_by
+ * @property integer $updated_by
+ * @property integer $deleted_by
+ * @property integer $version
  *
  * @property \open20\amos\ticket\models\TicketCategorie $categoriaPadre
  * @property \open20\amos\ticket\models\base\TicketCategorieUsersMm[] $ticketCategorieUsersMms
@@ -69,7 +71,7 @@ class TicketCategorie extends Record
         return [
             [['titolo'], 'required'],
             [['tecnica'], 'validateCategory'],
-            [['descrizione'], 'string'],
+            [['descrizione', 'technical_assistance_description'], 'string'],
             [[
                 'abilita_ticket',
                 'attiva',
@@ -156,6 +158,7 @@ class TicketCategorie extends Record
             'enable_dossier_id' => AmosTicket::t('amosticket', 'Enable Dossier Id'),
             'enable_phone' => AmosTicket::t('amosticket', 'Enable Phone'),
             'nomeCompleto' => AmosTicket::t('amosticket', 'Categoria'),
+            'technical_assistance_description' => AmosTicket::t('amosticket', 'Technical Assistance Description'),
         ]);
     }
 
