@@ -11,11 +11,14 @@
 
 namespace open2\amos\ticket\utility;
 
+use open20\amos\attachments\models\File;
+use open20\amos\comments\models\Comment;
 use open20\amos\core\helpers\Html;
 use open20\amos\core\utilities\Email;
 use open2\amos\ticket\AmosTicket;
 use open2\amos\ticket\models\Ticket;
 use open2\amos\ticket\models\TicketCategorie;
+use yii\helpers\VarDumper;
 
 /**
  * Class EmailUtil
@@ -34,6 +37,12 @@ class EmailUtil
      */
     public static function sendEmailNewTicketReferenti($ticket, $model_ticket_categoria, $partnershipMsg)
     {
+        $className = AmosTicket::instance()->emailUtilClass;
+        if (class_exists($className) && method_exists($className, __FUNCTION__)){
+            $functionName = __FUNCTION__;
+            return $className::$functionName($ticket, $model_ticket_categoria, $partnershipMsg);
+        }
+
         $from = \Yii::$app->params['supportEmail'];
         //$to = [$user->email];
 
@@ -55,10 +64,18 @@ class EmailUtil
             $body[] = '<strong>' . $partnershipMsg . '</strong>';
         }
 
-        $body[] = $ticket->getAttributeLabel('created_by') . ': ' . $ticket->createdUserProfile->nomeCognome;
+        if ($ticket->isGuestTicket()) {
+            $body[] = $ticket->getAttributeLabel('created_by') . ': ' . $ticket->guest_name . ' ' . $ticket->guest_surname;
+        } else {
+            $body[] = $ticket->getAttributeLabel('created_by') . ': ' . $ticket->createdUserProfile->nomeCognome;
+        }
         $body[] = $ticket->getAttributeLabel('titolo') . ': ' . $ticket->titolo;
         $body[] = $ticket->getAttributeLabel('descrizione') . ': ' . $ticket->descrizione;
-        $body[] = '<strong>' . Html::a(AmosTicket::t('amosticket', 'Clicca qui per visualizzarlo.'), \Yii::$app->urlManager->createAbsoluteUrl(['/ticket/ticket/view?id=' . $ticket->id])) . '</strong><br />';
+        $body[] = '<strong>' . Html::a(
+            AmosTicket::t('amosticket', 'Clicca qui per visualizzarlo.'),
+                \Yii::$app->params['platform'] ['backendUrl'] . '/ticket/ticket/view?id=' . $ticket->id
+                // \Yii::$app->urlManager->createAbsoluteUrl(['/ticket/ticket/view?id=' . $ticket->id])
+            ) . '</strong><br />';
         $body[] = AmosTicket::t('amosticket', 'Ricordati di controllarlo.');
 
         $params = [
@@ -83,6 +100,12 @@ class EmailUtil
      */
     public static function sendEmailForwardReferenti($ticket, $partnershipMsg)
     {
+        $className = AmosTicket::instance()->emailUtilClass;
+        if (class_exists($className) && method_exists($className, __FUNCTION__)){
+            $functionName = __FUNCTION__;
+            return $className::$functionName($ticket, $partnershipMsg);
+        }
+
         $from = \Yii::$app->params['supportEmail'];
 
         $ticketPrecedente = Ticket::findOne($ticket->forwarded_from_id);
@@ -135,6 +158,12 @@ class EmailUtil
      */
     public static function sendEmailForwardOperatore($ticket, $partnershipMsg)
     {
+        $className = AmosTicket::instance()->emailUtilClass;
+        if (class_exists($className) && method_exists($className, __FUNCTION__)){
+            $functionName = __FUNCTION__;
+            return $className::$functionName($ticket, $partnershipMsg);
+        }
+
         $from = \Yii::$app->params['supportEmail'];
 
         $ticketPrecedente = Ticket::findOne($ticket->forwarded_from_id);
@@ -175,6 +204,65 @@ class EmailUtil
     }
 
     /**
+     * manda la mail di inoltro del ticket all'operatore per informarlo che è stato
+     * aperto un nuovo ticket in un'altra categoria
+     *
+     * @param Ticket $ticket
+     * @param Comment $answare
+     * @return bool
+     * @throws \ReflectionException
+     */
+    public static function sendCloseTicketGuestAnsware($ticket, $answare)
+    {
+        $className = AmosTicket::instance()->emailUtilClass;
+        if (class_exists($className) && method_exists($className, __FUNCTION__)){
+            $functionName = __FUNCTION__;
+            return $className::$functionName($ticket, $answare);
+        }
+
+        $from = \Yii::$app->params['supportEmail'];
+
+        $userProfile['nome'] = $ticket->guest_name;
+        $userProfile['cognome'] = $ticket->guest_surname;
+        $to =  $ticket->guest_email;
+
+        $subject = AmosTicket::t('amosticket', 'Richiesta informazioni ' . $ticket->id . ' - ' .$ticket->ticketCategoria->titolo);
+
+        $body[] = AmosTicket::t('amosticket', 'in riferimento alla vostra richiesta informazioni nr. 
+        {ticketId} sulla tematica {catName}, vi riportiamo la vostra domanda e la nostra risposta.', [
+            'ticketId' => $ticket->id,
+            'catName' => $ticket->ticketCategoria->titolo,
+        ]);
+        $body[] = '';
+        $body[] = AmosTicket::t('amosticket', 'Domanda:');
+        $description = \yii\helpers\HtmlPurifier::process($ticket->descrizione);
+        echo nl2br($description);
+        $body[] = AmosTicket::t('amosticket', '<strong>'.$description.'</strong>');
+
+        $body[] = AmosTicket::t('amosticket', 'Risposta:');
+        $body[] = AmosTicket::t('amosticket', '<strong>'.$answare->comment_text.'</strong>');
+
+        $body[] = AmosTicket::t('amosticket', '');
+        $body[] = AmosTicket::t('amosticket', 'Cordiali saluti');
+
+        $params = [
+            'userProfile' => $userProfile,
+            'body' => $body,
+        ];
+
+        $layout = [
+            'html' => '@vendor/open2/amos-ticket/src/mail/generic/generic-user-html',
+        ];
+
+        $files = [];
+        /** @var File $file */
+        foreach ($answare->hasMultipleFiles('commentAttachments')->all() as $file) {
+            $files[$file->name .'.'.$file->type] = $file->getPath();
+        }
+        return self::sendEmail($to, $from, $subject, $params, $layout, null,[],[],$files);
+    }
+
+    /**
      * manda la mail di chiusura del ticket all'operatore
      *
      * @param Ticket $ticket
@@ -184,10 +272,23 @@ class EmailUtil
      */
     public static function sendEmailChiusuraOperatore($ticket, $partnershipMsg)
     {
+        $className = AmosTicket::instance()->emailUtilClass;
+        if (class_exists($className) && method_exists($className, __FUNCTION__)){
+            $functionName = __FUNCTION__;
+            return $className::$functionName($ticket, $partnershipMsg);
+        }
+
         $from = \Yii::$app->params['supportEmail'];
 
-        $creatorUserProfile = $ticket->getCreatedUserProfile()->one();
-        $to = $creatorUserProfile->user->email;
+        if($ticket->isGuestTicket()) {
+            $to = $ticket->guest_email;
+            $userProfile['name'] = $ticket->guest_name;
+            $userProfile['cognome'] = $ticket->guest_surname;
+        } else {
+            $creatorUserProfile = $ticket->getCreatedUserProfile()->one();
+            $to = $creatorUserProfile->user->email;
+            $userProfile = $creatorUserProfile->toArray();
+        }
 
         $subject = AmosTicket::t("amosticket", 'Chiusura ticket id. ' . $ticket->id);
 
@@ -198,7 +299,7 @@ class EmailUtil
         }
 
         $params = [
-            'userProfile' => $creatorUserProfile->toArray(),
+            'userProfile' => $userProfile,
             'body' => $body,
         ];
 
@@ -218,6 +319,12 @@ class EmailUtil
      */
     public static function sendEmailTecnicaOperatore($ticket)
     {
+        $className = AmosTicket::instance()->emailUtilClass;
+        if (class_exists($className) && method_exists($className, __FUNCTION__)){
+            $functionName = __FUNCTION__;
+            return $className::$functionName($ticket);
+        }
+
         $from = \Yii::$app->params['supportEmail'];
 
         $creatorUserProfile = $ticket->getCreatedUserProfile()->one();
@@ -251,6 +358,12 @@ class EmailUtil
      */
     public static function sendEmailCategoriaTecnica($ticket, $model_ticket_categoria, $partnershipMsg)
     {
+        $className = AmosTicket::instance()->emailUtilClass;
+        if (class_exists($className) && method_exists($className, __FUNCTION__)){
+            $functionName = __FUNCTION__;
+            return $className::$functionName($ticket, $model_ticket_categoria, $partnershipMsg);
+        }
+
         $from = \Yii::$app->params['supportEmail'];
 
         $emailReferenti = $model_ticket_categoria->email_tecnica;
@@ -307,8 +420,14 @@ class EmailUtil
      * @return bool
      * @throws \ReflectionException
      */
-    public static function sendEmail($to, $from, $subject, $params, $template, $layoutHtml = null, $replyTo = [], $cc = [])
+    public static function sendEmail($to, $from, $subject, $params, $template, $layoutHtml = null, $replyTo = [], $cc = [], $files = [])
     {
+//        $className = AmosTicket::instance()->emailUtilClass;
+//        if (class_exists($className) && method_exists($className, __FUNCTION__)){
+//            $functionName = __FUNCTION__;
+//            return $className::$functionName($to, $from, $subject, $params, $template, $layoutHtml = null, $replyTo = [], $cc = [], $files = []);
+//        }
+
         if ($layoutHtml) {
             \Yii::$app->mailer->htmlLayout = $layoutHtml;
         }
@@ -325,7 +444,7 @@ class EmailUtil
 
         /** @var \open20\amos\core\utilities\Email $email */
         $email = new Email();
-        return $email->sendMail($from, $to, $subject, $message, [], [], [], 0, false, $cc, $replyTo);
+        return $email->sendMail($from, $to, $subject, $message, $files, [], [], 0, false, $cc, $replyTo);
 
 
 //        $mail = \Yii::$app->mailer->compose(

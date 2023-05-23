@@ -24,6 +24,7 @@ use open2\amos\ticket\models\TicketCategorie;
 use open2\amos\ticket\models\TicketCategorieUsersMm;
 use Yii;
 use yii\helpers\Url;
+use yii\helpers\VarDumper;
 
 /**
  * Class TicketCategorieController
@@ -72,6 +73,42 @@ class TicketCategorieController extends CrudController
         $this->setUpLayout();
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function beforeAction($action)
+    {
+
+        $urlCreate   = '/ticket/ticket-categorie/create';
+        $urlManage   = null;
+
+        $this->view->params = [
+            'isGuest' => false,
+//            'modelLabel' => 'news',
+//            'titleSection' => $titleSection,
+//            'subTitleSection' => $subTitleSection,
+//            'urlLinkAll' => $urlLinkAll,
+//            'labelLinkAll' => $labelLinkAll,
+//            'titleLinkAll' => $titleLinkAll,
+//            'labelCreate' => $labelCreate,
+//            'titleCreate' => $titleCreate,
+//            'labelManage' => $labelManage,
+//            'titleManage' => $titleManage,
+
+            'urlCreate' => $urlCreate,
+            'urlManage' => $urlManage,
+        ];
+
+        if (!parent::beforeAction($action)) {
+            return false;
+        }
+
+        // other custom code here
+
+        return true;
+    }
+
     /**
      * Lists all TicketCategorie models.
      * @param string|null $layout
@@ -97,6 +134,7 @@ class TicketCategorieController extends CrudController
      */
     public function actionView($id)
     {
+        $this->setUpLayout('form');
         $this->model = $this->findModel($id);
         if ($this->model->load(Yii::$app->request->post()) && $this->model->save()) {
             return $this->redirect(['view', 'id' => $this->model->id]);
@@ -228,7 +266,8 @@ class TicketCategorieController extends CrudController
                         $saved_referenti = $this->model_referenti->saveUser2TicketCategoria();
 
                         Yii::$app->getSession()->addFlash('success', AmosTicket::t('amosticket', 'Categoria aggiornata con successo.'));
-                        return $this->redirect(['/ticket/ticket-categorie/update', 'id' => $this->model->id]);
+//                        return $this->redirect(['/ticket/ticket-categorie/update', 'id' => $this->model->id]);
+                        return $this->redirect(['index']);
                     } else {
                         Yii::$app->getSession()->addFlash('danger', AmosTicket::t('amosticket', 'Si &egrave; verificato un errore durante il salvataggio'));
                     }
@@ -265,12 +304,17 @@ class TicketCategorieController extends CrudController
                 TicketCategorieUsersMm::deleteAll(['ticket_categoria_id' => $id]);
                 Yii::$app->getSession()->addFlash('success', AmosTicket::t('amosticket', 'Ticket category successfully deleted'));
             } else {
-                Yii::$app->getSession()->addFlash('danger', AmosTicket::t('amosticket', 'You are not authorized to delete this news category'));
+
+                if (count(Yii::$app->session->get('danger')) <= 0) {
+                    Yii::$app->getSession()->addFlash('danger', AmosTicket::t('amosticket', 'Si &egrave; verificato un errore durante l\'eliminazione'));
+                }
+
             }
         } else {
             Yii::$app->getSession()->addFlash('danger', AmosTicket::t('amosticket', 'Category not found'));
         }
-        return $this->redirect(['index']);
+
+       return $this->redirect(['index']);
     }
 
     /**

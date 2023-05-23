@@ -60,6 +60,34 @@ class TicketController extends CrudController
     }
 
     /**
+     * @inheritdoc
+     */
+    public function beforeAction($action)
+    {
+
+        $urlCreate   = '/ticket/ticket/create';
+        $urlManage = null;
+
+        $this->view->params = [
+            // il create non ha senso senza una categoria, la action da errore... da definire la logica per
+            // il create - per ora inibisco il pulsante
+            'hideCreate' => true,
+            'isGuest' => false,
+            'urlCreate' => $urlCreate,
+            'urlManage' => $urlManage,
+        ];
+
+        if (!parent::beforeAction($action)) {
+            return false;
+        }
+
+        // other custom code here
+
+        return true;
+    }
+
+
+    /**
      * Used for set page title and breadcrumbs.
      * @param string $newsPageTitle Ticket page title (
      */
@@ -162,6 +190,7 @@ class TicketController extends CrudController
     public function actionView($id)
     {
         $this->model = $this->findModel($id);
+        $this->setUpLayout('main');
 
         if ($this->model->load(Yii::$app->request->post()) && $this->model->save()) {
             return $this->redirect(['view', 'id' => $this->model->id]);

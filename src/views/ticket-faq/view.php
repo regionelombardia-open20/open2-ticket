@@ -20,7 +20,7 @@ use yii\widgets\DetailView;
  * @var open2\amos\ticket\models\TicketFaq $model
  */
 
-$this->title = strip_tags(substr($model->domanda, 0, 15) . '...');
+$this->title = strip_tags(substr($model->domanda, 0, 50) . '...');
 //$this->params['breadcrumbs'][] = ['label' => Yii::t('cruds', 'Ticket Faq'), 'url' => ['index']];
 //$this->params['breadcrumbs'][] = $this->title;
 $this->params['breadcrumbs'][] = ['label' => AmosTicket::t('amosticket', 'Assistenza'), 'url' => '/ticket'];
@@ -45,6 +45,7 @@ $this->params['breadcrumbs'][] = $this->title;
         'attributes' => [
             'id',
             'domanda:html',
+           
             'risposta:html',
             [
                 'attribute' => 'ticket_categoria_id',

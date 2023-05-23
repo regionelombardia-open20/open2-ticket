@@ -65,6 +65,32 @@ class TicketFaqController extends CrudController
         parent::init();
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function beforeAction($action)
+    {
+
+        $urlCreate   = '/ticket/ticket-faq/create';
+        $labelCreate = AmosTicket::t('amosticket','Nuova FAQ');
+        $urlManage = null;
+
+        $this->view->params = [
+            'isGuest' => false,
+            'urlCreate' => $urlCreate,
+            'labelCreate' => $labelCreate,
+            'urlManage' => $urlManage,
+        ];
+
+        if (!parent::beforeAction($action)) {
+            return false;
+        }
+
+        // other custom code here
+
+        return true;
+    }
+
 
 
     /**
@@ -89,6 +115,7 @@ class TicketFaqController extends CrudController
      */
     public function actionView($id)
     {
+        $this->setUpLayout('form');
         $this->model = $this->findModel($id);
         return $this->render('view', ['model' => $this->model]);
     }

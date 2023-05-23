@@ -20,6 +20,7 @@ use open2\amos\ticket\AmosTicket;
 
 $this->title = AmosTicket::t('amosticket', 'Gestione Faq');
 $this->params['breadcrumbs'][] = $this->title;
+$view = $this;
 ?>
 <div class="ticket-faq-index">
     <?php echo $this->render('_search', ['model' => $model]); ?>
@@ -37,8 +38,35 @@ $this->params['breadcrumbs'][] = $this->title;
                     'attribute' => 'ticketCategoria.nomeCompleto',
                     'label' => AmosTicket::t('amosticket', 'Categoria')
                 ],
-                'domanda:html',
-                'risposta:html',
+                'domanda' => [
+                    'attribute' => 'domanda',
+                    'label' => AmosTicket::t('amosticket', 'Domanda'),
+                    'value' => function ($model) {
+                        return strip_tags($model->domanda);
+                    },
+                    'format' => 'html',
+                ],
+                'risposta' => [
+                    'attribute' => 'risposta',
+                    'label' => AmosTicket::t('amosticket', 'Risposta'),
+                    'value' => function ($model) {
+                        $valTruncate = 100;
+                        $length = strlen(strip_tags($model->risposta));
+
+                        $text = \yii\helpers\StringHelper::truncate(strip_tags($model->risposta),$valTruncate,'... ');
+
+                        if ($length >= $valTruncate) {
+                            $modal = $this->render('_modal-answare', [
+                                'model' => $model,
+                            ]);
+                        } else {
+                            $modal = '';
+                        }
+
+                        return $text . $modal;
+                    },
+                    'format' => 'raw',
+                ],
 
                 [
                     'class' => 'open20\amos\core\views\grid\ActionColumn',

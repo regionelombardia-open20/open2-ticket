@@ -18,7 +18,16 @@ use open2\amos\ticket\models\Ticket;
  * @var yii\web\View $this
  * @var yii\data\ActiveDataProvider $dataProvider
  * @var open2\amos\ticket\models\search\TicketSearch $model
+ * @var AmosTicket $module
  */
+
+$module = \Yii::$app->getModule('ticket');
+$disableTicketOrganization = (!empty($module) ? $module->disableTicketOrganization : false);
+
+$template =  '{view}{update}{delete}';
+if (AmosTicket::instance()->hideUpdateButtonOnTickets) {
+    $template =  '{view}{delete}';
+}
 
 $columnsGrid = [
     'id',
@@ -34,11 +43,15 @@ $columnsGrid = [
         'attribute' => 'createdUserProfile',
         'label' => AmosTicket::t('amosticket', 'Aperto Da'),
         'value' => function ($model) {
-            /** @var Ticket $model */
-            $createdUserProfile = $model->createdUserProfile;
-            return Html::a($createdUserProfile->nomeCognome, $createdUserProfile->getFullViewUrl(), [
-                'title' => AmosTicket::t('amosticket', 'Apri il profilo di {nome_profilo}', ['nome_profilo' => $createdUserProfile->nomeCognome])
-            ]);
+            if ($model->isGuestTicket()) {
+                return  $model->guest_name . ' ' . $model->guest_surname;
+            } else  {
+                /** @var Ticket $model */
+                $createdUserProfile = $model->createdUserProfile;
+                return Html::a($createdUserProfile->nomeCognome, $createdUserProfile->getFullViewUrl(), [
+                    'title' => AmosTicket::t('amosticket', 'Apri il profilo di {nome_profilo}', ['nome_profilo' => $createdUserProfile->nomeCognome])
+                ]);
+            }
         },
         'format' => 'html'
     ],
@@ -94,6 +107,7 @@ $columnsGrid = [
     'ticketCategoria.nomeCompleto',
     'action' => [
         'class' => 'open20\amos\core\views\grid\ActionColumn',
+        'template' => $template,
     ],
 ];
 $hideColumns = (isset($this->params['hideColumns'])) ? $this->params['hideColumns'] : null;
@@ -104,6 +118,11 @@ if (!is_null($hideColumns) && is_array($hideColumns)) {
         }
     }
 }
+
+if ($disableTicketOrganization) {
+    unset($columnsGrid['partnership_id']);
+}
+
 ?>
 <div class="ticket-index">
     <?php echo $this->render('_search', ['model' => $model]); ?>

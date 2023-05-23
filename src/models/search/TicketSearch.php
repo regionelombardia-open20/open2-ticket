@@ -15,6 +15,7 @@ use open20\amos\core\interfaces\ContentModelSearchInterface;
 use open20\amos\core\interfaces\SearchModelInterface;
 use open20\amos\core\record\CmsField;
 use open20\amos\core\record\Record;
+use open2\amos\ticket\AmosTicket;
 use open2\amos\ticket\models\Ticket;
 use open2\amos\ticket\models\TicketCategorie;
 use open2\amos\ticket\models\TicketCategorieUsersMm;
@@ -24,6 +25,8 @@ use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\db\Query;
+use yii\helpers\ArrayHelper;
+use yii\helpers\VarDumper;
 
 /**
  * Class TicketSearch
@@ -34,6 +37,7 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
 {
     public $general;
     public $statusSearch;
+    public $stringCreatedBy;
 
     /**
      * @inheritdoc
@@ -60,9 +64,20 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
                 'closed_at',
                 'created_at',
                 'updated_at',
-                'deleted_at'
+                'deleted_at',
+                'stringCreatedBy'
                 ], 'safe'],
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return ArrayHelper::merge(parent::attributeLabels(), [
+            'stringCreatedBy' => AmosTicket::t('amosticket', 'Creato da')
+        ]);
     }
 
     /**
@@ -115,6 +130,27 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
             ['like', static::tableName().'.forward_message', $this->general],
             ['like', static::tableName().'.partnership_type', $this->general],
         ]);
+
+        if (!empty($this->stringCreatedBy)){
+
+            $query->join('LEFT JOIN', 'user_profile profile', 'profile.user_id = '.static::tableName().'.created_by');
+            $expr = new Expression('
+            IF('.static::tableName().'.created_by, 
+                CONCAT(profile.nome, \' \', profile.cognome) COLLATE utf8_general_ci,
+                CONCAT('.static::tableName().'.guest_name, \' \', '.static::tableName().'.guest_surname) COLLATE utf8_general_ci
+                )
+            LIKE
+            \'%'.$this->stringCreatedBy.'%\'
+       
+            ');
+
+
+            $query->andWhere($expr);
+        }
+//        echo '<div style="height: 200px"></div>';
+//        VarDumper::dump($this->stringCreatedBy,3,true);
+//        VarDumper::dump($query->createCommand()->rawSql,3,true);
+
 
         return $query;
     }

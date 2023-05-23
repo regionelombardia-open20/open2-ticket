@@ -229,12 +229,14 @@ TICKET VIEW
     a,
     .btn.btn-secondary {
       float: right;
-      padding: 0 @padding-min;
+      padding: @padding-min;
     }
 
     >div {
-      min-height: 20px;
-      margin-bottom: @margin-medium;
+      padding: 6px 0;
+      &:not(:last-child) {
+      border-bottom: #000 dotted 1px;
+      }
     }
 
     .state span {
@@ -260,13 +262,15 @@ TICKET VIEW
     //margin-bottom: 20px;
     background: @light-background-primary-color;
     padding: @padding-default;
-
     .ticket-label {
-      width: 15%;
+      width: 25%;
+      margin-right: 5%;
+      line-height: 1.3;
     }
 
     .ticket-content {
-      width: 85%;
+      width: 70%;
+      line-height: 1.3;
     }
   }
 
@@ -286,17 +290,32 @@ TICKET VIEW
 
   .ticket-answer {
     margin-bottom: 20px;
-
+    margin-top: 10px;
+    min-height: 0;
+    background: darken(@light-background-primary-color, 15%);
+    &:empty {
+      padding-top: 0;
+      padding-bottom: 0px;
+    }
     .ticket-label {
-      width: 15%;
+      width: 25%;
+      margin-right: 5%;
+      line-height: 1.3;
     }
 
     .ticket-content {
-      width: 85%;
+      width: 70%;
+      line-height: 1.3;
     }
   }
 
   .ticket-text {
+    .ticket-desc {
+      padding: 15px;
+      border: #ccc 1px solid;
+      border-top: none;
+      color: #666;
+    }
     .ticket-label {
       width: 15%;
     }
@@ -306,7 +325,6 @@ TICKET VIEW
     }
 
     .ticket-label-desc {
-      text-transform: uppercase;
       font-weight: bold;
       border-bottom: 1px solid @black-color;
     }
@@ -506,4 +524,13 @@ WIDGET GRAFICO ASSISTANCE
     }
   }
 
+}
+.ticket-comments {
+  .subtitle-comments {
+    padding: 0;
+    margin-bottom: 15px !important;
+    h3.subtitle-comments {
+      border-bottom: none;
+    }
+  }
 }

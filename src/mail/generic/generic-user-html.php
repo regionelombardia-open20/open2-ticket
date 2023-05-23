@@ -14,6 +14,7 @@ use yii\helpers\Html;
 
 /**
  * @var $this yii\web\View
+ * @var array $body
  * @var \open20\amos\core\user\User $user
  */
 
@@ -22,10 +23,7 @@ $appName = Yii::$app->name;
 
 $this->title = AmosTicket::t('amosticket', 'Registrazione {appName}', ['appName' => $appName]);
 $this->registerCssFile('http://fonts.googleapis.com/css?family=Roboto');
-$sessoBenvenuto = AmosTicket::t('amosticket', 'Benvenuta');
-if ($userProfile['sesso'] == 'Maschio') {
-    $sessoBenvenuto = AmosTicket::t('amosticket', 'Benvenuto');
-}
+
 ?>
 
 

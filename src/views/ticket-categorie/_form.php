@@ -29,6 +29,9 @@ use yii\web\View;
 
 $tecnicaFieldName = Html::getInputName($model, 'tecnica');
 
+/** @var AmosTicket $module */
+$module = \Yii::$app->getModule('ticket');
+
 $js = <<<JS
 
 function showHideTechnicalAssistanceDescription() {
@@ -48,39 +51,56 @@ $("input:radio[name='$tecnicaFieldName']").change(function() {
 JS;
 $this->registerJs($js, View::POS_READY);
 
+$categoryReferentsHide = (!empty($module) && is_array($module->categoryReferentsHide))? $module->categoryReferentsHide: [];
+$fielsdToHide = (!empty($module) && is_array($module->categoryFieldsHide))? $module->categoryFieldsHide: [];
 ?>
 
-<div class="news-categorie-form col-xs-12">
+<div class="news-categorie-form">
     <?php
     $form = ActiveForm::begin([
         'options' => ['enctype' => 'multipart/form-data'] // important
     ]);
     ?>
     <div class="row">
-        <div class="col-lg-6 col-sm-6">
+        <?php
+        if (!in_array('titolo', $fielsdToHide)):
+        ?>
+        <div class="col-sm-12">
             <?= $form->field($model, 'titolo')->textInput(['maxlength' => true]) ?>
         </div>
-        <div class="col-lg-6 col-sm-6">
-            <div class="col-lg-8 col-sm-8 pull-right">
-                <?= $form->field($model, 'categoryIcon')->widget(AttachmentsInput::classname(), [
-                    'options' => [// Options of the Kartik's FileInput widget
-                        'multiple' => false, // If you want to allow multiple upload, default to false
-                        'accept' => "image/*"
-                    ],
-                    'pluginOptions' => [// Plugin options of the Kartik's FileInput widget
-                        'maxFileCount' => 1,
-                        'showRemove' => false, // Client max files,
-                        'indicatorNew' => false,
-                        'allowedPreviewTypes' => ['image'],
-                        'previewFileIconSettings' => false,
-                        'overwriteInitial' => false,
-                        'layoutTemplates' => false
-                    ]
-                ]) ?>
+        <?php
+        endif;
+        ?>
+        <?php
+        if ($module->enableCategoryIcon){
+            ?>
+            <div class="col-sm-12">
+                <div>
+                    <?= $form->field($model, 'categoryIcon')->widget(AttachmentsInput::classname(), [
+                        'options' => [// Options of the Kartik's FileInput widget
+                            'multiple' => false, // If you want to allow multiple upload, default to false
+                            'accept' => "image/*"
+                        ],
+                        'pluginOptions' => [// Plugin options of the Kartik's FileInput widget
+                            'maxFileCount' => 1,
+                            'showRemove' => false, // Client max files,
+                            'indicatorNew' => false,
+                            'allowedPreviewTypes' => ['image'],
+                            'previewFileIconSettings' => false,
+                            'overwriteInitial' => false,
+                            'layoutTemplates' => false
+                        ]
+                    ]) ?>
+                </div>
             </div>
-        </div>
+            <?php
+        }
+        ?>
     </div>
     <div class="row">
+        <?php
+        if (!in_array('descrizione', $fielsdToHide)):
+        ?>
         <div class="col-lg-12 col-sm-12">
             <?= $form->field($model, 'descrizione')->widget(\yii\redactor\widgets\Redactor::className(), [
                 'clientOptions' => [
@@ -92,34 +112,55 @@ $this->registerJs($js, View::POS_READY);
                 ]
             ]) ?>
         </div>
-        <div class="col-lg-12 col-sm-12">
-            <?php
-            $fatherCategoryId = $model->categoria_padre_id;
+        <?php
+        endif;
+        ?>
+
+        <?php
+        if (!$module->oneLevelCategories) {
             ?>
-            <?= $form->field($model, 'categoria_padre_id')->widget(Select::className(), [
-                'auto_fill' => false,
-                'options' => [
-                    'placeholder' => AmosTicket::t('amosticket', '#father_category_field_placeholder'),
-                    'id' => 'categoria_padre_id-id',
-                    'disabled' => false,
-                    'value' => $fatherCategoryId
-                ],
-                'pluginOptions' => [
-                    'allowClear' => true
-                ],
-                'data' =>
-                    ArrayHelper::map(TicketUtility::getTicketCategories($model)
-                        ->orderBy('titolo')->all(),
-                        'id', 'nomeCompleto'),
-            ]); ?>
-        </div>
+            <div class="col-lg-12 col-sm-12">
+                <?php
+                $fatherCategoryId = $model->categoria_padre_id;
+                ?>
+                <?= $form->field($model, 'categoria_padre_id')->widget(Select::className(), [
+                    'auto_fill' => false,
+                    'options' => [
+                        'placeholder' => AmosTicket::t('amosticket', '#father_category_field_placeholder'),
+                        'id' => 'categoria_padre_id-id',
+                        'disabled' => false,
+                        'value' => $fatherCategoryId
+                    ],
+                    'pluginOptions' => [
+                        'allowClear' => true
+                    ],
+                    'data' =>
+                        ArrayHelper::map(TicketUtility::getTicketCategories($model)
+                            ->orderBy('titolo')->all(),
+                            'id', 'nomeCompleto'),
+                ]); ?>
+            </div>
+            <?php
+        }
+        ?>
     </div>
     <div class="row">
+
+        <?php
+        if (!in_array('attiva', $fielsdToHide)):
+        ?>
         <?= Html::tag('div',
             $form->field($model, 'attiva')->inline()->radioList(
                 TicketUtility::getBooleanFieldsValues(true),
                 ['class' => 'comment-choice']),
             ['class' => 'col-md-4 col-xs-12']);
+        ?>
+        <?php
+        endif;
+        ?>
+
+        <?php
+        if (!in_array('abilita_ticket', $fielsdToHide)):
         ?>
         <?= Html::tag('div',
             $form->field($model, 'abilita_ticket')->inline()->radioList(
@@ -127,7 +168,15 @@ $this->registerJs($js, View::POS_READY);
                 ['class' => 'comment-choice']),
             ['class' => 'col-md-4 col-xs-12']);
         ?>
+        <?php
+        endif;
+        ?>
+
     </div>
+
+    <?php
+    if (!in_array('tecnica', $fielsdToHide)):
+    ?>
     <div class="row">
         <?= Html::tag('div',
             $form->field($model, 'tecnica')->inline()->radioList(
@@ -144,18 +193,33 @@ $this->registerJs($js, View::POS_READY);
             <?= $form->field($model, 'technical_assistance_description')->textarea(['rows' => 5]) ?>
         </div>
     </div>
+    <?php
+    endif;
+    ?>
     <div class="row">
+        <?php
+        if (!in_array('enable_dossier_id', $fielsdToHide)):
+        ?>
         <?= Html::tag('div',
             $form->field($model, 'enable_dossier_id')->inline()->radioList(
                 TicketUtility::getBooleanFieldsValues(true),
                 ['class' => 'comment-choice']),
             ['class' => 'col-md-4 col-xs-12']);
         ?>
+        <?php
+        endif;
+        ?>
+        <?php
+        if (!in_array('enable_phone', $fielsdToHide)):
+        ?>
         <?= Html::tag('div',
             $form->field($model, 'enable_phone')->inline()->radioList(
                 TicketUtility::getBooleanFieldsValues(true),
                 ['class' => 'comment-choice']),
             ['class' => 'col-md-4 col-xs-12']);
+        ?>
+        <?php
+        endif;
         ?>
     </div>
 
@@ -173,14 +237,23 @@ JS
         );
         ?>
         <div class="row">
+            <?php
+            if (!in_array('abilita_per_community', $fielsdToHide)):
+            ?>
             <div class="col-lg-12 col-sm-12">
                 <?=
                 $form->field($model, 'abilita_per_community')->checkbox()->label(AmosTicket::t('amosticket', '#is_category_for_community', ['communityName' => $community->name]));
                 ?>
             </div>
+            <?php
+            endif;
+            ?>
         </div>
     <?php endif; ?>
 
+    <?php
+    if ($categoryReferentsHide):
+    ?>
     <div class="row">
         <div class="col-lg-12 col-sm-12">
             <?php
@@ -211,6 +284,10 @@ JS
             ?>
         </div>
     </div>
+    <?php
+    endif;
+    ?>
+
     <?= RequiredFieldsTipWidget::widget() ?>
     <?= CreatedUpdatedWidget::widget(['model' => $model]) ?>
     <?= CloseSaveButtonWidget::widget(['model' => $model]); ?>

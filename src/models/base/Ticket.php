@@ -14,6 +14,7 @@ namespace open2\amos\ticket\models\base;
 use open20\amos\admin\AmosAdmin;
 use open20\amos\core\interfaces\OrganizationsModuleInterface;
 use open20\amos\core\record\Record;
+use open20\amos\core\utilities\CurrentUser;
 use open2\amos\ticket\AmosTicket;
 
 /**
@@ -41,6 +42,9 @@ use open2\amos\ticket\AmosTicket;
  * @property string $organization_name
  * @property string $dossier_id
  * @property string $phone
+ * @property string $guest_name
+ * @property string $guest_surname
+ * @property string $guest_email
  * @property string $created_at
  * @property string $updated_at
  * @property string $deleted_at
@@ -105,14 +109,17 @@ class Ticket extends Record
                 'forwarded_at'
             ], 'safe'],
             [$requiredFields, 'required'],
-            [[
-                'ticket_categoria_id',
-                'titolo',
-                'descrizione'
-            ], 'required'],
+//            [[
+//                'ticket_categoria_id',
+//                'titolo',
+//                'descrizione'
+//            ], 'required'],
             [[
                 'status',
                 'titolo',
+                'guest_name',
+                'guest_surname',
+                'guest_email',
                 'partnership_type'
             ], 'string', 'max' => 255],
             [[
@@ -163,6 +170,9 @@ class Ticket extends Record
             'organization_name' => AmosTicket::t('amosticket', 'Organization'),
             'dossier_id' => AmosTicket::t('amosticket', 'Dossier Id'),
             'phone' => AmosTicket::t('amosticket', 'Phone'),
+            'guest_name' => AmosTicket::t('amosticket', 'Guest name'),
+            'guest_surname' => AmosTicket::t('amosticket', 'Guest surname'),
+            'guest_email' => AmosTicket::t('amosticket', 'Guest email'),
         ];
     }
 
@@ -207,5 +217,32 @@ class Ticket extends Record
     public function getNextTicket()
     {
         return $this->hasOne(\open2\amos\ticket\models\Ticket::className(), ['forwarded_from_id' => 'id']);
+    }
+
+    /**
+     * Internal Ticket or External
+     *
+     * @return bool
+     */
+    public function isGuestTicket()
+    {
+        // il creatore è nullo
+        if (is_null($this->created_by)) {
+            return true;
+        }
+
+        // il creatore non è nullo, ma è comunqu empty... tipo zero
+        if (!is_null($this->created_by) && empty($this->created_by)) {
+            return true;
+        }
+
+        // il creatore è un utente guest di piattaforma
+        $guestUserId = \Yii::$app->params['platformConfigurations']['guestUserId'] ?? null;
+        if(!is_null($guestUserId) && ($this->created_by == $guestUserId)) {
+            return true;
+        }
+
+        // tutte le condizioni per valutare se il ticket è esterno sono passate... allore è un ticket interno
+        return false;
     }
 }

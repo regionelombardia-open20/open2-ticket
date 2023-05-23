@@ -24,6 +24,8 @@ use yii\widgets\ActiveForm;
 
 $enableAutoOpenSearchPanel = !isset(\Yii::$app->params['enableAutoOpenSearchPanel']) || \Yii::$app->params['enableAutoOpenSearchPanel'] === true;
 
+/** @var AmosTicket $module */
+$module = \Yii::$app->getModule('ticket');
 ?>
 
 <div class="ticket-categorie-search element-to-toggle" data-toggle-element="form-search">
@@ -39,20 +41,26 @@ $enableAutoOpenSearchPanel = !isset(\Yii::$app->params['enableAutoOpenSearchPane
     <div class="col-sm-6 col-lg-4">
         <?= $form->field($model, 'titolo') ?>
     </div>
-    <div class="col-sm-6 col-lg-4">
-        <?php
-        $data = ArrayHelper::map(TicketUtility::getTicketCategories()->orderBy('titolo')->all(), 'id', 'nomeCompleto');
-        echo $form->field($model, 'categoria_padre_id')->widget(Select2::className(), [
-                'data' => $data,
-                'options' => ['placeholder' => AmosTicket::t('amosticket', 'Cerca per categoria ...')],
-                'pluginOptions' => [
-                    'tags' => true,
-                    'allowClear' => true,
-                ],
-            ]
-        );
+    <?php
+    if (!$module->oneLevelCategories) {
         ?>
-    </div>
+        <div class="col-sm-6 col-lg-4">
+            <?php
+            $data = ArrayHelper::map(TicketUtility::getTicketCategories()->orderBy('titolo')->all(), 'id', 'nomeCompleto');
+            echo $form->field($model, 'categoria_padre_id')->widget(Select2::className(), [
+                    'data' => $data,
+                    'options' => ['placeholder' => AmosTicket::t('amosticket', 'Cerca per categoria ...')],
+                    'pluginOptions' => [
+                        'tags' => true,
+                        'allowClear' => true,
+                    ],
+                ]
+            );
+            ?>
+        </div>
+        <?php
+    }
+    ?>
 
     <div class="col-xs-12">
         <div class="pull-right">

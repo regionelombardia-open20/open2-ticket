@@ -76,6 +76,15 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
         $this->on('afterEnterStatus{' . self::TICKET_WORKFLOW_STATUS_WAITING . '}', [$this, 'goingToWaiting']);
     }
 
+    public function getCloseCommentThread()
+    {
+        // i ticket GUEST debbono essere chiusi dopo il primo commento... e quindi nessuna risposta ulteriore è prevista
+        if ($this->isGuestTicket() && $this->getFirstAnswer()) {
+            return true;
+        }
+        return parent::getCloseCommentThread();
+    }
+
     /**
      * @inheritdoc
      */
@@ -235,11 +244,17 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
      */
     public function getFirstAnswer()
     {
-        return $this->hasOne(\open20\amos\comments\models\Comment::className(), ['context_id' => 'id'])
+        $q = $this->hasOne(\open20\amos\comments\models\Comment::className(), ['context_id' => 'id'])
             ->andWhere(['context' => \open2\amos\ticket\models\Ticket::className()])
-            ->andWhere(['<>', 'created_by', $this->created_by])
-            ->orderBy(['created_at' => SORT_ASC])->limit(1)
-            ->one();
+            ->orderBy(['created_at' => SORT_ASC])
+            ->limit(1)
+        ;
+
+        if (!$this->isGuestTicket()){
+            $q->andWhere(['<>', 'created_by', $this->created_by]);
+        }
+
+        return $q->one();
     }
 
     /**
@@ -249,12 +264,17 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
      */
     public function getLastAnswer()
     {
-        return $this->hasOne(\open20\amos\comments\models\Comment::className(), ['context_id' => 'id'])
+        $q = $this->hasOne(\open20\amos\comments\models\Comment::className(), ['context_id' => 'id'])
             ->andWhere(['context' => \open2\amos\ticket\models\Ticket::className()])
-            ->andWhere(['<>', 'created_by', $this->created_by])
             ->orderBy(['created_at' => SORT_DESC])
             ->limit(1)
-            ->one();
+            ;
+
+        if (!$this->isGuestTicket()){
+            $q->andWhere(['<>', 'created_by', $this->created_by]);
+        }
+
+        return $q->one();
     }
 
     /**

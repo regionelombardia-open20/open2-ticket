@@ -15,6 +15,7 @@ use open20\amos\community\models\Community;
 use open20\amos\core\record\Record;
 use open20\amos\core\validators\StringHtmlValidator;
 use open2\amos\ticket\AmosTicket;
+use yii\base\ModelEvent;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -55,6 +56,9 @@ use yii\helpers\ArrayHelper;
  */
 class TicketCategorie extends Record
 {
+
+    const EVENT_PREPARE_DELETE = 'prepare-delete';
+
     /**
      * @inheritdoc
      */
@@ -122,8 +126,13 @@ class TicketCategorie extends Record
     /* Chiamata dal controller durante la creazione o modifica di una categoria */
     public function validateReferenti($idReferenti)
     {
+        /**
+        * @var AmosTicket $module
+        */
+        $module = \Yii::$app->getModule('ticket');
+
         if (!$this->tecnica && $this->abilita_ticket) {
-            if (empty($idReferenti)) {
+            if (empty($idReferenti) && !$module->categoryReferentsHide) {
                 $this->addError("abilita_ticket", 'Se la categoria (non tecnica) è abilitata per l\'inserimento dei ticket, ci deve essere almeno un referente');
                 return false;
             }
@@ -141,7 +150,7 @@ class TicketCategorie extends Record
             'titolo' => AmosTicket::t('amosticket', 'Titolo'),
             'sottotitolo' => AmosTicket::t('amosticket', 'Sottotitolo'),
             'descrizione_breve' => AmosTicket::t('amosticket', 'Descrizione breve'),
-            'descrizione' => AmosTicket::t('amosticket', 'Descrizione'),
+            'descrizione' => AmosTicket::t('amosticket', 'Descrizione categoria'),
             'abilita_ticket' => AmosTicket::t('amosticket', 'Abilita creazione ticket'),
             'attiva' => AmosTicket::t('amosticket', 'Attiva'),
             'tecnica' => AmosTicket::t('amosticket', 'Tecnica'),
@@ -212,5 +221,14 @@ class TicketCategorie extends Record
             }
         }
         return $nomeCompleto;
+    }
+
+    public function beforeDelete()
+    {
+        $event = new ModelEvent();
+        $this->trigger(self::EVENT_PREPARE_DELETE, $event);
+        if ($event->isValid)  {
+            return parent::beforeDelete();
+        }
     }
 }

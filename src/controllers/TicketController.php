@@ -17,6 +17,7 @@ use open2\amos\ticket\assets\TicketAsset;
 use open2\amos\ticket\models\search\TicketSearch;
 use open2\amos\ticket\models\Ticket;
 use open2\amos\ticket\models\TicketCategorie;
+use open2\amos\ticket\utility\EmailUtil;
 use raoul2000\workflow\base\WorkflowException;
 use Yii;
 use yii\db\Expression;
@@ -25,6 +26,7 @@ use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\helpers\VarDumper;
 
 /**
  * Class TicketController
@@ -144,17 +146,32 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
      */
     public function actionView($id)
     {
-        $ticket = Ticket::findOne($id);
+        $this->setUpLayout('form');
+        $this->model = $this->findModel($id);
+        $ticket = $this->model; //Ticket::findOne($id);
         if ($ticket->status == Ticket::TICKET_WORKFLOW_STATUS_WAITING) {
             $firstAnswer = $ticket->getFirstAnswer();
             if (!is_null($firstAnswer) and Yii::$app->getUser()->can('REFERENTE_TICKET')) { //è stato preso in carico
                 try {
-                    $ticket->sendToStatus(Ticket::TICKET_WORKFLOW_STATUS_PROCESSING);
-                    $ok = $ticket->save(false);
-                    if ($ok) {
-                        Yii::$app->session->addFlash('success', AmosTicket::t('amosticket', 'Ticket preso in carico!'));
+                    if ($ticket->isGuestTicket()) {
+                        EmailUtil::sendCloseTicketGuestAnsware($ticket, $firstAnswer);
+                        $ticket->sendToStatus(Ticket::TICKET_WORKFLOW_STATUS_CLOSED);
+                        $ticket->closed_by = Yii::$app->getUser()->id;
+                        $ticket->closed_at = date('Y-m-d H:i:s');
+                        $ok = $ticket->save(false);
+                        if ($ok) {
+                            Yii::$app->session->addFlash('success', AmosTicket::t('amosticket', 'Email inviata e ticket chiuso correttamente'));
+                        } else {
+                            Yii::$app->session->addFlash('danger', AmosTicket::t('amosticket', '#ERROR_WHILE_PROCESSING_TICKET'));
+                        }
                     } else {
-                        Yii::$app->session->addFlash('danger', AmosTicket::t('amosticket', '#ERROR_WHILE_PROCESSING_TICKET'));
+                        $ticket->sendToStatus(Ticket::TICKET_WORKFLOW_STATUS_PROCESSING);
+                        $ok = $ticket->save(false);
+                        if ($ok) {
+                            Yii::$app->session->addFlash('success', AmosTicket::t('amosticket', 'Ticket preso in carico!'));
+                        } else {
+                            Yii::$app->session->addFlash('danger', AmosTicket::t('amosticket', '#ERROR_WHILE_PROCESSING_TICKET'));
+                        }
                     }
                     return $this->redirect(Url::current(['_csrf-backend' => null]));
                 } catch (WorkflowException $e) {
@@ -162,7 +179,12 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
                 }
             }
         }
-        return parent::actionView($id);
+        return $this->render(
+            'view',
+            [
+                'model' => $this->model,
+            ]
+        );
     }
 
     /**

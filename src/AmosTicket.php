@@ -46,13 +46,43 @@ class AmosTicket extends AmosModule implements ModuleInterface, SearchModuleInte
         ],
     ];
 
+    public $categoryFieldsHide = [
+//        For example...
+//        'attiva',
+//        'abilita_ticket',
+    ];
+
+    public $categoryReferentsHide = false;
+
     public $enableOrganizationNameString = false;
-    
+
     public $disableInfoFields = false;
     
     public $disableCategory = false;
     
     public $disableTicketOrganization = false;
+
+    public $disableForwardToAnotherCategory = false;
+
+    public $oneLevelCategories = false;
+
+    public $enableCategoryIcon = true;
+
+    public $searchTicketCreatorWithString = false;
+
+    public $hideUpdateButtonOnTickets = false;
+
+    /**
+     * @var array
+     */
+    public $ticketSearchFieldsHide = [
+
+    ];
+
+    /**
+     * @var string emailUtilClass ClassName to make override of open2\amos\ticket\utility\EmailUtil
+     */
+    public $emailUtilClass = '';
 
     /**
      * @inheritdoc

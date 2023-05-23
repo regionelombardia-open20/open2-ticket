@@ -24,35 +24,54 @@ $this->title = AmosTicket::t('amosticket', 'Categorie');
 $this->params['breadcrumbs'][] = ['label' => $this->title, 'url' => '/ticket/ticket-categorie/index'];
 //$this->params['breadcrumbs'][] = $this->title;
 
+/** @var AmosTicket $module */
+$module = \Yii::$app->getModule('ticket');
+$fielsdToHide = (!empty($module) && is_array($module->categoryFieldsHide))? $module->categoryFieldsHide: [];
 ?>
 <div class="news-categorie-index">
     <?php echo $this->render('_search', ['model' => $model]); ?>
     <?php
+
+    $columns = [];
+
+    if ($module->enableCategoryIcon) {
+        $columns[] = [
+            'label' => $model->getAttributeLabel('categoryIcon'),
+            'format' => 'html',
+            'value' => function ($model) {
+                /** @var TicketCategorie $model */
+                $url = $model->getCategoryIconUrl();
+                $contentImage = Html::img($url, ['class' => 'gridview-image', 'alt' => $model->getAttributeLabel('categoryIcon')]);
+                return $contentImage;
+            }
+        ];
+    }
+
+    $columns[] = 'titolo';
+
+    $columns[] = 'descrizione:html';
+
+    if (!$module->oneLevelCategories) {
+        $columns['categoria_padre_id'] =[
+                'attribute' => 'categoriaPadre.nomeCompleto',
+                'label' => AmosTicket::t('amosticket', 'Categoria padre')
+            ]
+        ;
+    }
+
+
+    if (!in_array('tecnica', $fielsdToHide)) {
+        $columns[] = 'tecnica:boolean';
+    }
+
+    $columns[] = [
+        'class' => 'open20\amos\core\views\grid\ActionColumn'
+    ];
+
     echo AmosGridView::widget([
         'dataProvider' => $dataProvider,
         //'filterModel' => $model,
-        'columns' => [
-            [
-                'label' => $model->getAttributeLabel('categoryIcon'),
-                'format' => 'html',
-                'value' => function ($model) {
-                    /** @var TicketCategorie $model */
-                    $url = $model->getCategoryIconUrl();
-                    $contentImage = Html::img($url, ['class' => 'gridview-image', 'alt' => $model->getAttributeLabel('categoryIcon')]);
-                    return $contentImage;
-                }
-            ],
-            'titolo',
-            'descrizione:html',
-            'categoria_padre_id' => [
-                'attribute' => 'categoriaPadre.nomeCompleto',
-                'label' => AmosTicket::t('amosticket', 'Categoria padre')
-            ],
-            'tecnica:boolean',
-            [
-                'class' => 'open20\amos\core\views\grid\ActionColumn'
-            ]
-        ]
+        'columns' => $columns,
     ]);
     ?>
 </div>

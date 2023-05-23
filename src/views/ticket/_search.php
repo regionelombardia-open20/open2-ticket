@@ -46,18 +46,45 @@ $enableAutoOpenSearchPanel = !isset(\Yii::$app->params['enableAutoOpenSearchPane
     <div class="col-sm-6 col-lg-4">
         <?= $form->field($model, 'id') ?>
     </div>
-    <div class="col-sm-6 col-lg-4">
-        <?= $form->field($model, 'general')->label(AmosTicket::t('amosticket', 'Ricerca libera')) ?>
-    </div>
-    <div class="col-sm-6 col-lg-4">
-        <?= $form->field($model, 'titolo') ?>
-    </div>
-    <div class="col-sm-6 col-lg-4">
-        <?= $form->field($model, 'dossier_id')->textInput() ?>
-    </div>
-    <div class="col-sm-6 col-lg-4">
-        <?= $form->field($model, 'phone')->textInput() ?>
-    </div>
+    <?php
+    if (!in_array('general', AmosTicket::instance()->ticketSearchFieldsHide)) {
+        ?>
+        <div class="col-sm-6 col-lg-4">
+            <?= $form->field($model, 'general')->label(AmosTicket::t('amosticket', 'Ricerca libera')) ?>
+        </div>
+        <?php
+    }
+    ?>
+
+    <?php
+    if (!in_array('titolo', AmosTicket::instance()->ticketSearchFieldsHide)) {
+        ?>
+        <div class="col-sm-6 col-lg-4">
+            <?= $form->field($model, 'titolo') ?>
+        </div>
+        <?php
+    }
+    ?>
+
+    <?php
+    if (!in_array('dossier_id', AmosTicket::instance()->ticketSearchFieldsHide)) {
+        ?>
+        <div class="col-sm-6 col-lg-4">
+            <?= $form->field($model, 'dossier_id')->textInput() ?>
+        </div>
+        <?php
+    }
+    ?>
+
+    <?php
+    if (!in_array('phone', AmosTicket::instance()->ticketSearchFieldsHide)) {
+        ?>
+        <div class="col-sm-6 col-lg-4">
+            <?= $form->field($model, 'phone')->textInput() ?>
+        </div>
+        <?php
+    }
+    ?>
 
     <div class="col-sm-6 col-lg-4">
         <?php
@@ -75,29 +102,45 @@ $enableAutoOpenSearchPanel = !isset(\Yii::$app->params['enableAutoOpenSearchPane
     </div>
 
     <?php if (!$hideCreatedBy) { ?>
-        <div class="col-sm-6 col-lg-4">
-            <?php
-            $creator = '';
-            $userProfileCreator = \open20\amos\admin\models\UserProfile::find()->andWhere(['user_id' => $model->created_by])->one();
-            if (!empty($userProfileCreator)) {
-                $creator = $userProfileCreator->getNomeCognome();
-            }
-            echo $form->field($model, 'created_by')->widget(Select2::className(), [
-                    'data' => (!empty($model->created_by) ? [$model->created_by => $creator] : []),
-                    'options' => ['placeholder' => AmosTicket::t('amosticket', 'Cerca ...')],
-                    'pluginOptions' => [
-                        'allowClear' => true,
-                        'minimumInputLength' => 3,
-                        'ajax' => [
-                            'url' => \yii\helpers\Url::to(['/admin/user-profile-ajax/ajax-user-list']),
-                            'dataType' => 'json',
-                            'data' => new \yii\web\JsExpression('function(params) { return {q:params.term}; }')
+
+        <?php if (AmosTicket::instance()->searchTicketCreatorWithString) { ?>
+            <div class="col-sm-6 col-lg-4">
+                <?php
+                $creator = '';
+                $userProfileCreator = \open20\amos\admin\models\UserProfile::find()->andWhere(['user_id' => $model->created_by])->one();
+                if (!empty($userProfileCreator)) {
+                    $creator = $userProfileCreator->getNomeCognome();
+                }
+                echo $form->field($model, 'stringCreatedBy')->textInput();
+                ?>
+            </div>
+
+
+        <?php } else { ?>
+            <div class="col-sm-6 col-lg-4">
+                <?php
+                $creator = '';
+                $userProfileCreator = \open20\amos\admin\models\UserProfile::find()->andWhere(['user_id' => $model->created_by])->one();
+                if (!empty($userProfileCreator)) {
+                    $creator = $userProfileCreator->getNomeCognome();
+                }
+                echo $form->field($model, 'created_by')->widget(Select2::className(), [
+                        'data' => (!empty($model->created_by) ? [$model->created_by => $creator] : []),
+                        'options' => ['placeholder' => AmosTicket::t('amosticket', 'Cerca ...')],
+                        'pluginOptions' => [
+                            'allowClear' => true,
+                            'minimumInputLength' => 3,
+                            'ajax' => [
+                                'url' => \yii\helpers\Url::to(['/admin/user-profile-ajax/ajax-user-list']),
+                                'dataType' => 'json',
+                                'data' => new \yii\web\JsExpression('function(params) { return {q:params.term}; }')
+                            ],
                         ],
-                    ],
-                ]
-            );
-            ?>
-        </div>
+                    ]
+                );
+                ?>
+            </div>
+        <?php } // searchCreatorWithString ?>
     <?php } // $hideCreatedBy ?>
 
     <?php if (!$hideStatus) { ?>
@@ -122,7 +165,7 @@ $enableAutoOpenSearchPanel = !isset(\Yii::$app->params['enableAutoOpenSearchPane
 
     <div class="col-xs-12">
         <div class="pull-right">
-            <?= Html::resetButton(AmosTicket::t('amosticket', 'Annulla'), ['class' => 'btn btn-secondary']) ?>
+            <?= Html::a(AmosTicket::t('amosticket', 'Annulla'), \yii\helpers\Url::to('/'.Yii::$app->request->getPathInfo()), ['class' => 'btn btn-secondary']) ?>
             <?= Html::submitButton(AmosTicket::t('amosticket', 'Cerca'), ['class' => 'btn btn-navigation-primary']) ?>
         </div>
     </div>
