@@ -391,6 +391,18 @@ class EmailUtil
 
         $body[] = $ticket->getAttributeLabel('descrizione') . ': ' . $ticket->descrizione;
         $body[] = $model_ticket_categoria->getAttributeLabel('technical_assistance_description') . ': ' . ($model_ticket_categoria->technical_assistance_description ? $model_ticket_categoria->technical_assistance_description : '-');
+        if ($model_ticket_categoria->isAdministrative()) {
+            $administrativeMsg = AmosTicket::t('amosticket', '#administrative_technical_mail_text');
+            $emailReferenti = TicketUtility::getEmailReferentiCategoria($ticket->ticket_categoria_id, true, true);
+            if (!empty($emailReferenti)) {
+                $administrativeMsg .= '<ul>';
+                foreach ($emailReferenti as $email) {
+                    $administrativeMsg .= '<li>' . $email . '</li>';
+                }
+                $administrativeMsg .= '</ul>';
+            }
+            $body[] = $administrativeMsg;
+        }
         $body[] = AmosTicket::t('amosticket', 'Questo ticket ci risulta di vostra competenza.');
         $body[] = '<strong>' . Html::a(
                 AmosTicket::t('amosticket', 'Clicca qui per visualizzarlo.'),

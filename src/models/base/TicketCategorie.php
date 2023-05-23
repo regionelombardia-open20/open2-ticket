@@ -31,6 +31,7 @@ use yii\helpers\ArrayHelper;
  * @property integer $abilita_ticket
  * @property integer $attiva
  * @property integer $tecnica
+ * @property integer $administrative
  * @property string $email_tecnica
  * @property integer $categoria_padre_id
  * @property boolean $abilita_per_community
@@ -56,9 +57,22 @@ use yii\helpers\ArrayHelper;
  */
 class TicketCategorie extends Record
 {
-
     const EVENT_PREPARE_DELETE = 'prepare-delete';
-
+    
+    /**
+     * @var AmosTicket|null $ticketModule
+     */
+    protected $ticketModule;
+    
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        $this->ticketModule = AmosTicket::instance();
+        parent::init();
+    }
+    
     /**
      * @inheritdoc
      */
@@ -66,7 +80,7 @@ class TicketCategorie extends Record
     {
         return 'ticket_categorie';
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -80,6 +94,7 @@ class TicketCategorie extends Record
                 'abilita_ticket',
                 'attiva',
                 'tecnica',
+                'administrative',
                 'created_by',
                 'updated_by',
                 'deleted_by',
@@ -95,56 +110,61 @@ class TicketCategorie extends Record
             [['descrizione'], StringHtmlValidator::className(), 'max' => 300],
         ];
     }
-
+    
     public function validateCategory()
     {
-        if ($this->tecnica && empty($this->email_tecnica)) {
-            $this->addError("email_tecnica", 'Email tecnica obbligatoria se la categoria è una categoria tecnica');
+        if (($this->tecnica || $this->isAdministrative()) && empty($this->email_tecnica)) {
+            $this->addError("email_tecnica", AmosTicket::t('amosticket', '#required_technical_email'));
         }
         if ($this->abilita_ticket) {
             /* if(!$this->tecnica && empty($this->ticketCategorieUsersMms)) {
               $this->addError("abilita_ticket", 'Se la categoria (non tecnica) è abilitata per l\'inserimento dei ticket, ci deve essere almeno un referente');
               } */
             if (!empty($this->categorieFiglie)) {
-                $this->addError("abilita_ticket", 'Solo le categorie \'foglie\' possono essere abilitata per l\'inserimento dei ticket');
+                $this->addError("abilita_ticket", AmosTicket::t('amosticket', '#error_only_leaves_category_enabled_to_create_tickets'));
             }
         }
-
+        
         if ($this->categoria_padre_id) {
             $categoriaPadre = TicketCategorie::findOne($this->categoria_padre_id);
             if ($categoriaPadre->abilita_ticket) {
-                $this->addError("categoria_padre_id", "La categoria 'padre' è abilitata per l'inserimento dei ticket, quindi deve essere una foglia (non può avere categorie figlie)");
+                $this->addError("categoria_padre_id", AmosTicket::t('amosticket', '#error_father_category_enabled_for_tickets_must_be_leaf'));
             }
-
+            
             // IFL-464: rimosso controllo per far inserire FAQ su qualsiasi categoria, sia essa padre o figlia.
             /*if (!empty($categoriaPadre->ticketFaq)) {
                 $this->addError("categoria_padre_id", "La categoria 'padre' ha delle faq associate, quindi deve essere una foglia (non può avere categorie figlie)");
             }*/
         }
     }
-
+    
     /* Chiamata dal controller durante la creazione o modifica di una categoria */
     public function validateReferenti($idReferenti)
     {
         /**
-        * @var AmosTicket $module
-        */
+         * @var AmosTicket $module
+         */
         $module = \Yii::$app->getModule('ticket');
-
+        
         if (!$this->tecnica && $this->abilita_ticket) {
             if (empty($idReferenti) && !$module->categoryReferentsHide) {
-                $this->addError("abilita_ticket", 'Se la categoria (non tecnica) è abilitata per l\'inserimento dei ticket, ci deve essere almeno un referente');
+                $this->addError("abilita_ticket", AmosTicket::t('amosticket', '#error_non_technical_category_must_has_referee'));
                 return false;
             }
         }
         return true;
     }
-
+    
     /**
      * @inheritdoc
      */
     public function attributeLabels()
     {
+        if (!is_null($this->ticketModule) && $this->ticketModule->enableAdministrativeTicketCategory) {
+            $emailTecnicaLabel = AmosTicket::t('amosticket', '#email_address_tecnical_and_administrative_categories');
+        } else {
+            $emailTecnicaLabel = AmosTicket::t('amosticket', '#email_address_tecnical_category');
+        }
         return ArrayHelper::merge(parent::attributeLabels(), [
             'id' => AmosTicket::t('amosticket', 'Id'),
             'titolo' => AmosTicket::t('amosticket', 'Titolo'),
@@ -154,7 +174,8 @@ class TicketCategorie extends Record
             'abilita_ticket' => AmosTicket::t('amosticket', 'Abilita creazione ticket'),
             'attiva' => AmosTicket::t('amosticket', 'Attiva'),
             'tecnica' => AmosTicket::t('amosticket', 'Tecnica'),
-            'email_tecnica' => AmosTicket::t('amosticket', 'Indirizzo email per categoria tecnica'),
+            'administrative' => AmosTicket::t('amosticket', '#administrative'),
+            'email_tecnica' => $emailTecnicaLabel,
             'created_at' => AmosTicket::t('amosticket', 'Creato il'),
             'updated_at' => AmosTicket::t('amosticket', 'Aggiornato il'),
             'deleted_at' => AmosTicket::t('amosticket', 'Cancellato il'),
@@ -170,7 +191,7 @@ class TicketCategorie extends Record
             'technical_assistance_description' => AmosTicket::t('amosticket', 'Technical Assistance Description'),
         ]);
     }
-
+    
     /**
      * This is the relation between the category and the father category.
      * Return an ActiveQuery related to TicketCategorie model.
@@ -181,7 +202,7 @@ class TicketCategorie extends Record
     {
         return $this->hasOne(\open2\amos\ticket\models\TicketCategorie::className(), ['id' => 'categoria_padre_id']);
     }
-
+    
     /**
      * Relation between category and sons categories
      * Returns an ActiveQuery related to model TicketCategorie.
@@ -192,7 +213,7 @@ class TicketCategorie extends Record
     {
         return $this->hasMany(\open2\amos\ticket\models\TicketCategorie::className(), ['categoria_padre_id' => 'id']);
     }
-
+    
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -200,17 +221,17 @@ class TicketCategorie extends Record
     {
         return $this->hasMany(\open2\amos\ticket\models\base\TicketCategorieUsersMm::className(), ['ticket_categoria_id' => 'id']);
     }
-
+    
     public function getTicketFaq()
     {
         return $this->hasMany(\open2\amos\ticket\models\TicketFaq::className(), ['ticket_categoria_id' => 'id']);
     }
-
+    
     public function getTicket()
     {
         return $this->hasMany(\open2\amos\ticket\models\Ticket::className(), ['ticket_categoria_id' => 'id']);
     }
-
+    
     public function getNomeCompleto()
     {
         $nomeCompleto = $this->titolo;
@@ -222,13 +243,31 @@ class TicketCategorie extends Record
         }
         return $nomeCompleto;
     }
-
+    
     public function beforeDelete()
     {
         $event = new ModelEvent();
         $this->trigger(self::EVENT_PREPARE_DELETE, $event);
-        if ($event->isValid)  {
+        if ($event->isValid) {
             return parent::beforeDelete();
         }
+    }
+    
+    /**
+     * This method checks if the ticket category is of technical type
+     * @return bool
+     */
+    public function isTecnica()
+    {
+        return ($this->tecnica == 1);
+    }
+    
+    /**
+     * This method checks if the ticket category is of administrative type
+     * @return bool
+     */
+    public function isAdministrative()
+    {
+        return ($this->administrative == 1);
     }
 }

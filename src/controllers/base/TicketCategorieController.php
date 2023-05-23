@@ -24,7 +24,6 @@ use open2\amos\ticket\models\TicketCategorie;
 use open2\amos\ticket\models\TicketCategorieUsersMm;
 use Yii;
 use yii\helpers\Url;
-use yii\helpers\VarDumper;
 
 /**
  * Class TicketCategorieController
@@ -39,27 +38,27 @@ class TicketCategorieController extends CrudController
 {
     public $model_referenti;
     public $referenti;
-
+    
     /**
      * Trait used for initialize the ticket dashboard
      */
     use TabDashboardControllerTrait;
-
+    
     /**
      * @var string $layout
      */
     public $layout = 'main';
-
+    
     /**
      * @inheritdoc
      */
     public function init()
     {
         $this->initDashboardTrait();
-
+        
         $this->setModelObj(new TicketCategorie());
         $this->setModelSearch(new TicketCategorieSearch());
-
+        
         $this->setAvailableViews([
             'grid' => [
                 'name' => 'grid',
@@ -67,22 +66,22 @@ class TicketCategorieController extends CrudController
                 'url' => '?currentView=grid'
             ],
         ]);
-
+        
         parent::init();
-
+        
         $this->setUpLayout();
     }
-
-
+    
+    
     /**
      * @inheritdoc
      */
     public function beforeAction($action)
     {
-
-        $urlCreate   = '/ticket/ticket-categorie/create';
-        $urlManage   = null;
-
+        
+        $urlCreate = '/ticket/ticket-categorie/create';
+        $urlManage = null;
+        
         $this->view->params = [
             'isGuest' => false,
 //            'modelLabel' => 'news',
@@ -95,20 +94,20 @@ class TicketCategorieController extends CrudController
 //            'titleCreate' => $titleCreate,
 //            'labelManage' => $labelManage,
 //            'titleManage' => $titleManage,
-
+            
             'urlCreate' => $urlCreate,
             'urlManage' => $urlManage,
         ];
-
+        
         if (!parent::beforeAction($action)) {
             return false;
         }
-
+        
         // other custom code here
-
+        
         return true;
     }
-
+    
     /**
      * Lists all TicketCategorie models.
      * @param string|null $layout
@@ -125,7 +124,7 @@ class TicketCategorieController extends CrudController
         $this->setDataProvider($this->getModelSearch()->search(Yii::$app->request->getQueryParams()));
         return parent::actionIndex();
     }
-
+    
     /**
      * Displays a single TicketCategorie model.
      * @param integer $id
@@ -142,7 +141,7 @@ class TicketCategorieController extends CrudController
             return $this->render('view', ['model' => $this->model]);
         }
     }
-
+    
     /**
      * Creates a new TicketCategorie model.
      * If creation is successful, the browser will be redirected to the 'view' page.
@@ -152,12 +151,12 @@ class TicketCategorieController extends CrudController
     public function actionCreate()
     {
         $this->setUpLayout('form');
-
+        
         $this->model = new TicketCategorie();
-
+        
         //carico i referenti ottenendo le variabili $this->model_referenti e $this->referenti popolate
         $this->loadReferenti($id = null);
-
+        
         // If scope set, show checkbox in form to enable user to create a category linked to a community
         $communityId = null;
         $community = null;
@@ -172,22 +171,22 @@ class TicketCategorieController extends CrudController
         }
         $community = Community::findOne($communityId);
         $this->model->community_id = $communityId;
-
+        
         if ($this->model->load(Yii::$app->request->post())) {
             //creo una transazione in modo che se non salvasse correttamente i referenti, non si creerebbe un record categoria
             $transaction = \Yii::$app->db->beginTransaction();
-
+            
             if ($this->model->validate()) {
-
+                
                 if ($this->model->save()) {
                     $this->model_referenti->ticket_categoria_id = $this->model->id;
                     //aggiorno i referenti della categoria con quelli in post
                     $this->setReferenti(Yii::$app->request->post()[$this->model_referenti->getModelName()]['ids']);
-
-
+                    
+                    
                     if (!$this->model->validateReferenti($this->model_referenti->ids)) {
                         $transaction->rollBack();
-
+                        
                         Yii::$app->getSession()->addFlash('danger', AmosTicket::t('amosticket', 'Modifiche non salvate. Verifica l\'inserimento dei campi'));
                         return $this->render('create', [
                             'model' => $this->model,
@@ -200,13 +199,13 @@ class TicketCategorieController extends CrudController
                         $saved_referenti = $this->model_referenti->saveUser2TicketCategoria();
                         if ($saved_referenti) {
                             $transaction->commit();
-
+                            
                             Yii::$app->getSession()->addFlash('success', AmosTicket::t('amosticket', 'Categoria salvata con successo.'));
                             //return $this->redirect(['/ticket/ticket-categorie/update', 'id' => $this->model->id]);
                             return $this->redirect(['index']);
                         } else {
                             $transaction->rollBack();
-
+                            
                             Yii::$app->getSession()->addFlash('danger', AmosTicket::t('amosticket', 'Category not created, check referents'));
                             return $this->render('create', [
                                 'model' => $this->model,
@@ -224,7 +223,7 @@ class TicketCategorieController extends CrudController
                 Yii::$app->getSession()->addFlash('danger', AmosTicket::t('amosticket', 'Modifiche non salvate. Verifica l\'inserimento dei campi'));
             }
         }
-
+        
         return $this->render('create', [
             'model' => $this->model,
             'model_referenti' => $this->model_referenti,
@@ -232,7 +231,7 @@ class TicketCategorieController extends CrudController
             'community' => $community,
         ]);
     }
-
+    
     /**
      * Updates an existing TicketCategorie model.
      * If update is successful, the browser will be redirected to the 'view' page.
@@ -243,17 +242,17 @@ class TicketCategorieController extends CrudController
     public function actionUpdate($id)
     {
         $this->setUpLayout('form');
-
+        
         $this->model = $this->findModel($id);
-
+        
         //carico i referenti ottenendo le variabili $this->model_referenti e $this->referenti popolate
         $this->loadReferenti($id);
-
+        
         $community = null;
         if (!empty($this->model->community_id)) {
             $community = Community::findOne(['id' => $this->model->community_id]);
         }
-
+        
         if ($this->model->load(Yii::$app->request->post())) {
             if ($this->model->validate()) {
                 //aggiorno i referenti della conferenza con quelli in post
@@ -264,7 +263,7 @@ class TicketCategorieController extends CrudController
                     if ($this->model->save()) {
                         //salvo i referenti 
                         $saved_referenti = $this->model_referenti->saveUser2TicketCategoria();
-
+                        
                         Yii::$app->getSession()->addFlash('success', AmosTicket::t('amosticket', 'Categoria aggiornata con successo.'));
 //                        return $this->redirect(['/ticket/ticket-categorie/update', 'id' => $this->model->id]);
                         return $this->redirect(['index']);
@@ -276,7 +275,7 @@ class TicketCategorieController extends CrudController
                 Yii::$app->getSession()->addFlash('danger', AmosTicket::t('amosticket', 'Modifiche non salvate. Verifica l\'inserimento dei campi'));
             }
         }
-
+        
         return $this->render('update', [
             'model' => $this->model,
             'model_referenti' => $this->model_referenti,
@@ -284,7 +283,7 @@ class TicketCategorieController extends CrudController
             'community' => $community,
         ]);
     }
-
+    
     /**
      * Deletes an existing TicketCategorie model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
@@ -304,19 +303,19 @@ class TicketCategorieController extends CrudController
                 TicketCategorieUsersMm::deleteAll(['ticket_categoria_id' => $id]);
                 Yii::$app->getSession()->addFlash('success', AmosTicket::t('amosticket', 'Ticket category successfully deleted'));
             } else {
-
+                
                 if (count(Yii::$app->session->get('danger')) <= 0) {
                     Yii::$app->getSession()->addFlash('danger', AmosTicket::t('amosticket', 'Si &egrave; verificato un errore durante l\'eliminazione'));
                 }
-
+                
             }
         } else {
             Yii::$app->getSession()->addFlash('danger', AmosTicket::t('amosticket', 'Category not found'));
         }
-
-       return $this->redirect(['index']);
+        
+        return $this->redirect(['index']);
     }
-
+    
     /**
      * @param int $ticket_categoria_id
      */
@@ -324,13 +323,13 @@ class TicketCategorieController extends CrudController
     {
         $this->model_referenti = new UserProfileForm();
         $this->model_referenti->ticket_categoria_id = $ticket_categoria_id;
-
+        
         //carica i referenti (da DB) per la categoria settata: popola $this->ids
         $this->model_referenti->loadUsers();
-
+        
         $this->referenti = UserProfileForm::getAvailableUsers();
     }
-
+    
     /**
      * Setta gli id degli user_profile ricevuti
      * @param array $ids

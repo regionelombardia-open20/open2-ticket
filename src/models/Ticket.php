@@ -49,33 +49,35 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
 {
     // Workflow ID
     const TICKET_WORKFLOW = 'TicketWorkflow';
-
+    
     // Workflow states IDS
     const TICKET_WORKFLOW_STATUS_WAITING = 'TicketWorkflow/WAITING';
+    const TICKET_WORKFLOW_STATUS_WAITING_TECHNICAL_ASSISTANCE = 'TicketWorkflow/WAITINGTECHNICALASSISTANCE';
     const TICKET_WORKFLOW_STATUS_PROCESSING = 'TicketWorkflow/PROCESSING';
     const TICKET_WORKFLOW_STATUS_CLOSED = 'TicketWorkflow/CLOSED';
     const PARTNERSHIP_TYPE_ORGANIZATION = 'organization';
     const PARTNERSHIP_TYPE_HEADQUARTER = 'headquarter';
-
+    
     public $closed_at_from;
     public $closed_at_to;
-
+    
     /**
      * @inheritdoc
      */
     public function init()
     {
         parent::init();
-
+        
         if ($this->isNewRecord) {
             $this->status = $this->getWorkflowSource()->getWorkflow(self::TICKET_WORKFLOW)->getInitialStatusId();
         }
-
+        
         $this->on('afterChangeStatusFrom{' . self::TICKET_WORKFLOW_STATUS_WAITING . '}to{' . self::TICKET_WORKFLOW_STATUS_PROCESSING . '}', [$this, 'goingFromWaitingToProcessing']);
         $this->on('afterChangeStatusFrom{' . self::TICKET_WORKFLOW_STATUS_PROCESSING . '}to{' . self::TICKET_WORKFLOW_STATUS_CLOSED . '}', [$this, 'goingFromProcessingToClosed']);
+        $this->on('afterChangeStatusFrom{' . self::TICKET_WORKFLOW_STATUS_WAITING_TECHNICAL_ASSISTANCE . '}to{' . self::TICKET_WORKFLOW_STATUS_CLOSED . '}', [$this, 'goingFromProcessingToClosed']);
         $this->on('afterEnterStatus{' . self::TICKET_WORKFLOW_STATUS_WAITING . '}', [$this, 'goingToWaiting']);
     }
-
+    
     public function getCloseCommentThread()
     {
         // i ticket GUEST debbono essere chiusi dopo il primo commento... e quindi nessuna risposta ulteriore è prevista
@@ -84,7 +86,7 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
         }
         return parent::getCloseCommentThread();
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -97,7 +99,7 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
             ]
         );
     }
-
+    
     /**
      * @return string
      */
@@ -105,7 +107,7 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
     {
         return ($this->partnership_id ? ($this->partnership_type . '-' . $this->partnership_id) : '');
     }
-
+    
     /**
      * @param string $ticketOrganization
      */
@@ -118,7 +120,7 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
                 ) = explode('-', $ticketOrganization);
         }
     }
-
+    
     /**
      * Azioni di creazione ticket: è stato creato dall'operatore o è stato inoltrato da altri
      * Può essere un ticket di una categoria tecnica
@@ -135,10 +137,14 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
                 $partnershipMsg = $this->getAttributeLabel('partnership_id') . ': ' . $partnership->name;
             }
         }
-
+        
         if ($categoria->tecnica) {
             EmailUtil::sendEmailCategoriaTecnica($this, $categoria, $partnershipMsg);
             EmailUtil::sendEmailTecnicaOperatore($this);
+        } elseif ($this->ticketModule->enableAdministrativeTicketCategory && $categoria->isAdministrative()) {
+            EmailUtil::sendEmailCategoriaTecnica($this, $categoria, $partnershipMsg);
+            EmailUtil::sendEmailTecnicaOperatore($this);
+            EmailUtil::sendEmailNewTicketReferenti($this, $categoria, $partnershipMsg);
         } elseif ($this->forwarded_from_id) {
             if ($this->forward_notify) {
                 EmailUtil::sendEmailForwardReferenti($this, $partnershipMsg);
@@ -148,7 +154,7 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
             EmailUtil::sendEmailNewTicketReferenti($this, $categoria, $partnershipMsg);
         }
     }
-
+    
     /**
      * Azioni di presa in carico
      *
@@ -157,7 +163,7 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
     public function goingFromWaitingToProcessing($event)
     {
     }
-
+    
     /**
      * Azioni di chiusura: è stato chiuso definitivamente
      * Se viene inoltrato o è di una categoria tecnica la mail l'email di chiusura
@@ -177,14 +183,14 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
                     $partnershipMsg = $this->getAttributeLabel('partnership_id') . ': ' . $partnership->name;
                 }
             }
-
+            
             $model_ticket_forwarded_to = Ticket::find()->andWhere(['forwarded_from_id' => $this->id])->one();
             if (empty($model_ticket_forwarded_to)) {
                 EmailUtil::sendEmailChiusuraOperatore($this, $partnershipMsg);
             }
         }
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -192,7 +198,7 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
     {
         return ($this->status != self::TICKET_WORKFLOW_STATUS_CLOSED);
     }
-
+    
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -204,7 +210,7 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
         )
             ->andWhere(['context' => \open2\amos\ticket\models\Ticket::className()]);
     }
-
+    
     /**
      * @return ActiveQuery
      */
@@ -218,7 +224,7 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
             ->orderBy(['created_at' => SORT_DESC])
             ->limit(3);
     }
-
+    
     /**
      * @param \open20\amos\comments\models\Comment $comment
      * @return ActiveQuery
@@ -227,7 +233,7 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
     {
         return $comment->getCreatedUserProfile();
     }
-
+    
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -236,7 +242,7 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
         $modelClass = \open20\amos\admin\AmosAdmin::instance()->createModel('UserProfile');
         return $this->hasOne($modelClass::className(), ['user_id' => 'closed_by']);
     }
-
+    
     /**
      * Il primo commento che non è del creatore del ticket
      *
@@ -247,16 +253,15 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
         $q = $this->hasOne(\open20\amos\comments\models\Comment::className(), ['context_id' => 'id'])
             ->andWhere(['context' => \open2\amos\ticket\models\Ticket::className()])
             ->orderBy(['created_at' => SORT_ASC])
-            ->limit(1)
-        ;
-
-        if (!$this->isGuestTicket()){
+            ->limit(1);
+        
+        if (!$this->isGuestTicket()) {
             $q->andWhere(['<>', 'created_by', $this->created_by]);
         }
-
+        
         return $q->one();
     }
-
+    
     /**
      * L'ultimo commento che non è del creatore del ticket
      *
@@ -267,16 +272,15 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
         $q = $this->hasOne(\open20\amos\comments\models\Comment::className(), ['context_id' => 'id'])
             ->andWhere(['context' => \open2\amos\ticket\models\Ticket::className()])
             ->orderBy(['created_at' => SORT_DESC])
-            ->limit(1)
-            ;
-
-        if (!$this->isGuestTicket()){
+            ->limit(1);
+        
+        if (!$this->isGuestTicket()) {
             $q->andWhere(['<>', 'created_by', $this->created_by]);
         }
-
+        
         return $q->one();
     }
-
+    
     /**
      * La lista dei responsabili del ticket
      *
@@ -288,7 +292,7 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
     {
         return TicketUtility::getReferenti($this->ticket_categoria_id, $alsoAdmin/* , $print */);
     }
-
+    
     /**
      * Torna true se l'utente $user_id è uno dei referenti del ticket
      *
@@ -305,10 +309,10 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
                 return true;
             }
         }
-
+        
         return false;
     }
-
+    
     /**
      * @return array
      */
@@ -317,13 +321,13 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
         $statusToRender = [
             //self::TICKET_WORKFLOW_STATUS_PROCESSING => AmosTicket::t('amosticket', 'Modifica in corsoooo'),
         ];
-
+        
         $hideDraftStatus = [];
         //$hideDraftStatus[] = self::TICKET_WORKFLOW_STATUS_WAITING;
         //$hideDraftStatus[] = self::TICKET_WORKFLOW_STATUS_CLOSED;
         return ['statusToRender' => $statusToRender, 'hideDraftStatus' => $hideDraftStatus];
     }
-
+    
     /**
      * Visibile se è l'antenato di un ticket visibile (per ora solo un livello)
      * @param null $user
@@ -335,17 +339,17 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
         if (!$user) {
             $user = Yii::$app->getUser();
         }
-
+        
         $model_ticket_forwarded_to = self::find()
             ->andWhere(['forwarded_from_id' => $this->id])
             ->one();
         if (!is_null($model_ticket_forwarded_to)) {
             return $user->can('TICKET_READ', ['model' => $model_ticket_forwarded_to]);
         }
-
+        
         return false;
     }
-
+    
     /**
      * E' l'antenato di un ticket
      * @return bool
@@ -354,10 +358,10 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
     public function isAncestor()
     {
         $model_ticket_forwarded_to = self::find()->andWhere(['forwarded_from_id' => $this->id])->one();
-
+        
         return !is_null($model_ticket_forwarded_to);
     }
-
+    
     /** @var \open20\amos\comments\AmosComments $commentModule * /
      * $count_comments = $commentModule->countComments($this);
      * }
@@ -437,7 +441,7 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
      * return WidgetIconTicketDashboard::className();
      * }
      */
-
+    
     /**
      * @inheritdoc
      */
@@ -445,7 +449,7 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
     {
         return ['titolo'];
     }
-
+    
     /**
      *
      * @return type
@@ -454,7 +458,7 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
     {
         return [];
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -501,7 +505,7 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
             ]
         );
     }
-
+    
     /**
      * Returns the text hint for the specified attribute.
      *
@@ -511,10 +515,10 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
     public function getAttributeHint($attribute)
     {
         $hints = $this->attributeHints();
-
+        
         return isset($hints[$attribute]) ? $hints[$attribute] : null;
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -528,7 +532,7 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
             ]
         );
     }
-
+    
     /**
      *
      * @return type
@@ -536,7 +540,7 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
     public static function getEditFields()
     {
         $labels = self::attributeLabels();
-
+        
         return [
             [
                 'slug' => 'titolo',
@@ -570,7 +574,7 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
             ],
         ];
     }
-
+    
     /**
      * @return string
      * @var \open20\amos\comments\models\Comment $firstAnswer
@@ -579,10 +583,10 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
     public function getFirstOpeningDate()
     {
         $firstAnswer = $this->getFirstAnswer();
-
+        
         return (!is_null($firstAnswer) ? $firstAnswer->created_at : '');
     }
-
+    
     /**
      * @return UserProfile
      * @var \open20\amos\comments\models\Comment $lastAnswer
@@ -591,10 +595,10 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
     public function getTicketReferee()
     {
         $lastAnswer = $this->getLastAnswer();
-
+        
         return (!is_null($lastAnswer) ? $lastAnswer->createdUserProfile : null);
     }
-
+    
     /**
      * @return TicketCategorie|null
      */
@@ -604,19 +608,19 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
             ? $this->ticketCategoria
             : null;
     }
-
+    
     /**
      * @return string
      */
     public function getTicketClosingDate()
     {
         $closingDateTime = $this->getStatusLastUpdateTime(self::TICKET_WORKFLOW_STATUS_CLOSED);
-
+        
         return !is_null($closingDateTime)
             ? $closingDateTime
             : '';
     }
-
+    
     /**
      * @return UserProfile|null
      */
@@ -627,13 +631,13 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
             /** @var UserProfile $userProfile */
             $userProfile = AmosAdmin::instance()->createModel('UserProfile');
             $closingUserProfile = $userProfile::findOne(['user_id' => $closingUserId]);
-
+            
             return $closingUserProfile;
         }
-
+        
         return null;
     }
-
+    
     /**
      * @return TicketGrammar
      */
@@ -641,7 +645,7 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
     {
         return new TicketGrammar();
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -649,7 +653,7 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
     {
         return 'ticket/ticket/view';
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -657,7 +661,7 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
     {
         return Url::toRoute(["/" . $this->getViewUrl(), "id" => $this->id]);
     }
-
+    
     /**
      * @inheritdoc
      */

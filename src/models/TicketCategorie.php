@@ -32,19 +32,22 @@ class TicketCategorie extends \open2\amos\ticket\models\base\TicketCategorie
      */
     public $categoryIcon;
     public $selected = 0;
-
+    
     public function init()
     {
         parent::init();
-
+        
         if ($this->isNewRecord) {
             $this->enable_dossier_id = 0;
             $this->enable_phone = 0;
             $this->attiva = 1;
             $this->tecnica = 0;
+            if (!is_null($this->ticketModule) && $this->ticketModule->enableAdministrativeTicketCategory) {
+                $this->administrative = 0;
+            }
         }
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -55,7 +58,7 @@ class TicketCategorie extends \open2\amos\ticket\models\base\TicketCategorie
             [['selected'], 'integer'],
         ]);
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -65,7 +68,7 @@ class TicketCategorie extends \open2\amos\ticket\models\base\TicketCategorie
             'categoryIcon' => AmosTicket::t('amosticket', 'Icona')
         ]);
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -77,7 +80,7 @@ class TicketCategorie extends \open2\amos\ticket\models\base\TicketCategorie
             ]
         ]);
     }
-
+    
     /**
      * Ritorna l'url dell'avatar.
      *
@@ -88,7 +91,7 @@ class TicketCategorie extends \open2\amos\ticket\models\base\TicketCategorie
     {
         return $this->getCategoryIconUrl($size);
     }
-
+    
     /**
      * Getter for $this->categoryIcon;
      * @return File
@@ -100,7 +103,7 @@ class TicketCategorie extends \open2\amos\ticket\models\base\TicketCategorie
         }
         return $this->categoryIcon;
     }
-
+    
     /**
      * @param $categoryIcon
      */
@@ -108,7 +111,7 @@ class TicketCategorie extends \open2\amos\ticket\models\base\TicketCategorie
     {
         $this->categoryIcon = $categoryIcon;
     }
-
+    
     /**
      * @return string
      */
@@ -124,7 +127,7 @@ class TicketCategorie extends \open2\amos\ticket\models\base\TicketCategorie
         }
         return $url;
     }
-
+    
     /**
      * This is the relation between the category and the parent category.
      * Return an ActiveQuery related to TicketCategorie model.
@@ -135,10 +138,9 @@ class TicketCategorie extends \open2\amos\ticket\models\base\TicketCategorie
     {
         return $this->hasOne(\open2\amos\ticket\models\TicketCategorie::className(), ['id' => 'categoria_padre_id']);
     }
-
+    
     public function getCommunity()
     {
         return $this->hasOne(Community::className(), ['id' => 'community_id']);
     }
-
 }

@@ -14,6 +14,7 @@ namespace open2\amos\ticket\models;
 use open20\amos\core\interfaces\ContentModelInterface;
 use open20\amos\seo\behaviors\SeoContentBehavior;
 use open20\amos\seo\interfaces\SeoModelInterface;
+use open2\amos\ticket\widgets\icons\WidgetIconTicketDashboard;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -32,7 +33,7 @@ class TicketFaq extends \open2\amos\ticket\models\base\TicketFaq implements Cont
             'domanda'
         ];
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -49,7 +50,7 @@ class TicketFaq extends \open2\amos\ticket\models\base\TicketFaq implements Cont
             ]
         ]);
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -58,7 +59,7 @@ class TicketFaq extends \open2\amos\ticket\models\base\TicketFaq implements Cont
         return [
         ];
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -67,11 +68,11 @@ class TicketFaq extends \open2\amos\ticket\models\base\TicketFaq implements Cont
         $hints = $this->attributeHints();
         return isset($hints[$attribute]) ? $hints[$attribute] : null;
     }
-
+    
     public static function getEditFields()
     {
         $labels = self::attributeLabels();
-
+        
         return [
             [
                 'slug' => 'domanda',
@@ -95,15 +96,15 @@ class TicketFaq extends \open2\amos\ticket\models\base\TicketFaq implements Cont
             ],
         ];
     }
-
+    
     /**
      * @inheritdoc
      */
     public function getSchema()
     {
-
+    
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -111,7 +112,7 @@ class TicketFaq extends \open2\amos\ticket\models\base\TicketFaq implements Cont
     {
         return $this->publication_startdate;
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -119,7 +120,7 @@ class TicketFaq extends \open2\amos\ticket\models\base\TicketFaq implements Cont
     {
         return $this->publication_enddate;
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -127,7 +128,7 @@ class TicketFaq extends \open2\amos\ticket\models\base\TicketFaq implements Cont
     {
         return null;
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -135,7 +136,7 @@ class TicketFaq extends \open2\amos\ticket\models\base\TicketFaq implements Cont
     {
         return [];
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -143,7 +144,7 @@ class TicketFaq extends \open2\amos\ticket\models\base\TicketFaq implements Cont
     {
         return $this->domanda;
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -151,7 +152,7 @@ class TicketFaq extends \open2\amos\ticket\models\base\TicketFaq implements Cont
     {
         return $this->domanda;
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -159,7 +160,7 @@ class TicketFaq extends \open2\amos\ticket\models\base\TicketFaq implements Cont
     {
         return $this->title;
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -167,7 +168,7 @@ class TicketFaq extends \open2\amos\ticket\models\base\TicketFaq implements Cont
     {
         return null;
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -175,7 +176,7 @@ class TicketFaq extends \open2\amos\ticket\models\base\TicketFaq implements Cont
     {
         return null;
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -183,15 +184,15 @@ class TicketFaq extends \open2\amos\ticket\models\base\TicketFaq implements Cont
     {
         return [];
     }
-
+    
     /**
      * @inheritdoc
      */
     public function getPluginWidgetClassname()
     {
-        return WidgetIconPrintareaDashboard::className();
+        return WidgetIconTicketDashboard::className();
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -199,7 +200,7 @@ class TicketFaq extends \open2\amos\ticket\models\base\TicketFaq implements Cont
     {
         return null;
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -207,7 +208,7 @@ class TicketFaq extends \open2\amos\ticket\models\base\TicketFaq implements Cont
     {
         return null;
     }
-
+    
     /**
      * @inheritdoc
      */

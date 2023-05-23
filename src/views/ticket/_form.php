@@ -52,10 +52,37 @@ if (empty($nameCat)) {
     $nameCat = $cat->nomeCompleto;
 }
 
-
 $disableInfoFields = (!empty($module) ? $module->disableInfoFields : false);
 $disableCategory = (!empty($module) ? $module->disableCategory : false);
 $disableTicketOrganization = (!empty($module) ? $module->disableTicketOrganization : false);
+
+if (!$disableInfoFields) {
+    if ($isNewRecord) {
+        if (Yii::$app->user->isGuest) {
+            $creatorNameSurname = AmosTicket::t('amosticket', '#guest_user');
+            $email = '-';
+        } else {
+            /** @var User $user */
+            $user = Yii::$app->user->identity;
+            $creatorNameSurname = $user->userProfile->nomeCognome;
+            $email = $user->email;
+        }
+        $createdAt = date('d-m-Y H:i:s');
+        if ($model->hasWorkflowStatus()) {
+            $status = $model->getWorkflowStatus()->getLabel();
+        } elseif ($cat->administrative) {
+            $status = AmosTicket::t('amosticket', "TICKET_WORKFLOW_STATUS_WAITING_TECHNICAL_ASSISTANCE");
+        } else {
+            $status = AmosTicket::t('amosticket', "TICKET_WORKFLOW_STATUS_PROCESSING");
+        }
+    } else {
+        $creatorNameSurname = $creatorUserProfile->nomeCognome;
+        $email = $creatorUserProfile->user->email;
+        $createdAt = $model->created_at;
+        $status = $model->getWorkflowStatus()->getLabel();
+    }
+}
+
 ?>
 
 <div class="ticket-form col-xs-12 nop">
@@ -72,83 +99,77 @@ $disableTicketOrganization = (!empty($module) ? $module->disableTicketOrganizati
     <?php if (!$disableInfoFields) { ?>
         <div class="row">
             <div class="col-lg-12 col-sm-12">
-                <?= $model->getAttributeLabel('ticket_categoria_id') ?>: <?= $nameCat ?>
+                <?= $model->getAttributeLabel('ticket_categoria_id') ?>: <?= $nameCat; ?>
             </div>
         </div>
 
         <div class="row">
             <div class="col-lg-12 col-sm-12">
                 <?= $model->getAttributeLabel('created_by') ?>:
-                <?= $creatorUserProfile->nomeCognome ?>
+                <?= $creatorNameSurname; ?>
             </div>
         </div>
 
         <div class="row">
             <div class="col-lg-12 col-sm-12">
                 <?= AmosTicket::t('amosticket', '#ticket_creator_email') ?>:
-                <?= $creatorUserProfile->user->email ?>
+                <?= $email; ?>
             </div>
         </div>
 
         <div class="row">
             <div class="col-lg-12 col-sm-12">
                 <?= $model->getAttributeLabel('created_at') ?>:
-                <?php
-                $createdAt = $model->created_at;
-                if ($isNewRecord) {
-                    $createdAt = date('d-m-Y H:i:s');
-                }
-                echo Yii::$app->getFormatter()->asDatetime($createdAt);
-                ?>
+                <?= Yii::$app->formatter->asDatetime($createdAt); ?>
             </div>
         </div>
 
         <div class="row">
             <div class="col-lg-12 col-sm-12">
-                <?= $model->getAttributeLabel('status') ?>
-                : <?= $model->hasWorkflowStatus() ? $model->getWorkflowStatus()->getLabel() : AmosTicket::t('amosticket', "TICKET_WORKFLOW_STATUS_PROCESSING") ?>
+                <?= $model->getAttributeLabel('status') ?>:
+                <?= $status; ?>
             </div>
         </div>
     <?php } ?>
     
     <?php if (!$disableCategory) { ?>
-    <div class="row">
-        
-        <div class="col-lg-12 col-sm-12">
-            <?php
-            if (false) {
-                $ticketCategories = TicketUtility::getTicketCategories(null, true)->orderBy('titolo')->all();
-                $ticketCategoryId = $model->ticket_categoria_id;
-                if (!$model->ticket_categoria_id && (count($ticketCategories) == 1)) {
-                    $ticketCategoryId = $ticketCategories[0]->id;
+        <div class="row">
+
+            <div class="col-lg-12 col-sm-12">
+                <?php
+                // if (false) {
+                //     $ticketCategories = TicketUtility::getTicketCategories(null, true)->orderBy('titolo')->all();
+                //     $ticketCategoryId = $model->ticket_categoria_id;
+                //     if (!$model->ticket_categoria_id && (count($ticketCategories) == 1)) {
+                //         $ticketCategoryId = $ticketCategories[0]->id;
+                //     }
+                //
+                //     echo $form->field($model, 'ticket_categoria_id')->widget(Select::className(),
+                //         [
+                //             'auto_fill' => true,
+                //             'options' => [
+                //                 'placeholder' => AmosTicket::t('amosticket', '#category_field_placeholder'),
+                //                 'id' => 'ticket_categoria_id-id',
+                //                 'disabled' => false,
+                //                 'value' => $ticketCategoryId
+                //             ],
+                //             'data' => ArrayHelper::map(
+                //                 TicketUtility::getTicketCategories(null, true)
+                //                     ->orderBy('titolo')
+                //                     ->all(), 'id', 'titolo'
+                //             ),
+                //         ]);
+                // }
+                
+                if ($isNewRecord && !empty($_GET['ticket_categoria_id'])) {
+                    $model->ticket_categoria_id = $_GET['ticket_categoria_id'];
                 }
-
-                echo $form->field($model, 'ticket_categoria_id')->widget(Select::className(),
-                    [
-                        'auto_fill' => true,
-                        'options' => [
-                            'placeholder' => AmosTicket::t('amosticket', '#category_field_placeholder'),
-                            'id' => 'ticket_categoria_id-id',
-                            'disabled' => false,
-                            'value' => $ticketCategoryId
-                        ],
-                        'data' => ArrayHelper::map(
-                            TicketUtility::getTicketCategories(null, true)
-                                ->orderBy('titolo')
-                                ->all(), 'id', 'titolo'
-                        ),
-                    ]);
-            }
-
-            if ($isNewRecord && !empty($_GET['ticket_categoria_id'])) {
-                $model->ticket_categoria_id = $_GET['ticket_categoria_id'];
-            }
-
-            echo $form->field($model, 'ticket_categoria_id')->hiddenInput()->label(false);
-            ?>
+                
+                echo $form->field($model, 'ticket_categoria_id')->hiddenInput()->label(false);
+                ?>
+            </div>
         </div>
-    </div>
-
+    
     <?php } ?>
     
     <?php if (!$disableTicketOrganization) { ?>
@@ -192,7 +213,7 @@ $disableTicketOrganization = (!empty($module) ? $module->disableTicketOrganizati
             ]);
         ?>
     </div>
-
+    
     <?php if (!is_null($cat) && $cat->enable_dossier_id): ?>
         <div class="col-lg-6 col-sm-6">
             <?= $form->field($model, 'dossier_id')->textInput(['maxlength' => true]) ?>
@@ -206,9 +227,9 @@ $disableTicketOrganization = (!empty($module) ? $module->disableTicketOrganizati
 
     <div class="clearfix"></div>
     <?php $this->endBlock(); ?>
-
+    
     <?= $this->blocks['dettagli'] ?>
-
+    
     <?= WorkflowTransitionButtonsWidget::widget([
         'form' => $form,
         'model' => $model,
@@ -219,11 +240,11 @@ $disableTicketOrganization = (!empty($module) ? $module->disableTicketOrganizati
         'initialStatusName' => "WAITING",
         'initialStatus' => Ticket::TICKET_WORKFLOW_STATUS_WAITING,
         'statusToRender' => $statusToRenderToHide['statusToRender'],
-
+        
         //POII-1147 gli utenti validatore/facilitatore o ADMIN possono sempre salvare la news => parametro a false
         //altrimenti se stato VALIDATO => pulsante salva nascosto
         'hideSaveDraftStatus' => $statusToRenderToHide['hideDraftStatus'],
-
+        
         'draftButtons' => [
             Ticket::TICKET_WORKFLOW_STATUS_WAITING => [
                 'button' => Html::submitButton($buttonLabel, ['class' => 'btn btn-workflow']),
@@ -240,6 +261,6 @@ $disableTicketOrganization = (!empty($module) ? $module->disableTicketOrganizati
         ]
     ]);
     ?>
-
+    
     <?php ActiveForm::end(); ?>
 </div>

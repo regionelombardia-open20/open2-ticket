@@ -18,7 +18,6 @@ use open20\amos\dashboard\controllers\TabDashboardControllerTrait;
 use open2\amos\ticket\AmosTicket;
 use open2\amos\ticket\models\search\TicketSearch;
 use open2\amos\ticket\models\Ticket;
-use open2\amos\ticket\models\TicketCategorie;
 use Yii;
 use yii\helpers\Url;
 
@@ -37,17 +36,23 @@ class TicketController extends CrudController
      * Trait used for initialize the ticket dashboard
      */
     use TabDashboardControllerTrait;
-
+    
+    /**
+     * @var AmosTicket $ticketModule
+     */
+    protected $ticketModule = null;
+    
     /**
      * @inheritdoc
      */
     public function init()
     {
         $this->initDashboardTrait();
-
+        $this->ticketModule = AmosTicket::instance();
+        
         $this->setModelObj(new Ticket());
         $this->setModelSearch(new TicketSearch());
-
+        
         $this->setAvailableViews([
             'grid' => [
                 'name' => 'grid',
@@ -55,19 +60,19 @@ class TicketController extends CrudController
                 'url' => '?currentView=grid'
             ],
         ]);
-
+        
         parent::init();
     }
-
+    
     /**
      * @inheritdoc
      */
     public function beforeAction($action)
     {
-
-        $urlCreate   = '/ticket/ticket/create';
+        
+        $urlCreate = '/ticket/ticket/create';
         $urlManage = null;
-
+        
         $this->view->params = [
             // il create non ha senso senza una categoria, la action da errore... da definire la logica per
             // il create - per ora inibisco il pulsante
@@ -76,17 +81,17 @@ class TicketController extends CrudController
             'urlCreate' => $urlCreate,
             'urlManage' => $urlManage,
         ];
-
+        
         if (!parent::beforeAction($action)) {
             return false;
         }
-
+        
         // other custom code here
-
+        
         return true;
     }
-
-
+    
+    
     /**
      * Used for set page title and breadcrumbs.
      * @param string $newsPageTitle Ticket page title (
@@ -99,7 +104,7 @@ class TicketController extends CrudController
         Yii::$app->view->title = $ticketPageTitle;
         Yii::$app->view->params['breadcrumbs'][] = ['label' => $ticketPageTitle];
     }
-
+    
     /**
      * Set a view param used in \open20\amos\core\forms\CreateNewButtonWidget
      * @param bool $hideBtn
@@ -113,7 +118,7 @@ class TicketController extends CrudController
             $this->hideCreateNewBtn();
         }
     }
-
+    
     /**
      * Method useful to hide the create new button.
      */
@@ -121,7 +126,7 @@ class TicketController extends CrudController
     {
         Yii::$app->view->params['createNewBtnParams']['layout'] = '';
     }
-
+    
     /**
      * This method is useful to set all common params for all list views.
      * @param bool $setCurrentDashboard
@@ -136,7 +141,7 @@ class TicketController extends CrudController
         Yii::$app->session->set(AmosTicket::beginCreateNewSessionKey(), Url::previous());
         Yii::$app->session->set(AmosTicket::beginCreateNewSessionKeyDateTime(), date('Y-m-d H:i:s'));
     }
-
+    
     /**
      * Base operations for list views
      * @param string $pageTitle
@@ -157,7 +162,7 @@ class TicketController extends CrudController
         ];
         return $this->render('index', $renderParams);
     }
-
+    
     /**
      * This method returns the close url for close button in action view.
      * @return string
@@ -166,7 +171,7 @@ class TicketController extends CrudController
     {
         return Yii::$app->session->get(AmosTicket::beginCreateNewSessionKey());
     }
-
+    
     /**
      * @return array|string
      */
@@ -179,7 +184,7 @@ class TicketController extends CrudController
             return ['/ticket/ticket/ticket-waiting'];
         }
     }
-
+    
     /**
      * Displays a single Ticket model.
      * @param integer $id
@@ -191,7 +196,7 @@ class TicketController extends CrudController
     {
         $this->model = $this->findModel($id);
         $this->setUpLayout('main');
-
+        
         if ($this->model->load(Yii::$app->request->post()) && $this->model->save()) {
             return $this->redirect(['view', 'id' => $this->model->id]);
         } else {
@@ -204,7 +209,7 @@ class TicketController extends CrudController
             ]);
         }
     }
-
+    
     /**
      * Updates an existing Ticket model.
      * If update is successful, the browser will be redirected to the 'view' page.
@@ -218,7 +223,7 @@ class TicketController extends CrudController
         $this->model = $this->findModel($id);
         $oldStatus = $this->model->status;
         if ($this->model->load(Yii::$app->request->post()) && $this->model->validate()) {
-            if($this->model->status == Ticket::TICKET_WORKFLOW_STATUS_CLOSED && $oldStatus != Ticket::TICKET_WORKFLOW_STATUS_CLOSED){
+            if ($this->model->status == Ticket::TICKET_WORKFLOW_STATUS_CLOSED && $oldStatus != Ticket::TICKET_WORKFLOW_STATUS_CLOSED) {
                 $this->model->closed_by = Yii::$app->getUser()->id;
                 $this->model->closed_at = $this->model->updated_at;
             }
@@ -229,12 +234,12 @@ class TicketController extends CrudController
                 Yii::$app->getSession()->addFlash('danger', AmosTicket::t('amoscore', 'Item not updated, check data'));
             }
         }
-
+        
         return $this->render('update', [
             'model' => $this->model,
         ]);
     }
-
+    
     /**
      * Deletes an existing Ticket model.
      * If deletion is successful, the browser will be redirected to the 'index' page.

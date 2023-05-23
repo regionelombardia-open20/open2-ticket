@@ -26,7 +26,6 @@ use yii\db\ActiveQuery;
 use yii\db\Expression;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
-use yii\helpers\VarDumper;
 
 /**
  * Class TicketSearch
@@ -38,7 +37,21 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
     public $general;
     public $statusSearch;
     public $stringCreatedBy;
-
+    
+    /**
+     * @var AmosTicket|null $ticketModule
+     */
+    protected $ticketModule;
+    
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        $this->ticketModule = AmosTicket::instance();
+        parent::init();
+    }
+    
     /**
      * @inheritdoc
      */
@@ -53,7 +66,7 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
                 'created_by',
                 'updated_by',
                 'deleted_by'
-                ], 'integer'],
+            ], 'integer'],
             [[
                 'general',
                 'titolo',
@@ -66,10 +79,10 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
                 'updated_at',
                 'deleted_at',
                 'stringCreatedBy'
-                ], 'safe'],
+            ], 'safe'],
         ];
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -79,7 +92,7 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
             'stringCreatedBy' => AmosTicket::t('amosticket', 'Creato da')
         ]);
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -88,7 +101,7 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
         // bypass scenarios() implementation in the parent class
         return Model::scenarios();
     }
-
+    
     public function getScope($params)
     {
         $scope = $this->formName();
@@ -97,7 +110,7 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
         }
         return $scope;
     }
-
+    
     /**
      * @param ActiveQuery $query
      * @return mixed
@@ -105,56 +118,52 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
     public function applySearchFilters($query)
     {
         $query->andFilterWhere([
-            static::tableName().'.id' => $this->id,
-            static::tableName().'.closed_by' => $this->closed_by,
-            static::tableName().'.closed_at' => $this->closed_at,
-            static::tableName().'.ticket_categoria_id' => $this->ticket_categoria_id,
-            static::tableName().'.version' => $this->version,
-            static::tableName().'.created_at' => $this->created_at,
-            static::tableName().'.updated_at' => $this->updated_at,
-            static::tableName().'.deleted_at' => $this->deleted_at,
-            static::tableName().'.created_by' => $this->created_by,
-            static::tableName().'.updated_by' => $this->updated_by,
-            static::tableName().'.deleted_by' => $this->deleted_by,
+            static::tableName() . '.id' => $this->id,
+            static::tableName() . '.closed_by' => $this->closed_by,
+            static::tableName() . '.closed_at' => $this->closed_at,
+            static::tableName() . '.ticket_categoria_id' => $this->ticket_categoria_id,
+            static::tableName() . '.version' => $this->version,
+            static::tableName() . '.created_at' => $this->created_at,
+            static::tableName() . '.updated_at' => $this->updated_at,
+            static::tableName() . '.deleted_at' => $this->deleted_at,
+            static::tableName() . '.created_by' => $this->created_by,
+            static::tableName() . '.updated_by' => $this->updated_by,
+            static::tableName() . '.deleted_by' => $this->deleted_by,
         ]);
-
-        $query->andFilterWhere(['like', static::tableName().'.titolo', $this->titolo])
-            ->andFilterWhere(['like', static::tableName().'.status', $this->statusSearch]);
-        $query->andFilterWhere(['like', static::tableName().'.phone', $this->phone]);
-        $query->andFilterWhere(['like', static::tableName().'.dossier_id', $this->dossier_id]);
-
+        
+        $query->andFilterWhere(['like', static::tableName() . '.titolo', $this->titolo])
+            ->andFilterWhere(['like', static::tableName() . '.status', $this->statusSearch]);
+        $query->andFilterWhere(['like', static::tableName() . '.phone', $this->phone]);
+        $query->andFilterWhere(['like', static::tableName() . '.dossier_id', $this->dossier_id]);
+        
         $query->andFilterWhere(['OR',
-            ['like', static::tableName().'.titolo', $this->general],
-            ['like', static::tableName().'.descrizione', $this->general],
-            ['like', static::tableName().'.descrizione_breve', $this->general],
-            ['like', static::tableName().'.forward_message', $this->general],
-            ['like', static::tableName().'.partnership_type', $this->general],
+            ['like', static::tableName() . '.titolo', $this->general],
+            ['like', static::tableName() . '.descrizione', $this->general],
+            ['like', static::tableName() . '.descrizione_breve', $this->general],
+            ['like', static::tableName() . '.forward_message', $this->general],
+            ['like', static::tableName() . '.partnership_type', $this->general],
         ]);
-
-        if (!empty($this->stringCreatedBy)){
-
-            $query->join('LEFT JOIN', 'user_profile profile', 'profile.user_id = '.static::tableName().'.created_by');
+        
+        if (!empty($this->stringCreatedBy)) {
+            
+            $query->join('LEFT JOIN', 'user_profile profile', 'profile.user_id = ' . static::tableName() . '.created_by');
             $expr = new Expression('
-            IF('.static::tableName().'.created_by, 
+            IF(' . static::tableName() . '.created_by,
                 CONCAT(profile.nome, \' \', profile.cognome) COLLATE utf8_general_ci,
-                CONCAT('.static::tableName().'.guest_name, \' \', '.static::tableName().'.guest_surname) COLLATE utf8_general_ci
+                CONCAT(' . static::tableName() . '.guest_name, \' \', ' . static::tableName() . '.guest_surname) COLLATE utf8_general_ci
                 )
             LIKE
-            \'%'.$this->stringCreatedBy.'%\'
+            \'%' . $this->stringCreatedBy . '%\'
        
             ');
-
-
+            
+            
             $query->andWhere($expr);
         }
-//        echo '<div style="height: 200px"></div>';
-//        VarDumper::dump($this->stringCreatedBy,3,true);
-//        VarDumper::dump($query->createCommand()->rawSql,3,true);
-
-
+        
         return $query;
     }
-
+    
     /**
      * Method that searches all tickets waiting.
      *
@@ -167,7 +176,7 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
     {
         return $this->search($params, "all", $limit);
     }
-
+    
     /**
      * Method that searches all tickets waiting.
      *
@@ -180,7 +189,7 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
     {
         return $this->search($params, "all", $limit, Ticket::TICKET_WORKFLOW_STATUS_WAITING);
     }
-
+    
     /**
      * Method that searches all tickets closed.
      *
@@ -193,7 +202,7 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
     {
         return $this->search($params, "all", $limit, Ticket::TICKET_WORKFLOW_STATUS_CLOSED);
     }
-
+    
     /**
      * Method that searches all tickets processing.
      *
@@ -204,9 +213,14 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
      */
     public function searchTicketProcessing($params, $limit = null)
     {
-        return $this->search($params, "all", $limit, Ticket::TICKET_WORKFLOW_STATUS_PROCESSING);
+        if ($this->ticketModule->enableAdministrativeTicketCategory) {
+            $statuses = [Ticket::TICKET_WORKFLOW_STATUS_PROCESSING, Ticket::TICKET_WORKFLOW_STATUS_WAITING_TECHNICAL_ASSISTANCE];
+        } else {
+            $statuses = Ticket::TICKET_WORKFLOW_STATUS_PROCESSING;
+        }
+        return $this->search($params, "all", $limit, $statuses);
     }
-
+    
     /**
      * Content search method
      *
@@ -220,49 +234,49 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
     {
         // $defaultOrder = ['order' => SORT_ASC];
         //$queryOrder = ((!is_null($order) && is_array($order) && isset($order['order']) && is_numeric($order['order'])) ? $order : $defaultOrder);
-
+        
         if (!empty($queryType)) {
             if ($queryType == 'all') {
                 if (Yii::$app->getUser()->can('AMMINISTRATORE_TICKET')) {
-
+                
                 } else if (Yii::$app->getUser()->can('REFERENTE_TICKET')) {
                     $queryType = 'menaged-by';
                 } else {
                     $queryType = 'created-by';
                 }
             }
-
+            
             $query = $this->buildQuery($params, $queryType, $onlyStatus);
         } else {
             $query = $this->baseSearch($params);
         }
-
+        
         $query->joinWith('ticketCategoria');
-
+        
         $abilita_per_community = false;
-
+        
         /** @var \open20\amos\cwh\AmosCwh $moduleCwh */
         $moduleCwh = \Yii::$app->getModule('cwh');
-
+        
         if (!is_null($moduleCwh)) {
             $scope = $moduleCwh->getCwhScope();
             // If scope set, filter categories for cwh
             if (!empty($scope) && isset($scope['community'])) {
-
+                
                 $abilita_per_community = true;
-
+                
                 $query->andFilterWhere([
-                    TicketCategorie::tableName().'.community_id' => $scope['community'],
+                    TicketCategorie::tableName() . '.community_id' => $scope['community'],
                 ]);
             }
         }
-
+        
         $query->andFilterWhere([
-            TicketCategorie::tableName().'.abilita_per_community' => $abilita_per_community,
+            TicketCategorie::tableName() . '.abilita_per_community' => $abilita_per_community,
         ]);
-
+        
         $query->limit($limit);
-
+        
         $dp_params = ['query' => $query,];
         if ($limit) {
             $dp_params ['pagination'] = false;
@@ -270,16 +284,16 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
         //set the data provider
         $dataProvider = new ActiveDataProvider($dp_params);
         $dataProvider = $this->searchDefaultOrder($dataProvider);
-
+        
         if (!($this->load($params) && $this->validate())) {
             return $dataProvider;
         }
-
+        
         $this->applySearchFilters($query);
-
+        
         return $dataProvider;
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -297,9 +311,9 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
         }
         return $dataProvider;
     }
-
+    
     /**
-     *  Content Model
+     * Content Model
      * @param array $params
      * @param string $queryType
      * @return ActiveQuery $query
@@ -307,13 +321,13 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
      */
     public function buildQuery($params, $queryType, $onlyStatus = false)
     {
-        $query          = $this->baseSearch($params);
-        $classname      = \open2\amos\ticket\models\Ticket::className();
-        $moduleCwh      = \Yii::$app->getModule('cwh');
+        $query = $this->baseSearch($params);
+        $classname = \open2\amos\ticket\models\Ticket::className();
+        $moduleCwh = \Yii::$app->getModule('cwh');
         $cwhActiveQuery = null;
-
+        
         $isSetCwh = !is_null($moduleCwh) && in_array($classname, $moduleCwh->modelsEnabled);
-
+        
         if ($isSetCwh) {
             /** @var \open20\amos\cwh\AmosCwh $moduleCwh */
             $moduleCwh->setCwhScopeFromSession();
@@ -322,19 +336,19 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
                 'queryBase' => $query
             ]);
         }
-
+        
         switch ($queryType) {
             case 'created-by':
                 if ($isSetCwh) {
                     $query = $cwhActiveQuery->getQueryCwhOwn();
                 } else {
                     $query->andFilterWhere([
-                        static::tableName().'.created_by' => Yii::$app->getUser()->id
+                        static::tableName() . '.created_by' => Yii::$app->getUser()->id
                     ]);
                 }
                 if ($onlyStatus) {
                     $query->andWhere([
-                        static::tableName().'.status' => $onlyStatus
+                        static::tableName() . '.status' => $onlyStatus
                     ]);
                 }
                 break;
@@ -343,18 +357,18 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
 
                   } else { */
                 $userProfileId = 0;
-                $userProfile   = \open20\amos\admin\models\UserProfile::find()->andWhere(['user_id' => \Yii::$app->user->id])->one();
+                $userProfile = \open20\amos\admin\models\UserProfile::find()->andWhere(['user_id' => \Yii::$app->user->id])->one();
                 if (!empty($userProfile)) {
                     $userProfileId = $userProfile->id;
                 }
                 $query->innerJoin(TicketCategorieUsersMm::tableName(),
-                    'ticket.ticket_categoria_id = '.TicketCategorieUsersMm::tableName().'.ticket_categoria_id'
-                    .' AND '.TicketCategorieUsersMm::tableName().'.user_profile_id = '.$userProfileId);
+                    'ticket.ticket_categoria_id = ' . TicketCategorieUsersMm::tableName() . '.ticket_categoria_id'
+                    . ' AND ' . TicketCategorieUsersMm::tableName() . '.user_profile_id = ' . $userProfileId);
                 //}
                 //}
                 if ($onlyStatus) {
                     $query->andWhere([
-                        static::tableName().'.status' => $onlyStatus
+                        static::tableName() . '.status' => $onlyStatus
                     ]);
                 }
                 break;
@@ -364,12 +378,10 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
                 } else {
                     if ($onlyStatus) {
                         $tmp = [
-                            static::tableName().'.status' => $onlyStatus
+                            static::tableName() . '.status' => $onlyStatus
                         ];
-                        //pr($tmp);
-                        //print "onlyStatus222: $onlyStatus.<br />";exit;
                         $query->andWhere([
-                            static::tableName().'.status' => $onlyStatus
+                            static::tableName() . '.status' => $onlyStatus
                         ]);
                     }
                 }
@@ -377,7 +389,7 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
         }
         return $query;
     }
-
+    
     /**
      * Content base search: all content matching search parameters and not deleted.
      *
@@ -389,14 +401,14 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
     {
         //init the default search values
         $this->initOrderVars();
-
+        
         //check params to get orders value
         $this->setOrderVars($params);
         /** @var Record $className */
         $className = \open2\amos\ticket\models\Ticket::className();
         return $className::find()->distinct();
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -404,7 +416,7 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
     {
         return true;
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -412,9 +424,9 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
     {
         $params = array_merge($params, Yii::$app->request->get());
         $this->load($params);
-        $query  = $this->buildQuery($params, 'all');
+        $query = $this->buildQuery($params, 'all');
         $this->applySearchFilters($query);
-
+        
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
             'sort' => [
@@ -432,25 +444,25 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
         if (!empty($params["conditionSearch"])) {
             $commands = explode(";", $params["conditionSearch"]);
             foreach ($commands as $command) {
-                $query->andWhere(eval("return ".$command.";"));
+                $query->andWhere(eval("return " . $command . ";"));
             }
         }
         return $dataProvider;
     }
-
+    
     /**
      * @inheritdoc
      */
     public function cmsSearchFields()
     {
         $searchFields = [];
-
+        
         array_push($searchFields, new CmsField("titolo", "TEXT"));
         array_push($searchFields, new CmsField("descrizione", "TEXT"));
-
+        
         return $searchFields;
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -463,7 +475,7 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
             new CmsField("descrizione", "TEXT", 'amosticket', $this->attributeLabels()['descrizione']));
         return $viewFields;
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -474,7 +486,7 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
             'descrizione',
         ];
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -482,7 +494,7 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
     {
         return $this->buildQuery($params, 'all');
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -490,7 +502,7 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
     {
         return $this->buildQuery($params, 'created-by');
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -498,7 +510,7 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
     {
         return $this->buildQuery($params, 'own-interest');
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -506,15 +518,15 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
     {
         return $this->buildQuery($params, 'to-validate');
     }
-
+    
     /**
      * @inheritdoc
      */
     public function convertToSearchResult($model)
     {
-
+    
     }
-
+    
     /**
      * @return Query
      */
@@ -542,12 +554,12 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
             ->leftJoin('comment_reply cr', 'cm.id = cr.comment_id')
             ->leftJoin('organizations o', 'p.prevalent_partnership_id = o.id')
             ->groupBy('t.id');
-
+        
         // If scope set, filter categories for cwh
         $isCommunity = false;
         /** @var \open20\amos\cwh\AmosCwh $moduleCwh */
-        $moduleCwh   = \Yii::$app->getModule('cwh');
-
+        $moduleCwh = \Yii::$app->getModule('cwh');
+        
         if (!is_null($moduleCwh)) {
             $scope = $moduleCwh->getCwhScope();
             if (!empty($scope) && isset($scope['community'])) {
@@ -557,13 +569,13 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
                 ]);
             }
         }
-
+        
         if (!$isCommunity) {
             $query->andWhere([
                 'c.community_id' => null,
             ]);
         }
-
+        
         return $query;
     }
 }

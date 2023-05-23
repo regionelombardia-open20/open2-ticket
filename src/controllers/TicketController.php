@@ -20,13 +20,10 @@ use open2\amos\ticket\models\TicketCategorie;
 use open2\amos\ticket\utility\EmailUtil;
 use raoul2000\workflow\base\WorkflowException;
 use Yii;
-use yii\db\Expression;
-use yii\db\Query;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Url;
-use yii\helpers\VarDumper;
 
 /**
  * Class TicketController
@@ -35,7 +32,6 @@ use yii\helpers\VarDumper;
  */
 class TicketController extends \open2\amos\ticket\controllers\base\TicketController
 {
-
     /**
      * @inheritdoc
      */
@@ -44,7 +40,7 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
         TicketAsset::register($this->getView());
         parent::init();
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -79,7 +75,7 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
         ]);
         return $behaviors;
     }
-
+    
     /**
      * Lists all Ticket models.
      * @param string|null $layout
@@ -95,7 +91,7 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
         $this->setCreateNewBtnParams();
         return $this->baseListsAction(AmosTicket::t('amosticket', 'Tutti i ticket'), true);
     }
-
+    
     /**
      * Action to search to waiting ticket
      * @throws \yii\web\NotFoundHttpException
@@ -105,10 +101,10 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
         $this->view->params['hideColumns'] = ['closed_at', 'closed_by', 'status'];
         $this->view->params['hideStatus'] = true;
         $this->view->params['hideCreatedBy'] = !Yii::$app->getUser()->can('AMMINISTRATORE_TICKET') && !Yii::$app->getUser()->can('REFERENTE_TICKET');
-        $this->setDataProvider($this->getModelSearch()->searchTicketWaiting(Yii::$app->request->getQueryParams()));
+        $this->setDataProvider($this->modelSearch->searchTicketWaiting(Yii::$app->request->getQueryParams()));
         return $this->baseListsAction(AmosTicket::t('amosticket', 'Ticket in attesa'), true);
     }
-
+    
     /**
      * Action to search to processing ticket
      * @return string
@@ -119,10 +115,10 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
         $this->view->params['hideColumns'] = ['closed_at', 'closed_by', 'status'];
         $this->view->params['hideStatus'] = true;
         $this->view->params['hideCreatedBy'] = !Yii::$app->getUser()->can('AMMINISTRATORE_TICKET') && !Yii::$app->getUser()->can('REFERENTE_TICKET');
-        $this->setDataProvider($this->getModelSearch()->searchTicketProcessing(Yii::$app->request->getQueryParams()));
+        $this->setDataProvider($this->modelSearch->searchTicketProcessing(Yii::$app->request->getQueryParams()));
         return $this->baseListsAction(AmosTicket::t('amosticket', 'Ticket in lavorazione'), true);
     }
-
+    
     /**
      * Action to search to waiting ticket
      * @return string
@@ -134,10 +130,10 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
         $this->view->params['hideStatus'] = true;
         $this->view->params['currentDashboard'] = $this->getCurrentDashboard();
         $this->view->params['hideCreatedBy'] = !Yii::$app->getUser()->can('AMMINISTRATORE_TICKET') && !Yii::$app->getUser()->can('REFERENTE_TICKET');
-        $this->setDataProvider($this->getModelSearch()->searchTicketClosed(Yii::$app->request->getQueryParams()));
+        $this->setDataProvider($this->modelSearch->searchTicketClosed(Yii::$app->request->getQueryParams()));
         return $this->baseListsAction(AmosTicket::t('amosticket', 'Ticket chiusi'), true);
     }
-
+    
     /**
      * @param int $id
      * @return string|\yii\web\Response
@@ -186,7 +182,7 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
             ]
         );
     }
-
+    
     /**
      * Creates a new Ticket model.
      * If creation is successful, the browser will be redirected to the 'view' page.
@@ -195,16 +191,16 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
     public function actionCreate()
     {
         $this->setUpLayout('form');
-
+        
         $categoriaId = Yii::$app->request->get('categoriaId');
-
+        
         if (is_null($categoriaId)) {
             throw new AmosException(AmosTicket::t('amosticket', '#create_ticket_missing_param_category_id'));
         }
-
+        
         $this->model = new Ticket();
         $this->model->ticket_categoria_id = $categoriaId;
-
+        
         if ($this->model->load(Yii::$app->request->post()) && $this->model->validate()) {
             if ($this->model->save()) {
                 $categoria = TicketCategorie::findOne($this->model->ticket_categoria_id);
@@ -221,8 +217,19 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
                         Yii::$app->session->addFlash('danger', $e->getMessage());
                         return $this->redirect($this->standardRedirectUrl());
                     }
+                } elseif ($this->ticketModule->enableAdministrativeTicketCategory && $categoria->isAdministrative()) {
+                    try {
+                        $this->model->sendToStatus(Ticket::TICKET_WORKFLOW_STATUS_WAITING_TECHNICAL_ASSISTANCE);
+                        $ok = $this->model->save(false);
+                        if (!$ok) {
+                            Yii::$app->session->addFlash('danger', AmosTicket::t('amosticket', '#ERROR_WHILE_PROCESSING_TICKET'));
+                        }
+                    } catch (WorkflowException $e) {
+                        Yii::$app->session->addFlash('danger', $e->getMessage());
+                        return $this->redirect($this->standardRedirectUrl());
+                    }
                 }
-
+                
                 Yii::$app->getSession()->addFlash('success', AmosTicket::t('amosticket', 'Il ticket è stato creato'));
                 return $this->render(
                     'create_thankyou',
@@ -237,7 +244,7 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
             $categoriaId = Yii::$app->request->getQueryParam("categoriaId");
             $this->model->ticket_categoria_id = $categoriaId;
         }
-
+        
         return $this->render(
             'create',
             [
@@ -245,7 +252,7 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
             ]
         );
     }
-
+    
     /**
      * @param int $id
      * @return \yii\web\Response
@@ -257,7 +264,7 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
         try {
             $oldStatus = $this->model->status;
             $this->model->sendToStatus(Ticket::TICKET_WORKFLOW_STATUS_CLOSED);
-            if($this->model->status == Ticket::TICKET_WORKFLOW_STATUS_CLOSED && $oldStatus != Ticket::TICKET_WORKFLOW_STATUS_CLOSED){
+            if ($this->model->status == Ticket::TICKET_WORKFLOW_STATUS_CLOSED && $oldStatus != Ticket::TICKET_WORKFLOW_STATUS_CLOSED) {
                 $this->model->closed_by = Yii::$app->getUser()->id;
                 $this->model->closed_at = $this->model->updated_at;
             }
@@ -272,7 +279,7 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
         }
         return $this->redirect($this->standardRedirectUrl());
     }
-
+    
     /**
      * @param int $id
      * @return string|\yii\web\Response
@@ -284,7 +291,7 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
         /** @var Ticket $model_old_ticket */
         $model_old_ticket = $this->findModel($id);
         $this->model = new Ticket();
-
+        
         // inizializzo coi vecchi dati
         $this->model->forwarded_from_id = $model_old_ticket->id;
         $this->model->created_by = $model_old_ticket->created_by;
@@ -294,7 +301,7 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
         $this->model->descrizione = $model_old_ticket->descrizione;
         $this->model->version = $model_old_ticket->version;
         $this->model->partnership_id = $model_old_ticket->partnership_id;
-
+        
         if ($this->model->load(Yii::$app->request->post()) && $this->model->validate()) {
             if ($this->model->save()) {
                 try {
@@ -307,6 +314,8 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
                         $this->model->sendToStatus(Ticket::TICKET_WORKFLOW_STATUS_CLOSED);
                         $this->model->closed_by = Yii::$app->getUser()->id;
                         $this->model->closed_at = $this->model->updated_at;
+                    } elseif ($this->ticketModule->enableAdministrativeTicketCategory && $categoria->isAdministrative()) {
+                        $this->model->sendToStatus(Ticket::TICKET_WORKFLOW_STATUS_WAITING_TECHNICAL_ASSISTANCE);
                     }
                     $ok = $this->model->save();
                     if ($ok) {
@@ -315,9 +324,7 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
                         $model_old_ticket->closed_by = Yii::$app->getUser()->id;
                         $model_old_ticket->closed_at = $this->model->updated_at;
                         $ok = $model_old_ticket->save(false);
-                        if ($ok) {
-
-                        } else {
+                        if (!$ok) {
                             Yii::$app->session->addFlash('danger', AmosTicket::t('amosticket', '#ERROR_WHILE_PROCESSING_TICKET'));
                         }
                     } else {
@@ -326,11 +333,11 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
                 } catch (WorkflowException $e) {
                     Yii::$app->session->addFlash('danger', $e->getMessage());
                 }
-
+                
                 return $this->redirect($this->standardRedirectUrl());
             } else {
                 Yii::$app->getSession()->addFlash('danger', AmosTicket::t('amosticket', 'Ticket category not changed, check data'));
-
+                
                 return $this->render('change-categoria', [
                     'model' => $this->model,
                     'model_old_ticket' => $model_old_ticket,
@@ -408,14 +415,14 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
 //            'model_old_ticket' => $this->model,
 //        ]);
 //    }
-
-
+    
+    
     /**
      * Set a view param used in \open20\amos\core\forms\CreateNewButtonWidget
      */
     protected function setCreateNewBtnParams()
     {
-        if(\Yii::$app->user->can('TICKET_EXPORT')) {
+        if (\Yii::$app->user->can('TICKET_EXPORT')) {
             $extract = Html::a(AmosTicket::t('amosticket', 'Esporta i ticket'), '/ticket/ticket/extract-tickets',
                 ['class' => 'btn btn-navigation-primary']);
             Yii::$app->view->params['additionalButtons'] = [
@@ -423,50 +430,51 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
             ];
         }
     }
-
+    
     /**
      * @return \yii\console\Response|\yii\web\Response
      * @throws \PHPExcel_Exception
      * @throws \PHPExcel_Reader_Exception
      * @throws \PHPExcel_Writer_Exception
      */
-    public function actionExtractTickets(){
-       $ticketSearch = new TicketSearch();
-       $query = $ticketSearch->queryExtractTicket();
-       $result = $query->all();
-
+    public function actionExtractTickets()
+    {
+        $ticketSearch = new TicketSearch();
+        $query = $ticketSearch->queryExtractTicket();
+        $result = $query->all();
+        
         $xlsData = [];
         // ------- LABELS --------
-        $xlsData[]= [
-            AmosTicket::t('amosticket', 'Ticked id'),   AmosTicket::t('amosticket', 'Categoria'),
+        $xlsData[] = [
+            AmosTicket::t('amosticket', 'Ticked id'), AmosTicket::t('amosticket', 'Categoria'),
             AmosTicket::t('amosticket', 'titolo'), AmosTicket::t('amosticket', 'Descrizione'),
-            AmosTicket::t('amosticket', 'Utente creatore ticket') , AmosTicket::t('amosticket', 'Email utente creatore') ,
-            AmosTicket::t('amosticket',  'Società afferente'),
+            AmosTicket::t('amosticket', 'Utente creatore ticket'), AmosTicket::t('amosticket', 'Email utente creatore'),
+            AmosTicket::t('amosticket', 'Società afferente'),
             AmosTicket::t('amosticket', 'Referente che sta gestendo il ticket'), AmosTicket::t('amosticket', 'Stato'),
-            AmosTicket::t('amosticket', 'Creato il'),  AmosTicket::t('amosticket', 'Chiuso il'),
-            AmosTicket::t('amosticket', 'Commenti'),  AmosTicket::t('amosticket', 'Risposte ai commenti')
+            AmosTicket::t('amosticket', 'Creato il'), AmosTicket::t('amosticket', 'Chiuso il'),
+            AmosTicket::t('amosticket', 'Commenti'), AmosTicket::t('amosticket', 'Risposte ai commenti')
         ];
-
+        
         // ------  DATA --------
-        foreach ($result as $faq){
+        foreach ($result as $faq) {
             $modelTicket = Ticket::findOne($faq['ticket_id']);
-            if(!empty($modelTicket)) {
-                $status =  AmosTicket::t('amosticket', $modelTicket->workflowStatusLabel);
-                $referee  =$modelTicket->ticketReferee;
+            if (!empty($modelTicket)) {
+                $status = AmosTicket::t('amosticket', $modelTicket->workflowStatusLabel);
+                $referee = $modelTicket->ticketReferee;
             }
-            $comments = (!empty($faq['commenti']) ? "-" : '').str_replace('#****#', "\n-", $faq['commenti'] );
-            $commentsReply = (!empty($faq['risposte_ai_commenti']) ? "-" : '').str_replace('#****#', "\n\n-", $faq['risposte_ai_commenti'] );
-            $xlsData[]= [
-                $faq['ticket_id'], $faq['categoria'], $faq['titolo'],$faq['descrizione'],
-                $faq['operatore_creatore'], $faq['email_operatore'],$faq['societa_afferente'], $referee, $status, $faq['created_at'], $faq['closed_at'],
+            $comments = (!empty($faq['commenti']) ? "-" : '') . str_replace('#****#', "\n-", $faq['commenti']);
+            $commentsReply = (!empty($faq['risposte_ai_commenti']) ? "-" : '') . str_replace('#****#', "\n\n-", $faq['risposte_ai_commenti']);
+            $xlsData[] = [
+                $faq['ticket_id'], $faq['categoria'], $faq['titolo'], $faq['descrizione'],
+                $faq['operatore_creatore'], $faq['email_operatore'], $faq['societa_afferente'], $referee, $status, $faq['created_at'], $faq['closed_at'],
                 $comments, $commentsReply
             ];
         }
-
+        
         // ----- GENERATE  EXCELL -------
         $objPHPExcel = new \PHPExcel();
         //li pone nella tab attuale del file xls
-        $objPHPExcel->getActiveSheet()->fromArray($xlsData, NULL, 'A1');
+        $objPHPExcel->getActiveSheet()->fromArray($xlsData, null, 'A1');
         $objWriter = \PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
         $objWriter->save('/tmp/ticket-faq.xls');
         return \Yii::$app->response->sendFile('/tmp/ticket-faq.xls');

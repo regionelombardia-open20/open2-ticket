@@ -14,7 +14,6 @@ namespace open2\amos\ticket\models\base;
 use open20\amos\admin\AmosAdmin;
 use open20\amos\core\interfaces\OrganizationsModuleInterface;
 use open20\amos\core\record\Record;
-use open20\amos\core\utilities\CurrentUser;
 use open2\amos\ticket\AmosTicket;
 
 /**
@@ -65,7 +64,7 @@ class Ticket extends Record
      * @var AmosTicket $ticketModule
      */
     protected $ticketModule = null;
-
+    
     /**
      * @inheritdoc
      */
@@ -73,19 +72,27 @@ class Ticket extends Record
     {
         return 'ticket';
     }
-
+    
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        $this->ticketModule = AmosTicket::instance();
+        parent::init();
+    }
+    
     /**
      * @inheritdoc
      */
     public function rules()
     {
-        $this->ticketModule = \Yii::$app->getModule('ticket');
         if ($this->ticketModule) {
             if (!empty($this->ticketModule->fieldsConfigurations['required'])) {
                 $requiredFields = $this->ticketModule->fieldsConfigurations['required'];
             }
         }
-
+        
         $rules = [
             [['descrizione', 'forward_message', 'organization_name'], 'string'],
             [[
@@ -131,14 +138,14 @@ class Ticket extends Record
             ], 'number'],
             [['ticket_categoria_id'], 'exist', 'skipOnError' => true, 'targetClass' => \open2\amos\ticket\models\TicketCategorie::className(), 'targetAttribute' => ['ticket_categoria_id' => 'id']],
         ];
-
+        
         if ($this->ticketCategoria && $this->ticketCategoria->enable_phone) {
             $rules[] = [['phone'], 'required'];
         }
-
+        
         return $rules;
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -175,7 +182,7 @@ class Ticket extends Record
             'guest_email' => AmosTicket::t('amosticket', 'Guest email'),
         ];
     }
-
+    
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -183,7 +190,7 @@ class Ticket extends Record
     {
         return $this->hasOne(\open2\amos\ticket\models\TicketCategorie::className(), ['id' => 'ticket_categoria_id']);
     }
-
+    
     /**
      * @return \yii\db\ActiveQuery
      * @throws \yii\base\InvalidConfigException
@@ -202,7 +209,7 @@ class Ticket extends Record
         }
         return null;
     }
-
+    
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -210,7 +217,7 @@ class Ticket extends Record
     {
         return $this->hasOne(\open2\amos\ticket\models\Ticket::className(), ['id' => 'forwarded_from_id']);
     }
-
+    
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -218,7 +225,7 @@ class Ticket extends Record
     {
         return $this->hasOne(\open2\amos\ticket\models\Ticket::className(), ['forwarded_from_id' => 'id']);
     }
-
+    
     /**
      * Internal Ticket or External
      *
@@ -230,18 +237,18 @@ class Ticket extends Record
         if (is_null($this->created_by)) {
             return true;
         }
-
+        
         // il creatore non è nullo, ma è comunqu empty... tipo zero
         if (!is_null($this->created_by) && empty($this->created_by)) {
             return true;
         }
-
+        
         // il creatore è un utente guest di piattaforma
         $guestUserId = \Yii::$app->params['platformConfigurations']['guestUserId'] ?? null;
-        if(!is_null($guestUserId) && ($this->created_by == $guestUserId)) {
+        if (!is_null($guestUserId) && ($this->created_by == $guestUserId)) {
             return true;
         }
-
+        
         // tutte le condizioni per valutare se il ticket è esterno sono passate... allore è un ticket interno
         return false;
     }

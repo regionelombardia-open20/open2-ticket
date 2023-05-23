@@ -16,8 +16,8 @@ use open20\amos\core\interfaces\SearchModuleInterface;
 use open20\amos\core\module\AmosModule;
 use open20\amos\core\module\ModuleInterface;
 use open20\amos\core\user\User;
-use open2\amos\ticket\models\search\TicketFaqSearch;
-use open2\amos\ticket\models\TicketFaq;
+use open20\amos\core\widget\WidgetAbstract;
+use open2\amos\ticket\models\Ticket;
 use open2\amos\ticket\widgets\icons\WidgetIconTicketAdminFaq;
 use open2\amos\ticket\widgets\icons\WidgetIconTicketAll;
 use open2\amos\ticket\widgets\icons\WidgetIconTicketCategorie;
@@ -26,7 +26,6 @@ use open2\amos\ticket\widgets\icons\WidgetIconTicketDashboard;
 use open2\amos\ticket\widgets\icons\WidgetIconTicketFaq;
 use open2\amos\ticket\widgets\icons\WidgetIconTicketProcessing;
 use open2\amos\ticket\widgets\icons\WidgetIconTicketWaiting;
-use open2\amos\ticket\models\Ticket;
 use Yii;
 
 /**
@@ -36,7 +35,7 @@ use Yii;
 class AmosTicket extends AmosModule implements ModuleInterface, SearchModuleInterface, CmsModuleInterface
 {
     public static $CONFIG_FOLDER = 'config';
-
+    
     public $config = [];
     public $fieldsConfigurations = [
         'required' => [
@@ -45,45 +44,50 @@ class AmosTicket extends AmosModule implements ModuleInterface, SearchModuleInte
             'descrizione'
         ],
     ];
-
+    
     public $categoryFieldsHide = [
 //        For example...
 //        'attiva',
 //        'abilita_ticket',
     ];
-
+    
     public $categoryReferentsHide = false;
-
+    
     public $enableOrganizationNameString = false;
-
+    
     public $disableInfoFields = false;
     
     public $disableCategory = false;
     
     public $disableTicketOrganization = false;
-
+    
     public $disableForwardToAnotherCategory = false;
-
+    
     public $oneLevelCategories = false;
-
+    
     public $enableCategoryIcon = true;
-
+    
     public $searchTicketCreatorWithString = false;
-
+    
     public $hideUpdateButtonOnTickets = false;
-
+    
     /**
      * @var array
      */
     public $ticketSearchFieldsHide = [
-
+    
     ];
-
+    
     /**
      * @var string emailUtilClass ClassName to make override of open2\amos\ticket\utility\EmailUtil
      */
     public $emailUtilClass = '';
-
+    
+    /**
+     * @var bool $enableAdministrativeTicketCategory
+     */
+    public $enableAdministrativeTicketCategory = false;
+    
     /**
      * @inheritdoc
      */
@@ -94,14 +98,14 @@ class AmosTicket extends AmosModule implements ModuleInterface, SearchModuleInte
         \Yii::setAlias('@open2/amos/' . static::getModuleName() . '/controllers', __DIR__ . '/controllers');
         \Yii::setAlias('@open2/amos/' . static::getModuleName() . '/widgets/icons', __DIR__ . '/widgets/icons');
         \Yii::setAlias('@open2/amos/' . static::getModuleName() . '/migrations', __DIR__ . '/migrations');
-
+        
         // \Yii::configure($this, require(__DIR__ . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.php'));
         // 
         // initialize the module with the configuration loaded from config.php
         $config = require(__DIR__ . DIRECTORY_SEPARATOR . self::$CONFIG_FOLDER . DIRECTORY_SEPARATOR . 'config.php');
         Yii::configure($this, $config);
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -109,7 +113,7 @@ class AmosTicket extends AmosModule implements ModuleInterface, SearchModuleInte
     {
         return 'ticket';
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -117,7 +121,7 @@ class AmosTicket extends AmosModule implements ModuleInterface, SearchModuleInte
     {
         return [];
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -134,7 +138,7 @@ class AmosTicket extends AmosModule implements ModuleInterface, SearchModuleInte
             WidgetIconTicketWaiting::className(),
         ];
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -150,70 +154,64 @@ class AmosTicket extends AmosModule implements ModuleInterface, SearchModuleInte
             'TicketCategorieSearch' => __NAMESPACE__ . '\\' . 'models\search\TicketCategorieSearch',
         ];
     }
-
+    
     /**
      * @inheritdoc
      */
     public static function getModuleIconName()
     {
-
         if (!empty(\Yii::$app->params['dashboardEngine']) && \Yii::$app->params['dashboardEngine'] == WidgetAbstract::ENGINE_ROWS) {
             return 'assistenza';
         } else {
             return 'feed';
         }
     }
-
+    
     /**
      * @inheritdoc
      */
     public static function getModelClassName()
     {
-        return TicketFaq::className();
+        return AmosTicket::instance()->model('TicketFaq');
     }
-
+    
     /**
      * @inheritdoc
      */
     public static function getModelSearchClassName()
     {
-        return TicketFaqSearch::className();
+        return AmosTicket::instance()->model('TicketFaqSearch');
     }
-
+    
+    /**
+     * @param $model
+     * @param $data
+     * @param array $post
+     */
     public static function createTicket($model, $data, $post)
     {
-        /*
-	print_r($post['RecordDynamicModel']['email']);
-        die();
-        */
-       $user = User::findByUsername($post['RecordDynamicModel']['email']);
-
-        //$titolo = $model->oggetto;
+        $user = User::findByUsername($post['RecordDynamicModel']['email']);
+        
         $categoria_id = intval($post['RecordDynamicModel']['categoria']);
-	$messageText = $post['RecordDynamicModel']['messaggio'];
-	$styledMessageText = AmosTicket::createMessage($messageText);
-
-       $ticket = new Ticket();
-       $ticket->ticket_categoria_id = $categoria_id;
-       $ticket->titolo = $post['RecordDynamicModel']['oggetto'];
-       $ticket->descrizione = $styledMessageText;
-       $ticket->created_by = $user->id;
-
-       //print_r(\Yii::$app->request->post());
-       //die();
-
-       $ticket->save(false);
-
-
+        $messageText = $post['RecordDynamicModel']['messaggio'];
+        $styledMessageText = AmosTicket::createMessage($messageText);
+        
+        $ticket = new Ticket();
+        $ticket->ticket_categoria_id = $categoria_id;
+        $ticket->titolo = $post['RecordDynamicModel']['oggetto'];
+        $ticket->descrizione = $styledMessageText;
+        $ticket->created_by = $user->id;
+        
+        $ticket->save(false);
     }
-
-    public static function createMessage($messageText){
-
-	$styledMessageText = '<p>'.$messageText.'</p>';
-
-	return $styledMessageText;
-
+    
+    /**
+     * @param string $messageText
+     * @return string
+     */
+    public static function createMessage($messageText)
+    {
+        $styledMessageText = '<p>' . $messageText . '</p>';
+        return $styledMessageText;
     }
-
-
 }

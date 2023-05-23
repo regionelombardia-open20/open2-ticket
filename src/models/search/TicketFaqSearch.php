@@ -36,7 +36,7 @@ class TicketFaqSearch extends TicketFaq implements CmsModelInterface
             [['domanda', 'risposta', 'created_at', 'updated_at', 'deleted_at'], 'safe'],
         ];
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -45,7 +45,7 @@ class TicketFaqSearch extends TicketFaq implements CmsModelInterface
         // bypass scenarios() implementation in the parent class
         return Model::scenarios();
     }
-
+    
     public function getScope($params)
     {
         $scope = $this->formName();
@@ -54,16 +54,16 @@ class TicketFaqSearch extends TicketFaq implements CmsModelInterface
         }
         return $scope;
     }
-
+    
     public function search($params, $limit = null)
     {
         /** @var ActiveQuery $query */
         $query = TicketFaq::find();
-
+        
         $query->joinWith('ticketCategoria');
-
+        
         $abilita_per_community = false;
-
+        
         // If scope set, filter categories for cwh
         $moduleCwh = \Yii::$app->getModule('cwh');
         if (!is_null($moduleCwh)) {
@@ -76,21 +76,21 @@ class TicketFaqSearch extends TicketFaq implements CmsModelInterface
                 ]);
             }
         }
-
+        
         $query->andFilterWhere([
             'ticket_categorie.abilita_per_community' => $abilita_per_community,
         ]);
-
+        
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
-
+        
         $scope = $this->getScope($params);
-
+        
         if (!($this->load($params, $scope) && $this->validate())) {
             return $dataProvider;
         }
-
+        
         $query->andFilterWhere([
             'id' => $this->id,
             'ticket_categoria_id' => $this->ticket_categoria_id,
@@ -102,9 +102,9 @@ class TicketFaqSearch extends TicketFaq implements CmsModelInterface
             'updated_by' => $this->updated_by,
             'deleted_by' => $this->deleted_by,
         ]);
-
+        
         $query->andFilterWhere(['like', 'domanda', $this->domanda])
-                ->andFilterWhere(['like', 'risposta', $this->risposta]);
+            ->andFilterWhere(['like', 'risposta', $this->risposta]);
         if ($params["withPagination"]) {
             $dataProvider->setPagination(['pageSize' => $limit]);
             $query->limit(null);
@@ -119,24 +119,24 @@ class TicketFaqSearch extends TicketFaq implements CmsModelInterface
         }
         return $dataProvider;
     }
-
+    
     /**
-     * 
-     * @param type $params
-     * @param type $limit
+     * @param array $params
+     * @param int|null $limit
      * @return ActiveDataProvider
+     * @throws \yii\base\InvalidConfigException
      */
     public function searchFrontEnd($params, $limit = null)
     {
         /** @var ActiveQuery $query */
         $query = TicketFaq::find();
-
+        
         $query->joinWith('ticketCategoria');
-
+        
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
-
+        
         $query->andFilterWhere([
             'id' => $this->id,
             'ticket_categoria_id' => $this->ticket_categoria_id,
@@ -148,9 +148,9 @@ class TicketFaqSearch extends TicketFaq implements CmsModelInterface
             'updated_by' => $this->updated_by,
             'deleted_by' => $this->deleted_by,
         ]);
-
+        
         $query->andFilterWhere(['like', 'domanda', $this->domanda])
-                ->andFilterWhere(['like', 'risposta', $this->risposta]);
+            ->andFilterWhere(['like', 'risposta', $this->risposta]);
         if ($params["withPagination"]) {
             $dataProvider->setPagination(['pageSize' => $limit]);
             $query->limit(null);
@@ -174,7 +174,7 @@ class TicketFaqSearch extends TicketFaq implements CmsModelInterface
         $params = array_merge($params, \Yii::$app->request->get());
         return $this->searchFrontEnd($params, $limit);
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -185,7 +185,7 @@ class TicketFaqSearch extends TicketFaq implements CmsModelInterface
         array_push($viewFields, new CmsField("risposta", "TEXT", 'amosticket', $this->attributeLabels()['risposta']));
         return $viewFields;
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -196,7 +196,7 @@ class TicketFaqSearch extends TicketFaq implements CmsModelInterface
         array_push($searchFields, new CmsField("risposta", "TEXT"));
         return $searchFields;
     }
-
+    
     /**
      * @inheritdoc
      */

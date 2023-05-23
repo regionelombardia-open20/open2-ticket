@@ -159,15 +159,21 @@ class TicketUtility extends BaseObject
      */
     public static function getEmailReferentiCategoria($ticket_categoria_id, $alsoAdmin = true, $withCheckRefereeSettings = false)
     {
+        /** @var AmosAdmin $adminModule */
+        $adminModule = AmosAdmin::instance();
+        
+        /** @var UserProfile $userProfileModel */
+        $userProfileModel = $adminModule->createModel('UserProfile');
+        
         $emails = [];
         //cerco gli user_profile referenti di una categoria
         /** @var ActiveQuery $q */
-        $q = UserProfile::find()
+        $q = $userProfileModel::find()
             ->innerJoin('ticket_categorie_users_mm', 'ticket_categorie_users_mm.user_profile_id = user_profile.id')
             ->andWhere(['ticket_categorie_users_mm.deleted_by' => null])
             ->andWhere(['ticket_categorie_users_mm.ticket_categoria_id' => $ticket_categoria_id]);
-        $q->andWhere([UserProfile::tableName() . '.attivo' => UserProfile::STATUS_ACTIVE]);
-        $q->andWhere(['!=', UserProfile::tableName() . '.nome', UserProfileUtility::DELETED_ACCOUNT_NAME]);
+        $q->andWhere([$userProfileModel::tableName() . '.attivo' => UserProfile::STATUS_ACTIVE]);
+        $q->andWhere(['!=', $userProfileModel::tableName() . '.nome', UserProfileUtility::DELETED_ACCOUNT_NAME]);
         $referentiUserProfile = $q->all();
 
         //ritorno un array con le email degli user referenti

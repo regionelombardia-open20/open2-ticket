@@ -31,7 +31,6 @@ use open2\amos\ticket\AmosTicket;
  */
 class TicketCategorieUsersMm extends \open20\amos\core\record\Record
 {
-
     /**
      * @inheritdoc
      */
@@ -39,7 +38,7 @@ class TicketCategorieUsersMm extends \open20\amos\core\record\Record
     {
         return 'ticket_categorie_users_mm';
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -53,7 +52,7 @@ class TicketCategorieUsersMm extends \open20\amos\core\record\Record
             [['ticket_categoria_id'], 'exist', 'skipOnError' => true, 'targetClass' => TicketCategorie::className(), 'targetAttribute' => ['ticket_categoria_id' => 'id']],
         ];
     }
-
+    
     /**
      * @inheritdoc
      */
@@ -71,7 +70,7 @@ class TicketCategorieUsersMm extends \open20\amos\core\record\Record
             'deleted_by' => AmosTicket::t('amosticket', 'Cancellato da'),
         ];
     }
-
+    
     /**
      * @return \yii\db\ActiveQuery
      */
@@ -79,7 +78,7 @@ class TicketCategorieUsersMm extends \open20\amos\core\record\Record
     {
         return $this->hasOne(\open20\amos\admin\models\UserProfile::className(), ['id' => 'user_profile_id']);
     }
-
+    
     /**
      * @return \yii\db\ActiveQuery
      */

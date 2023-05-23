@@ -534,3 +534,26 @@ WIDGET GRAFICO ASSISTANCE
     }
   }
 }
+
+.table-hover > tbody{
+  >tr{
+    > td.administrative-row,
+    > th.administrative-row,
+    > .administrative-row,
+    &.administrative-row > th,
+    &.administrative-row > td{
+        background-color: #FFEF78;
+      
+    }
+
+    > td.administrative-row:hover,
+    > th.administrative-row:hover,
+    &.administrative-row:hover > td,
+    &:hover > .administrative-row,
+    &.administrative-row:hover > th{
+      background-color: darken(#FFEF78, 10%);
+    }
+  }
+  
+}
+

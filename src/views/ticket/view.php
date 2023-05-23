@@ -24,6 +24,8 @@ use yii\helpers\Url;
  * @var open2\amos\ticket\models\Ticket|WorkflowLogFunctionsBehavior $model
  * @var AmosTicket $module
  */
+
+/** @var AmosTicket $module */
 $module = \Yii::$app->getModule('ticket');
 
 $this->title = $model->titolo;
@@ -35,7 +37,11 @@ $isOperatore = !$theUser->can('AMMINISTRATORE_TICKET') && !$theUser->can('REFERE
 
 $ticketIsWaiting = ($model->status == Ticket::TICKET_WORKFLOW_STATUS_WAITING);
 $ticketIsClosed = ($model->status == Ticket::TICKET_WORKFLOW_STATUS_CLOSED);
-$ticketIsProcessing = ($model->status == Ticket::TICKET_WORKFLOW_STATUS_PROCESSING);
+if ($module->enableAdministrativeTicketCategory) {
+    $ticketIsProcessing = (in_array($model->status, [Ticket::TICKET_WORKFLOW_STATUS_PROCESSING, Ticket::TICKET_WORKFLOW_STATUS_WAITING_TECHNICAL_ASSISTANCE]));
+} else {
+    $ticketIsProcessing = ($model->status == Ticket::TICKET_WORKFLOW_STATUS_PROCESSING);
+}
 if ($ticketIsWaiting) {
     $classState = 'state state-waiting';
 } elseif ($ticketIsProcessing) {
