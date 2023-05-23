@@ -5,18 +5,18 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\controllers
+ * @package    open2\amos\ticket\controllers
  * @category   CategoryName
  */
 
-namespace open20\amos\ticket\controllers;
+namespace open2\amos\ticket\controllers;
 
 use open20\amos\dashboard\controllers\base\DashboardController;
 use Yii;
 
 /**
  * Class DefaultController
- * @package open20\amos\ticket\controllers
+ * @package open2\amos\ticket\controllers
  */
 class DefaultController extends DashboardController
 {

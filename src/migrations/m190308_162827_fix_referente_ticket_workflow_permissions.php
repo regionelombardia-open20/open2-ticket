@@ -5,7 +5,7 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\migrations
+ * @package    open2\amos\ticket\migrations
  * @category   CategoryName
  */
 
@@ -23,7 +23,7 @@ class m190308_162827_fix_referente_ticket_workflow_permissions extends AmosMigra
     {
         return [
             [
-                'name' => \open20\amos\ticket\rules\workflow\TicketToClosedWorkflowRule::className(),
+                'name' => \open2\amos\ticket\rules\workflow\TicketToClosedWorkflowRule::className(),
                 'update' => true,
                 'newValues' => [
                     'addParents' => ['REFERENTE_TICKET']

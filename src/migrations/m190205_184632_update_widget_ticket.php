@@ -5,13 +5,13 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\migrations
+ * @package    open2\amos\ticket\migrations
  * @category   CategoryName
  */
 
 use open20\amos\core\migration\AmosMigration;
 use open20\amos\dashboard\models\AmosWidgets;
-use open20\amos\ticket\widgets\icons\WidgetIconTicketDashboard;
+use open2\amos\ticket\widgets\icons\WidgetIconTicketDashboard;
 
 /**
  * Class m190205_184632_update_widget_ticket

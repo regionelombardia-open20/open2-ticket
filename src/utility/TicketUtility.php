@@ -5,11 +5,11 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\utility
+ * @package    open2\amos\ticket\utility
  * @category   CategoryName
  */
 
-namespace open20\amos\ticket\utility;
+namespace open2\amos\ticket\utility;
 
 use open20\amos\admin\AmosAdmin;
 use open20\amos\admin\models\UserProfile;
@@ -20,9 +20,9 @@ use open20\amos\core\module\BaseAmosModule;
 use open20\amos\core\user\User;
 use open20\amos\organizzazioni\models\Profilo;
 use open20\amos\organizzazioni\models\ProfiloSedi;
-use open20\amos\ticket\models\Ticket;
-use open20\amos\ticket\models\TicketCategorie;
-use open20\amos\ticket\models\TicketCategorieUsersMm;
+use open2\amos\ticket\models\Ticket;
+use open2\amos\ticket\models\TicketCategorie;
+use open2\amos\ticket\models\TicketCategorieUsersMm;
 use Yii;
 use yii\base\BaseObject;
 use yii\db\ActiveQuery;
@@ -30,7 +30,7 @@ use yii\helpers\ArrayHelper;
 
 /**
  * Class TicketUtility
- * @package open20\amos\ticket\utility
+ * @package open2\amos\ticket\utility
  */
 class TicketUtility extends BaseObject
 {
@@ -121,6 +121,35 @@ class TicketUtility extends BaseObject
 
         return $referenti;
     }
+    /**
+     * This method checks if the referee logged user must receive the mail for the ticket faq categories.
+     * @param int $userId
+     * @return bool
+     * @throws \yii\base\InvalidConfigException
+     */
+    public static function checkIsToSendMailToReferees($userId)
+    {
+        /** @var \open20\amos\notificationmanager\AmosNotify $notifyModule */
+        $notifyModule = (class_exists('open20\amos\notificationmanager\AmosNotify') ? \open20\amos\notificationmanager\AmosNotify::instance() : null);
+        
+        if (!is_null($notifyModule)) {
+            /** @var \open20\amos\notificationmanager\models\NotificationConf $notificationConfModel */
+            $notificationConfModel = $notifyModule->createModel('NotificationConf');
+            $notificationConf = $notificationConfModel::findOne(['user_id' => $userId]);
+            if (!is_null($notificationConf) && $notificationConf->hasProperty('notify_ticket_faq_referee')) {
+                // Notify module and new notification conf field found, the use the new procedure logic that sand mail accordingly with the user preference.
+                $sendMail = ($notificationConf->notify_ticket_faq_referee == 1);
+            } else {
+                // New notification conf field not found, then use old procedure logic that always send mail.
+                $sendMail = true;
+            }
+        } else {
+            // Notify module not found, then use old procedure logic that always send mail.
+            $sendMail = true;
+        }
+        
+        return $sendMail;
+    }
 
     /**
      * @param int $ticket_categoria_id
@@ -128,7 +157,7 @@ class TicketUtility extends BaseObject
      * @return array
      * @throws \yii\base\InvalidConfigException
      */
-    public static function getEmailReferentiCategoria($ticket_categoria_id, $alsoAdmin = true)
+    public static function getEmailReferentiCategoria($ticket_categoria_id, $alsoAdmin = true, $withCheckRefereeSettings = false)
     {
         $emails = [];
         //cerco gli user_profile referenti di una categoria
@@ -144,16 +173,19 @@ class TicketUtility extends BaseObject
         //ritorno un array con le email degli user referenti
         if (!is_null($referentiUserProfile)) {
             foreach ($referentiUserProfile as $userRecord) {
-                $emails[] = $userRecord->user->email;
+                /** @var UserProfile $userRecord */
+                $user = $userRecord->user;
+                if (!$withCheckRefereeSettings || ($withCheckRefereeSettings && self::checkIsToSendMailToReferees($user->id))) {
+                    $emails[] = $user->email;
+                }
             }
         }
         if ($alsoAdmin) {
-            $emails = ArrayHelper::merge($emails, self::getAllAdminTicketUsersEmail());
+            $emails = ArrayHelper::merge($emails, self::getAllAdminTicketUsersEmail(true));
         }
         if (count($emails) > 1) {
             $emails = array_unique($emails);
         }
-
         return $emails;
     }
 
@@ -179,16 +211,21 @@ class TicketUtility extends BaseObject
     }
 
     /**
+     * @param bool $withCheckRefereeSettings
      * @return array
      * @throws \yii\base\InvalidConfigException
      */
-    public static function getAllAdminTicketUsersEmail()
+    public static function getAllAdminTicketUsersEmail($withCheckRefereeSettings = false)
     {
         $adminTicketUser = self::getAllAdminTicketUsers();
         $emails = [];
         if (!is_null($adminTicketUser)) {
             foreach ($adminTicketUser as $userRecord) {
-                $emails[] = $userRecord->user->email;
+                /** @var UserProfile $userRecord */
+                $user = $userRecord->user;
+                if (!$withCheckRefereeSettings || ($withCheckRefereeSettings && self::checkIsToSendMailToReferees($user->id))) {
+                    $emails[] = $user->email;
+                }
             }
         }
         return $emails;

@@ -5,7 +5,7 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\views\ticket-categorie
+ * @package    open2\amos\ticket\views\ticket-categorie
  * @category   CategoryName
  */
 
@@ -16,14 +16,14 @@ use open20\amos\core\forms\CreatedUpdatedWidget;
 use open20\amos\core\forms\editors\Select;
 use open20\amos\core\forms\RequiredFieldsTipWidget;
 use open20\amos\core\helpers\Html;
-use open20\amos\ticket\AmosTicket;
-use open20\amos\ticket\utility\TicketUtility;
+use open2\amos\ticket\AmosTicket;
+use open2\amos\ticket\utility\TicketUtility;
 use yii\helpers\ArrayHelper;
 use yii\web\View;
 
 /**
  * @var yii\web\View $this
- * @var open20\amos\ticket\models\TicketCategorie $model
+ * @var open2\amos\ticket\models\TicketCategorie $model
  * @var yii\widgets\ActiveForm $form
  */
 
@@ -185,7 +185,6 @@ JS
         <div class="col-lg-12 col-sm-12">
             <?php
             /**
-             * @see https://github.com/softark/yii2-dual-listbox or https://github.com/istvan-ujjmeszaros/bootstrap-duallistbox
              */
             echo \softark\duallistbox\DualListbox::widget([
                 'model' => $model_referenti,

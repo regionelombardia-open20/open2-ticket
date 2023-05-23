@@ -5,26 +5,24 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\utility
+ * @package    open2\amos\ticket\utility
  * @category   CategoryName
  */
 
-namespace open20\amos\ticket\utility;
+namespace open2\amos\ticket\utility;
 
 use open20\amos\core\helpers\Html;
 use open20\amos\core\utilities\Email;
-use open20\amos\ticket\AmosTicket;
-use open20\amos\ticket\models\Ticket;
-use open20\amos\ticket\models\TicketCategorie;
-use yii\log\Logger;
+use open2\amos\ticket\AmosTicket;
+use open2\amos\ticket\models\Ticket;
+use open2\amos\ticket\models\TicketCategorie;
 
 /**
  * Class EmailUtil
- * @package open20\amos\ticket\utility
+ * @package open2\amos\ticket\utility
  */
 class EmailUtil
 {
-
     /**
      * manda la mail di creazione del ticket ai referenti perché è un ticket nuovo
      *
@@ -44,7 +42,7 @@ class EmailUtil
         if (!empty($ticketCategoria) && !empty($ticketCategoria->community_id)) {
             $noCommunity = false;
         }
-        $emailReferenti = TicketUtility::getEmailReferentiCategoria($ticket->ticket_categoria_id, $noCommunity);
+        $emailReferenti = TicketUtility::getEmailReferentiCategoria($ticket->ticket_categoria_id, $noCommunity, true);
         $to = $emailReferenti;
 
         $subject = AmosTicket::t("amosticket", 'Nuovo ticket id. ' . $ticket->id);
@@ -69,7 +67,7 @@ class EmailUtil
         ];
 
         $layout = [
-            'html' => '@vendor/open20/amos-ticket/src/mail/generic/generic-html',
+            'html' => '@vendor/open2/amos-ticket/src/mail/generic/generic-html',
         ];
 
         return self::sendEmail($to, $from, $subject, $params, $layout);
@@ -89,7 +87,7 @@ class EmailUtil
 
         $ticketPrecedente = Ticket::findOne($ticket->forwarded_from_id);
 
-        $emailReferenti = TicketUtility::getEmailReferentiCategoria($ticket->ticket_categoria_id);
+        $emailReferenti = TicketUtility::getEmailReferentiCategoria($ticket->ticket_categoria_id, true, true);
         $to = $emailReferenti;
 
         $creatorUserProfile = $ticket->createdUserProfile;
@@ -120,7 +118,7 @@ class EmailUtil
         ];
 
         $layout = [
-            'html' => '@vendor/open20/amos-ticket/src/mail/generic/generic-html',
+            'html' => '@vendor/open2/amos-ticket/src/mail/generic/generic-html',
         ];
 
         return self::sendEmail($to, $from, $subject, $params, $layout);
@@ -170,7 +168,7 @@ class EmailUtil
         ];
 
         $layout = [
-            'html' => '@vendor/open20/amos-ticket/src/mail/generic/generic-user-html',
+            'html' => '@vendor/open2/amos-ticket/src/mail/generic/generic-user-html',
         ];
 
         return self::sendEmail($to, $from, $subject, $params, $layout);
@@ -205,7 +203,7 @@ class EmailUtil
         ];
 
         $layout = [
-            'html' => '@vendor/open20/amos-ticket/src/mail/generic/generic-user-html',
+            'html' => '@vendor/open2/amos-ticket/src/mail/generic/generic-user-html',
         ];
 
         return self::sendEmail($to, $from, $subject, $params, $layout);
@@ -236,7 +234,7 @@ class EmailUtil
         ];
 
         $layout = [
-            'html' => '@vendor/open20/amos-ticket/src/mail/generic/generic-user-html',
+            'html' => '@vendor/open2/amos-ticket/src/mail/generic/generic-user-html',
         ];
 
         return self::sendEmail($to, $from, $subject, $params, $layout);
@@ -291,14 +289,14 @@ class EmailUtil
         ];
 
         $layout = [
-            'html' => '@vendor/open20/amos-ticket/src/mail/generic/generic-html',
+            'html' => '@vendor/open2/amos-ticket/src/mail/generic/generic-html',
         ];
 
         return self::sendEmail($to, $from, $subject, $params, $layout, null, $creatorEmail, $creatorEmail);
     }
 
     /**
-     * @param string $to
+     * @param array|string $to
      * @param string $from
      * @param string $subject
      * @param array $params

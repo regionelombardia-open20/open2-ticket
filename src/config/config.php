@@ -5,7 +5,7 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\config
+ * @package    open2\amos\ticket\config
  * @category   CategoryName
  */
 

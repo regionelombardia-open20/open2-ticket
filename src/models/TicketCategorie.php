@@ -5,16 +5,16 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\models
+ * @package    open2\amos\ticket\models
  * @category   CategoryName
  */
 
-namespace open20\amos\ticket\models;
+namespace open2\amos\ticket\models;
 
 use open20\amos\attachments\behaviors\FileBehavior;
 use open20\amos\attachments\models\File;
 use open20\amos\community\models\Community;
-use open20\amos\ticket\AmosTicket;
+use open2\amos\ticket\AmosTicket;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -23,9 +23,9 @@ use yii\helpers\ArrayHelper;
  *
  * @method \yii\db\ActiveQuery hasOneFile($attribute = 'file', $sort = 'id')
  *
- * @package open20\amos\ticket\models
+ * @package open2\amos\ticket\models
  */
-class TicketCategorie extends \open20\amos\ticket\models\base\TicketCategorie
+class TicketCategorie extends \open2\amos\ticket\models\base\TicketCategorie
 {
     /**
      * @var File $categoryIcon
@@ -133,7 +133,7 @@ class TicketCategorie extends \open20\amos\ticket\models\base\TicketCategorie
      */
     public function getCategoriaPadre()
     {
-        return $this->hasOne(\open20\amos\ticket\models\TicketCategorie::className(), ['id' => 'categoria_padre_id']);
+        return $this->hasOne(\open2\amos\ticket\models\TicketCategorie::className(), ['id' => 'categoria_padre_id']);
     }
 
     public function getCommunity()

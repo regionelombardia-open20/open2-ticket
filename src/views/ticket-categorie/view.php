@@ -5,18 +5,18 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\views\ticket-categorie
+ * @package    open2\amos\ticket\views\ticket-categorie
  * @category   CategoryName
  */
 
 use open20\amos\core\forms\ContextMenuWidget;
 use open20\amos\core\helpers\Html;
-use open20\amos\ticket\AmosTicket;
+use open2\amos\ticket\AmosTicket;
 use yii\helpers\Url;
 
 /**
  * @var yii\web\View $this
- * @var open20\amos\ticket\models\TicketCategorie $model
+ * @var open2\amos\ticket\models\TicketCategorie $model
  */
 
 $this->title = $model->titolo;

@@ -5,11 +5,11 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\models
+ * @package    open2\amos\ticket\models
  * @category   CategoryName
  */
 
-namespace open20\amos\ticket\models;
+namespace open2\amos\ticket\models;
 
 use open20\amos\admin\AmosAdmin;
 use open20\amos\admin\models\UserProfile;
@@ -20,10 +20,10 @@ use open20\amos\core\interfaces\ModelLabelsInterface;
 use open20\amos\core\interfaces\ViewModelInterface;
 use open20\amos\core\record\Record;
 use open20\amos\workflow\behaviors\WorkflowLogFunctionsBehavior;
-use open20\amos\ticket\AmosTicket;
-use open20\amos\ticket\i18n\grammar\TicketGrammar;
-use open20\amos\ticket\utility\EmailUtil;
-use open20\amos\ticket\utility\TicketUtility;
+use open2\amos\ticket\AmosTicket;
+use open2\amos\ticket\i18n\grammar\TicketGrammar;
+use open2\amos\ticket\utility\EmailUtil;
+use open2\amos\ticket\utility\TicketUtility;
 use raoul2000\workflow\base\SimpleWorkflowBehavior;
 use Yii;
 use yii\base\Event;
@@ -43,9 +43,9 @@ use yii\helpers\Url;
  * @property \open20\amos\admin\models\UserProfile $ticketClosingReferee
  * @property \open20\amos\admin\models\UserProfile $closedUserProfile
  *
- * @package open20\amos\ticket\models
+ * @package open2\amos\ticket\models
  */
-class Ticket extends \open20\amos\ticket\models\base\Ticket implements CommentInterface, ModelLabelsInterface, ViewModelInterface
+class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInterface, ModelLabelsInterface, ViewModelInterface
 {
     // Workflow ID
     const TICKET_WORKFLOW = 'TicketWorkflow';
@@ -193,7 +193,7 @@ class Ticket extends \open20\amos\ticket\models\base\Ticket implements CommentIn
             \open20\amos\comments\models\Comment::className(),
             ['context_id' => 'id']
         )
-            ->andWhere(['context' => \open20\amos\ticket\models\Ticket::className()]);
+            ->andWhere(['context' => \open2\amos\ticket\models\Ticket::className()]);
     }
 
     /**
@@ -205,7 +205,7 @@ class Ticket extends \open20\amos\ticket\models\base\Ticket implements CommentIn
             \open20\amos\comments\models\Comment::className(),
             ['context_id' => 'id']
         )
-            ->andWhere(['context' => \open20\amos\ticket\models\Ticket::className()])
+            ->andWhere(['context' => \open2\amos\ticket\models\Ticket::className()])
             ->orderBy(['created_at' => SORT_DESC])
             ->limit(3);
     }
@@ -236,7 +236,7 @@ class Ticket extends \open20\amos\ticket\models\base\Ticket implements CommentIn
     public function getFirstAnswer()
     {
         return $this->hasOne(\open20\amos\comments\models\Comment::className(), ['context_id' => 'id'])
-            ->andWhere(['context' => \open20\amos\ticket\models\Ticket::className()])
+            ->andWhere(['context' => \open2\amos\ticket\models\Ticket::className()])
             ->andWhere(['<>', 'created_by', $this->created_by])
             ->orderBy(['created_at' => SORT_ASC])->limit(1)
             ->one();
@@ -250,7 +250,7 @@ class Ticket extends \open20\amos\ticket\models\base\Ticket implements CommentIn
     public function getLastAnswer()
     {
         return $this->hasOne(\open20\amos\comments\models\Comment::className(), ['context_id' => 'id'])
-            ->andWhere(['context' => \open20\amos\ticket\models\Ticket::className()])
+            ->andWhere(['context' => \open2\amos\ticket\models\Ticket::className()])
             ->andWhere(['<>', 'created_by', $this->created_by])
             ->orderBy(['created_at' => SORT_DESC])
             ->limit(1)
@@ -408,7 +408,7 @@ class Ticket extends \open20\amos\ticket\models\base\Ticket implements CommentIn
      * @return \yii\db\ActiveQuery
      * public function getCategory()
      * {
-     * return $this->hasOne(\open20\amos\ticket\models\TicketCategorie::className(), ['id' => 'ticket_categoria_id']);
+     * return $this->hasOne(\open2\amos\ticket\models\TicketCategorie::className(), ['id' => 'ticket_categoria_id']);
      * }
      *
      *
@@ -487,7 +487,6 @@ class Ticket extends \open20\amos\ticket\models\base\Ticket implements CommentIn
      *
      * @param string $attribute the attribute name
      * @return string the attribute hint
-     * @see attributeHints
      */
     public function getAttributeHint($attribute)
     {

@@ -5,19 +5,19 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\rules
+ * @package    open2\amos\ticket\rules
  * @category   CategoryName
  */
 
-namespace open20\amos\ticket\rules;
+namespace open2\amos\ticket\rules;
 
 use open20\amos\core\rules\BasicContentRule;
-use open20\amos\ticket\models\Ticket;
+use open2\amos\ticket\models\Ticket;
 use raoul2000\workflow\base\SimpleWorkflowBehavior;
 
 /**
  * Class TicketUpdateRule
- * @package open20\amos\ticket\rules
+ * @package open2\amos\ticket\rules
  */
 class TicketUpdateRule extends BasicContentRule
 {

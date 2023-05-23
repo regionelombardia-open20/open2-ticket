@@ -5,25 +5,25 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\assets
+ * @package    open2\amos\ticket\assets
  * @category   CategoryName
  */
 
-namespace open20\amos\ticket\assets;
+namespace open2\amos\ticket\assets;
 
 use open20\amos\core\widget\WidgetAbstract;
 use yii\web\AssetBundle;
 
 /**
  * Class TicketAsset
- * @package open20\amos\ticket\assets
+ * @package open2\amos\ticket\assets
  */
 class TicketAsset extends AssetBundle
 {
     /**
      * @inheritdoc
      */
-    public $sourcePath = '@vendor/open20/amos-ticket/src/assets/web';
+    public $sourcePath = '@vendor/open2/amos-ticket/src/assets/web';
 
     /**
      * @inheritdoc

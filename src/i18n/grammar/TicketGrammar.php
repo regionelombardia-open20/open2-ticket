@@ -5,18 +5,18 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\i18n\grammar
+ * @package    open2\amos\ticket\i18n\grammar
  * @category   CategoryName
  */
 
-namespace open20\amos\ticket\i18n\grammar;
+namespace open2\amos\ticket\i18n\grammar;
 
 use open20\amos\core\interfaces\ModelGrammarInterface;
-use open20\amos\ticket\AmosTicket;
+use open2\amos\ticket\AmosTicket;
 
 /**
  * Class TicketGrammar
- * @package open20\amos\ticket\i18n\grammar
+ * @package open2\amos\ticket\i18n\grammar
  */
 class TicketGrammar implements ModelGrammarInterface
 {

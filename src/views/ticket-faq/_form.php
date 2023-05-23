@@ -5,7 +5,7 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\views\ticket-faq
+ * @package    open2\amos\ticket\views\ticket-faq
  * @category   CategoryName
  */
 
@@ -13,13 +13,13 @@ use open20\amos\core\forms\AccordionWidget;
 use open20\amos\core\forms\ActiveForm;
 use open20\amos\core\forms\CloseSaveButtonWidget;
 use open20\amos\core\forms\editors\Select;
-use open20\amos\ticket\AmosTicket;
-use open20\amos\ticket\utility\TicketUtility;
+use open2\amos\ticket\AmosTicket;
+use open2\amos\ticket\utility\TicketUtility;
 use yii\helpers\ArrayHelper;
 
 /**
  * @var yii\web\View $this
- * @var open20\amos\ticket\models\TicketFaq $model
+ * @var open2\amos\ticket\models\TicketFaq $model
  * @var yii\widgets\ActiveForm $form
  */
 

@@ -5,12 +5,12 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\migrations
+ * @package    open2\amos\ticket\migrations
  * @category   CategoryName
  */
 
 use open20\amos\core\migration\AmosMigrationPermissions;
-use open20\amos\ticket\models\Ticket;
+use open2\amos\ticket\models\Ticket;
 use yii\helpers\ArrayHelper;
 use yii\rbac\Permission;
 
@@ -41,17 +41,17 @@ class m181026_183000_create_ticket_workflow_permissions extends AmosMigrationPer
     {
         return [
             [
-                'name' => \open20\amos\ticket\rules\workflow\TicketToClosedWorkflowRule::className(),
+                'name' => \open2\amos\ticket\rules\workflow\TicketToClosedWorkflowRule::className(),
                 'type' => Permission::TYPE_PERMISSION,
                 'description' => 'Check if you are an author or the admin',
-                'ruleName' => \open20\amos\ticket\rules\workflow\TicketToClosedWorkflowRule::className(),
+                'ruleName' => \open2\amos\ticket\rules\workflow\TicketToClosedWorkflowRule::className(),
                 'parent' => ['OPERATORE_TICKET']
             ],
             [
-                'name' => \open20\amos\ticket\rules\workflow\TicketToProcessingWorkflowRule::className(),
+                'name' => \open2\amos\ticket\rules\workflow\TicketToProcessingWorkflowRule::className(),
                 'type' => Permission::TYPE_PERMISSION,
                 'description' => 'Check if you are the admin',
-                'ruleName' => \open20\amos\ticket\rules\workflow\TicketToProcessingWorkflowRule::className(),
+                'ruleName' => \open2\amos\ticket\rules\workflow\TicketToProcessingWorkflowRule::className(),
                 'parent' => ['REFERENTE_TICKET']
             ],
         ];
@@ -75,13 +75,13 @@ class m181026_183000_create_ticket_workflow_permissions extends AmosMigrationPer
                 'name' => Ticket::TICKET_WORKFLOW_STATUS_PROCESSING,
                 'type' => Permission::TYPE_PERMISSION,
                 'description' => 'Permesso workflow ticket stato in carico',
-                'parent' => [\open20\amos\ticket\rules\workflow\TicketToProcessingWorkflowRule::className()]
+                'parent' => [\open2\amos\ticket\rules\workflow\TicketToProcessingWorkflowRule::className()]
             ],
             [
                 'name' => Ticket::TICKET_WORKFLOW_STATUS_CLOSED,
                 'type' => Permission::TYPE_PERMISSION,
                 'description' => 'Permesso workflow ticket stato chiuso',
-                'parent' => [\open20\amos\ticket\rules\workflow\TicketToClosedWorkflowRule::className()]
+                'parent' => [\open2\amos\ticket\rules\workflow\TicketToClosedWorkflowRule::className()]
             ],
         ];
     }
@@ -95,10 +95,10 @@ class m181026_183000_create_ticket_workflow_permissions extends AmosMigrationPer
     {
         return [
             [
-                'name' => \open20\amos\ticket\rules\TicketDeleteRule::className(),
+                'name' => \open2\amos\ticket\rules\TicketDeleteRule::className(),
                 'type' => Permission::TYPE_PERMISSION,
                 'description' => 'Nobody can delete',
-                'ruleName' => \open20\amos\ticket\rules\TicketDeleteRule::className(),
+                'ruleName' => \open2\amos\ticket\rules\TicketDeleteRule::className(),
                 'parent' => ['AMMINISTRATORE_TICKET']
             ],
         ];
@@ -117,7 +117,7 @@ class m181026_183000_create_ticket_workflow_permissions extends AmosMigrationPer
                 'type' => Permission::TYPE_PERMISSION,
                 'description' => 'Permesso di DELETE sul model Ticket',
                 //'update' => true,
-                'parent' => [\open20\amos\ticket\rules\TicketDeleteRule::className()]
+                'parent' => [\open2\amos\ticket\rules\TicketDeleteRule::className()]
             ],
         ];
     }

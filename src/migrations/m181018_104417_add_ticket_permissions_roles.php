@@ -5,7 +5,7 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\migrations
+ * @package    open2\amos\ticket\migrations
  * @category   CategoryName
  */
 
@@ -107,7 +107,7 @@ class m181018_104417_add_ticket_permissions_roles extends AmosMigrationPermissio
     {
         return [
             [
-                'name' => open20\amos\ticket\widgets\icons\WidgetIconTicketDashboard::className(),
+                'name' => open2\amos\ticket\widgets\icons\WidgetIconTicketDashboard::className(),
                 'type' => Permission::TYPE_PERMISSION,
                 'description' => 'Permesso per il widget WidgetIconTicketDashboard',
                 'ruleName' => null,

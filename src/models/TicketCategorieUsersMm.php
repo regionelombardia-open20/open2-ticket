@@ -5,11 +5,11 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\models
+ * @package    open2\amos\ticket\models
  * @category   CategoryName
  */
 
-namespace open20\amos\ticket\models;
+namespace open2\amos\ticket\models;
 
 use Yii;
 use yii\helpers\ArrayHelper;
@@ -17,7 +17,7 @@ use yii\helpers\ArrayHelper;
 /**
  * This is the model class for table "ticket_categorie_users_mm".
  */
-class TicketCategorieUsersMm extends \open20\amos\ticket\models\base\TicketCategorieUsersMm {
+class TicketCategorieUsersMm extends \open2\amos\ticket\models\base\TicketCategorieUsersMm {
 
     public function representingColumn() {
         return [
@@ -34,7 +34,6 @@ class TicketCategorieUsersMm extends \open20\amos\ticket\models\base\TicketCateg
      * Returns the text hint for the specified attribute.
      * @param string $attribute the attribute name
      * @return string the attribute hint
-     * @see attributeHints
      */
     public function getAttributeHint($attribute) {
         $hints = $this->attributeHints();

@@ -5,24 +5,24 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\models\search
+ * @package    open2\amos\ticket\models\search
  * @category   CategoryName
  */
 
-namespace open20\amos\ticket\models\search;
+namespace open2\amos\ticket\models\search;
 
 use open20\amos\core\interfaces\CmsModelInterface;
 use open20\amos\core\record\CmsField;
 use open20\amos\cwh\AmosCwh;
-use open20\amos\ticket\models\TicketFaq;
+use open2\amos\ticket\models\TicketFaq;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveQuery;
 
 /**
  * Class TicketFaqSearch
- * TicketFaqSearch represents the model behind the search form about `open20\amos\ticket\models\TicketFaq`.
- * @package open20\amos\ticket\models\search
+ * TicketFaqSearch represents the model behind the search form about `open2\amos\ticket\models\TicketFaq`.
+ * @package open2\amos\ticket\models\search
  */
 class TicketFaqSearch extends TicketFaq implements CmsModelInterface
 {

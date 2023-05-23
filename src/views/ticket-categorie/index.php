@@ -5,19 +5,19 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\views\ticket-categorie
+ * @package    open2\amos\ticket\views\ticket-categorie
  * @category   CategoryName
  */
 
 use open20\amos\core\views\AmosGridView;
-use open20\amos\ticket\AmosTicket;
-use open20\amos\ticket\models\TicketCategorie;
+use open2\amos\ticket\AmosTicket;
+use open2\amos\ticket\models\TicketCategorie;
 use yii\helpers\Html;
 
 /**
  * @var yii\web\View $this
  * @var yii\data\ActiveDataProvider $dataProvider
- * @var open20\amos\ticket\models\search\TicketCategorieSearch $searchModel
+ * @var open2\amos\ticket\models\search\TicketCategorieSearch $searchModel
  */
 
 $this->title = AmosTicket::t('amosticket', 'Categorie');

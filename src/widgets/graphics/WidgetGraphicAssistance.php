@@ -5,19 +5,19 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\widgets\graphics
+ * @package    open2\amos\ticket\widgets\graphics
  * @category   CategoryName
  */
 
-namespace open20\amos\ticket\widgets\graphics;
+namespace open2\amos\ticket\widgets\graphics;
 
 use open20\amos\core\widget\WidgetGraphic;
-use open20\amos\ticket\AmosTicket;
-use open20\amos\ticket\models\search\TicketSearch;
+use open2\amos\ticket\AmosTicket;
+use open2\amos\ticket\models\search\TicketSearch;
 
 /**
  * Class WidgetGraphicAssistance
- * @package open20\amos\ticket\widgets\graphics
+ * @package open2\amos\ticket\widgets\graphics
  */
 class WidgetGraphicAssistance extends WidgetGraphic
 {
@@ -38,7 +38,7 @@ class WidgetGraphicAssistance extends WidgetGraphic
      */
     public function getHtml()
     {
-        $viewToRender = '@vendor/open20/amos-ticket/src/widgets/graphics/views/assistance_widget';
+        $viewToRender = '@vendor/open2/amos-ticket/src/widgets/graphics/views/assistance_widget';
         $numberToView = 3;
 
         /** @var TicketSearch $searchModel */

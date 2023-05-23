@@ -5,7 +5,7 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\migrations
+ * @package    open2\amos\ticket\migrations
  * @category   CategoryName
  */
 
@@ -24,50 +24,50 @@ class m181023_153000_add_widget_permissions extends AmosMigrationPermissions
     {
         return [
             [
-                'name' => open20\amos\ticket\widgets\icons\WidgetIconTicketDashboard::className(),
+                'name' => open2\amos\ticket\widgets\icons\WidgetIconTicketDashboard::className(),
                 'type' => Permission::TYPE_PERMISSION,
                 'description' => 'Permesso per il widget WidgetIconTicketDashboard',
                 'ruleName' => null,
                 'parent' => ['OPERATORE_TICKET']
             ],
             [
-                'name' => open20\amos\ticket\widgets\icons\WidgetIconTicketFaq::className(),
+                'name' => open2\amos\ticket\widgets\icons\WidgetIconTicketFaq::className(),
                 'type' => Permission::TYPE_PERMISSION,
                 'description' => 'Permesso per il widget WidgetIconTicketFaq',
                 'parent' => ['OPERATORE_TICKET']
             ],
             [
-                'name' => open20\amos\ticket\widgets\icons\WidgetIconTicketWaiting::className(),
+                'name' => open2\amos\ticket\widgets\icons\WidgetIconTicketWaiting::className(),
                 'type' => Permission::TYPE_PERMISSION,
                 'description' => 'Permesso per il widget WidgetIconTicketWaiting',
                 'parent' => ['OPERATORE_TICKET']
             ],
             [
-                'name' => open20\amos\ticket\widgets\icons\WidgetIconTicketProcessing::className(),
+                'name' => open2\amos\ticket\widgets\icons\WidgetIconTicketProcessing::className(),
                 'type' => Permission::TYPE_PERMISSION,
                 'description' => 'Permesso per il widget WidgetIconTicketProcessing',
                 'parent' => ['OPERATORE_TICKET']
             ],
             [
-                'name' => open20\amos\ticket\widgets\icons\WidgetIconTicketClosed::className(),
+                'name' => open2\amos\ticket\widgets\icons\WidgetIconTicketClosed::className(),
                 'type' => Permission::TYPE_PERMISSION,
                 'description' => 'Permesso per il widget WidgetIconTicketClosed',
                 'parent' => ['OPERATORE_TICKET']
             ],
             [
-                'name' => open20\amos\ticket\widgets\icons\WidgetIconTicketAll::className(),
+                'name' => open2\amos\ticket\widgets\icons\WidgetIconTicketAll::className(),
                 'type' => Permission::TYPE_PERMISSION,
                 'description' => 'Permesso per il widget WidgetIconTicketAll',
                 'parent' => ['OPERATORE_TICKET']
             ],
             [
-                'name' => open20\amos\ticket\widgets\icons\WidgetIconTicketCategorie::className(),
+                'name' => open2\amos\ticket\widgets\icons\WidgetIconTicketCategorie::className(),
                 'type' => Permission::TYPE_PERMISSION,
                 'description' => 'Permesso per il widget WidgetIconTicketCategorie',
                 'parent' => ['REFERENTE_TICKET']
             ],
             [
-                'name' => open20\amos\ticket\widgets\icons\WidgetIconTicketAdminFaq::className(),
+                'name' => open2\amos\ticket\widgets\icons\WidgetIconTicketAdminFaq::className(),
                 'type' => Permission::TYPE_PERMISSION,
                 'description' => 'Permesso per il widget WidgetIconTicketAdminFaq',
                 'parent' => ['REFERENTE_TICKET']

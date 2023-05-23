@@ -5,11 +5,11 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\widgets\graphics\views
+ * @package    open2\amos\ticket\widgets\graphics\views
  * @category   CategoryName
  */
 
-use open20\amos\ticket\widgets\graphics\WidgetGraphicAssistance;
+use open2\amos\ticket\widgets\graphics\WidgetGraphicAssistance;
 use yii\data\ActiveDataProvider;
 
 /**

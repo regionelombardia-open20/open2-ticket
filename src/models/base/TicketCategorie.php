@@ -5,16 +5,16 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\models\base
+ * @package    open2\amos\ticket\models\base
  * @category   CategoryName
  */
 
-namespace open20\amos\ticket\models\base;
+namespace open2\amos\ticket\models\base;
 
 use open20\amos\community\models\Community;
 use open20\amos\core\record\Record;
 use open20\amos\core\validators\StringHtmlValidator;
-use open20\amos\ticket\AmosTicket;
+use open2\amos\ticket\AmosTicket;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -46,12 +46,12 @@ use yii\helpers\ArrayHelper;
  * @property integer $deleted_by
  * @property integer $version
  *
- * @property \open20\amos\ticket\models\TicketCategorie $categoriaPadre
- * @property \open20\amos\ticket\models\base\TicketCategorieUsersMm[] $ticketCategorieUsersMms
+ * @property \open2\amos\ticket\models\TicketCategorie $categoriaPadre
+ * @property \open2\amos\ticket\models\base\TicketCategorieUsersMm[] $ticketCategorieUsersMms
  * @property Community $community
  * @property string $nomeCompleto
  *
- * @package  open20\amos\ticket\models\base
+ * @package  open2\amos\ticket\models\base
  */
 class TicketCategorie extends Record
 {
@@ -170,7 +170,7 @@ class TicketCategorie extends Record
      */
     public function getCategoriaPadre()
     {
-        return $this->hasOne(\open20\amos\ticket\models\TicketCategorie::className(), ['id' => 'categoria_padre_id']);
+        return $this->hasOne(\open2\amos\ticket\models\TicketCategorie::className(), ['id' => 'categoria_padre_id']);
     }
 
     /**
@@ -181,7 +181,7 @@ class TicketCategorie extends Record
      */
     public function getCategorieFiglie()
     {
-        return $this->hasMany(\open20\amos\ticket\models\TicketCategorie::className(), ['categoria_padre_id' => 'id']);
+        return $this->hasMany(\open2\amos\ticket\models\TicketCategorie::className(), ['categoria_padre_id' => 'id']);
     }
 
     /**
@@ -189,24 +189,24 @@ class TicketCategorie extends Record
      */
     public function getTicketCategorieUsersMms()
     {
-        return $this->hasMany(\open20\amos\ticket\models\base\TicketCategorieUsersMm::className(), ['ticket_categoria_id' => 'id']);
+        return $this->hasMany(\open2\amos\ticket\models\base\TicketCategorieUsersMm::className(), ['ticket_categoria_id' => 'id']);
     }
 
     public function getTicketFaq()
     {
-        return $this->hasMany(\open20\amos\ticket\models\TicketFaq::className(), ['ticket_categoria_id' => 'id']);
+        return $this->hasMany(\open2\amos\ticket\models\TicketFaq::className(), ['ticket_categoria_id' => 'id']);
     }
 
     public function getTicket()
     {
-        return $this->hasMany(\open20\amos\ticket\models\Ticket::className(), ['ticket_categoria_id' => 'id']);
+        return $this->hasMany(\open2\amos\ticket\models\Ticket::className(), ['ticket_categoria_id' => 'id']);
     }
 
     public function getNomeCompleto()
     {
         $nomeCompleto = $this->titolo;
         if ($this->categoria_padre_id) {
-            $categoriaPadre = \open20\amos\ticket\models\TicketCategorie::findOne($this->categoria_padre_id);
+            $categoriaPadre = \open2\amos\ticket\models\TicketCategorie::findOne($this->categoria_padre_id);
             if ($categoriaPadre) {
                 $nomeCompleto = $categoriaPadre->getNomeCompleto() . " > " . $nomeCompleto;
             }

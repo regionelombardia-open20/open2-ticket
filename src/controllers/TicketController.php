@@ -5,18 +5,18 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\controllers
+ * @package    open2\amos\ticket\controllers
  * @category   CategoryName
  */
 
-namespace open20\amos\ticket\controllers;
+namespace open2\amos\ticket\controllers;
 
 use open20\amos\core\exceptions\AmosException;
-use open20\amos\ticket\AmosTicket;
-use open20\amos\ticket\assets\TicketAsset;
-use open20\amos\ticket\models\search\TicketSearch;
-use open20\amos\ticket\models\Ticket;
-use open20\amos\ticket\models\TicketCategorie;
+use open2\amos\ticket\AmosTicket;
+use open2\amos\ticket\assets\TicketAsset;
+use open2\amos\ticket\models\search\TicketSearch;
+use open2\amos\ticket\models\Ticket;
+use open2\amos\ticket\models\TicketCategorie;
 use raoul2000\workflow\base\WorkflowException;
 use Yii;
 use yii\db\Expression;
@@ -29,9 +29,9 @@ use yii\helpers\Url;
 /**
  * Class TicketController
  * This is the class for controller "TicketController".
- * @package open20\amos\ticket\controllers
+ * @package open2\amos\ticket\controllers
  */
-class TicketController extends \open20\amos\ticket\controllers\base\TicketController
+class TicketController extends \open2\amos\ticket\controllers\base\TicketController
 {
 
     /**

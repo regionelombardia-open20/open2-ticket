@@ -5,11 +5,11 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\models
+ * @package    open2\amos\ticket\models
  * @category   CategoryName
  */
 
-namespace open20\amos\ticket\models;
+namespace open2\amos\ticket\models;
 
 use open20\amos\core\interfaces\ContentModelInterface;
 use open20\amos\seo\behaviors\SeoContentBehavior;
@@ -19,9 +19,9 @@ use yii\helpers\ArrayHelper;
 /**
  * Class TicketFaq
  * This is the model class for table "ticket_faq".
- * @package open20\amos\ticket\models
+ * @package open2\amos\ticket\models
  */
-class TicketFaq extends \open20\amos\ticket\models\base\TicketFaq implements ContentModelInterface, SeoModelInterface
+class TicketFaq extends \open2\amos\ticket\models\base\TicketFaq implements ContentModelInterface, SeoModelInterface
 {
     /**
      * @inheritdoc

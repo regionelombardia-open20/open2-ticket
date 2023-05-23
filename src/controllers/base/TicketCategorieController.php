@@ -5,11 +5,11 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\controllers\base
+ * @package    open2\amos\ticket\controllers\base
  * @category   CategoryName
  */
 
-namespace open20\amos\ticket\controllers\base;
+namespace open2\amos\ticket\controllers\base;
 
 use open20\amos\community\models\Community;
 use open20\amos\core\controllers\CrudController;
@@ -17,11 +17,11 @@ use open20\amos\core\helpers\Html;
 use open20\amos\core\icons\AmosIcons;
 use open20\amos\cwh\AmosCwh;
 use open20\amos\dashboard\controllers\TabDashboardControllerTrait;
-use open20\amos\ticket\AmosTicket;
-use open20\amos\ticket\models\base\UserProfileForm;
-use open20\amos\ticket\models\search\TicketCategorieSearch;
-use open20\amos\ticket\models\TicketCategorie;
-use open20\amos\ticket\models\TicketCategorieUsersMm;
+use open2\amos\ticket\AmosTicket;
+use open2\amos\ticket\models\base\UserProfileForm;
+use open2\amos\ticket\models\search\TicketCategorieSearch;
+use open2\amos\ticket\models\TicketCategorie;
+use open2\amos\ticket\models\TicketCategorieUsersMm;
 use Yii;
 use yii\helpers\Url;
 
@@ -29,10 +29,10 @@ use yii\helpers\Url;
  * Class TicketCategorieController
  * TicketCategorieController implements the CRUD actions for TicketCategorie model.
  *
- * @property \open20\amos\ticket\models\TicketCategorie $model
- * @property \open20\amos\ticket\models\search\TicketCategorieSearch $modelSearch
+ * @property \open2\amos\ticket\models\TicketCategorie $model
+ * @property \open2\amos\ticket\models\search\TicketCategorieSearch $modelSearch
  *
- * @package open20\amos\ticket\controllers\base
+ * @package open2\amos\ticket\controllers\base
  */
 class TicketCategorieController extends CrudController
 {

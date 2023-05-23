@@ -5,12 +5,12 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\migrations
+ * @package    open2\amos\ticket\migrations
  * @category   CategoryName
  */
 
-use open20\amos\ticket\widgets\icons\WidgetIconTicketAdminFaq;
-use open20\amos\ticket\widgets\icons\WidgetIconTicketCategorie;
+use open2\amos\ticket\widgets\icons\WidgetIconTicketAdminFaq;
+use open2\amos\ticket\widgets\icons\WidgetIconTicketCategorie;
 use yii\rbac\Permission;
 
 /**

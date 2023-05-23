@@ -5,7 +5,7 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\migrations
+ * @package    open2\amos\ticket\migrations
  * @category   CategoryName
  */
 
@@ -26,7 +26,7 @@ class m181017_100000_add_widget_ticket extends AmosMigrationWidgets
     {
         $this->widgets = [
             [
-                'classname' => \open20\amos\ticket\widgets\icons\WidgetIconTicketDashboard::className(),
+                'classname' => \open2\amos\ticket\widgets\icons\WidgetIconTicketDashboard::className(),
                 'type' => AmosWidgets::TYPE_ICON,
                 'module' => self::MODULE_NAME,
                 'status' => AmosWidgets::STATUS_ENABLED,

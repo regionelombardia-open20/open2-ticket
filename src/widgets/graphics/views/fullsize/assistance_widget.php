@@ -5,16 +5,16 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\widgets\graphics\views\fullsize
+ * @package    open2\amos\ticket\widgets\graphics\views\fullsize
  * @category   CategoryName
  */
 
 use open20\amos\core\icons\AmosIcons;
-use open20\amos\ticket\AmosTicket;
-use open20\amos\ticket\models\Ticket;
-use open20\amos\ticket\widgets\graphics\WidgetGraphicAssistance;
+use open2\amos\ticket\AmosTicket;
+use open2\amos\ticket\models\Ticket;
+use open2\amos\ticket\widgets\graphics\WidgetGraphicAssistance;
 
-\open20\amos\ticket\assets\TicketAsset::register($this);
+\open2\amos\ticket\assets\TicketAsset::register($this);
 
 /**
  * @var yii\web\View $this

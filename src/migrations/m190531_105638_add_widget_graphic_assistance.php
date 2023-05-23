@@ -5,7 +5,7 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\migrations
+ * @package    open2\amos\ticket\migrations
  * @category   CategoryName
  */
 
@@ -26,7 +26,7 @@ class m190531_105638_add_widget_graphic_assistance extends AmosMigrationWidgets
     {
         $this->widgets = [
             [
-                'classname' => open20\amos\ticket\widgets\graphics\WidgetGraphicAssistance::className(),
+                'classname' => open2\amos\ticket\widgets\graphics\WidgetGraphicAssistance::className(),
                 'type' => AmosWidgets::TYPE_GRAPHIC,
                 'module' => self::MODULE_NAME,
                 'status' => AmosWidgets::STATUS_ENABLED,

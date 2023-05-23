@@ -5,19 +5,19 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\views\ticket
+ * @package    open2\amos\ticket\views\ticket
  * @category   CategoryName
  */
 
 use open20\amos\core\helpers\Html;
 use open20\amos\core\views\DataProviderView;
-use open20\amos\ticket\AmosTicket;
-use open20\amos\ticket\models\Ticket;
+use open2\amos\ticket\AmosTicket;
+use open2\amos\ticket\models\Ticket;
 
 /**
  * @var yii\web\View $this
  * @var yii\data\ActiveDataProvider $dataProvider
- * @var open20\amos\ticket\models\search\TicketSearch $model
+ * @var open2\amos\ticket\models\search\TicketSearch $model
  */
 
 $columnsGrid = [

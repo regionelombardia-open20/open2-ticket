@@ -5,12 +5,12 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\migrations
+ * @package    open2\amos\ticket\migrations
  * @category   CategoryName
  */
 
 use open20\amos\core\migration\AmosMigrationPermissions;
-use open20\amos\ticket\models\Ticket;
+use open2\amos\ticket\models\Ticket;
 
 /**
  * Class m190312_105549_temporary_fix_referente_ticket_workflow_permissions

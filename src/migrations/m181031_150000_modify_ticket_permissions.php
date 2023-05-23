@@ -5,13 +5,13 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\migrations
+ * @package    open2\amos\ticket\migrations
  * @category   CategoryName
  */
 
 use open20\amos\core\migration\AmosMigrationPermissions;
-use open20\amos\ticket\rules\TicketReadRule;
-use open20\amos\ticket\rules\TicketUpdateRule;
+use open2\amos\ticket\rules\TicketReadRule;
+use open2\amos\ticket\rules\TicketUpdateRule;
 use yii\helpers\ArrayHelper;
 use yii\rbac\Permission;
 

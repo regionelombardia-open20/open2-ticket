@@ -5,7 +5,7 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\views\ticket
+ * @package    open2\amos\ticket\views\ticket
  * @category   CategoryName
  */
 
@@ -15,17 +15,17 @@ use open20\amos\core\forms\Tabs;
 use open20\amos\core\forms\TextEditorWidget;
 use open20\amos\core\helpers\Html;
 use open20\amos\workflow\widgets\WorkflowTransitionButtonsWidget;
-use open20\amos\ticket\AmosTicket;
-use open20\amos\ticket\models\Ticket;
-use open20\amos\ticket\models\TicketCategorie;
-use open20\amos\ticket\utility\TicketUtility;
+use open2\amos\ticket\AmosTicket;
+use open2\amos\ticket\models\Ticket;
+use open2\amos\ticket\models\TicketCategorie;
+use open2\amos\ticket\utility\TicketUtility;
 use yii\helpers\ArrayHelper;
 
 /**
  * @var yii\web\View $this
  * @var yii\widgets\ActiveForm $form
- * @var open20\amos\ticket\models\Ticket $model
- * @var open20\amos\ticket\models\Ticket $model_old_ticket
+ * @var open2\amos\ticket\models\Ticket $model
+ * @var open2\amos\ticket\models\Ticket $model_old_ticket
  */
 
 ?>

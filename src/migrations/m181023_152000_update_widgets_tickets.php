@@ -5,7 +5,7 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\migrations
+ * @package    open2\amos\ticket\migrations
  * @category   CategoryName
  */
 
@@ -38,59 +38,59 @@ class m181023_152000_update_widgets_tickets extends AmosMigrationWidgets
     {
         return [
             [
-                'classname' => open20\amos\ticket\widgets\icons\WidgetIconTicketFaq::className(),
+                'classname' => open2\amos\ticket\widgets\icons\WidgetIconTicketFaq::className(),
                 'type' => AmosWidgets::TYPE_ICON,
                 'module' => self::MODULE_NAME,
                 'status' => AmosWidgets::STATUS_ENABLED,
-                'child_of' => \open20\amos\ticket\widgets\icons\WidgetIconTicketDashboard::className(),
+                'child_of' => \open2\amos\ticket\widgets\icons\WidgetIconTicketDashboard::className(),
                 'default_order' => 10,
             ],
             [
-                'classname' => open20\amos\ticket\widgets\icons\WidgetIconTicketWaiting::className(),
+                'classname' => open2\amos\ticket\widgets\icons\WidgetIconTicketWaiting::className(),
                 'type' => AmosWidgets::TYPE_ICON,
                 'module' => self::MODULE_NAME,
                 'status' => AmosWidgets::STATUS_ENABLED,
-                'child_of' => \open20\amos\ticket\widgets\icons\WidgetIconTicketDashboard::className(),
+                'child_of' => \open2\amos\ticket\widgets\icons\WidgetIconTicketDashboard::className(),
                 'default_order' => 20,
             ],
             [
-                'classname' => open20\amos\ticket\widgets\icons\WidgetIconTicketProcessing::className(),
+                'classname' => open2\amos\ticket\widgets\icons\WidgetIconTicketProcessing::className(),
                 'type' => AmosWidgets::TYPE_ICON,
                 'module' => self::MODULE_NAME,
                 'status' => AmosWidgets::STATUS_ENABLED,
-                'child_of' => \open20\amos\ticket\widgets\icons\WidgetIconTicketDashboard::className(),
+                'child_of' => \open2\amos\ticket\widgets\icons\WidgetIconTicketDashboard::className(),
                 'default_order' => 30,
             ],
             [
-                'classname' => open20\amos\ticket\widgets\icons\WidgetIconTicketClosed::className(),
+                'classname' => open2\amos\ticket\widgets\icons\WidgetIconTicketClosed::className(),
                 'type' => AmosWidgets::TYPE_ICON,
                 'module' => self::MODULE_NAME,
                 'status' => AmosWidgets::STATUS_ENABLED,
-                'child_of' => \open20\amos\ticket\widgets\icons\WidgetIconTicketDashboard::className(),
+                'child_of' => \open2\amos\ticket\widgets\icons\WidgetIconTicketDashboard::className(),
                 'default_order' => 40,
             ],
             [
-                'classname' => open20\amos\ticket\widgets\icons\WidgetIconTicketAll::className(),
+                'classname' => open2\amos\ticket\widgets\icons\WidgetIconTicketAll::className(),
                 'type' => AmosWidgets::TYPE_ICON,
                 'module' => self::MODULE_NAME,
                 'status' => AmosWidgets::STATUS_ENABLED,
-                'child_of' => \open20\amos\ticket\widgets\icons\WidgetIconTicketDashboard::className(),
+                'child_of' => \open2\amos\ticket\widgets\icons\WidgetIconTicketDashboard::className(),
                 'default_order' => 50,
             ],
             [
-                'classname' => open20\amos\ticket\widgets\icons\WidgetIconTicketCategorie::className(),
+                'classname' => open2\amos\ticket\widgets\icons\WidgetIconTicketCategorie::className(),
                 'type' => AmosWidgets::TYPE_ICON,
                 'module' => self::MODULE_NAME,
                 'status' => AmosWidgets::STATUS_ENABLED,
-                'child_of' => \open20\amos\ticket\widgets\icons\WidgetIconTicketDashboard::className(),
+                'child_of' => \open2\amos\ticket\widgets\icons\WidgetIconTicketDashboard::className(),
                 'default_order' => 100,
             ],
             [
-                'classname' => open20\amos\ticket\widgets\icons\WidgetIconTicketAdminFaq::className(),
+                'classname' => open2\amos\ticket\widgets\icons\WidgetIconTicketAdminFaq::className(),
                 'type' => AmosWidgets::TYPE_ICON,
                 'module' => self::MODULE_NAME,
                 'status' => AmosWidgets::STATUS_ENABLED,
-                'child_of' => \open20\amos\ticket\widgets\icons\WidgetIconTicketDashboard::className(),
+                'child_of' => \open2\amos\ticket\widgets\icons\WidgetIconTicketDashboard::className(),
                 'default_order' => 110,
             ],
         ];

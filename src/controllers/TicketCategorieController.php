@@ -5,16 +5,16 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\controllers
+ * @package    open2\amos\ticket\controllers
  * @category   CategoryName
  */
 
-namespace open20\amos\ticket\controllers;
+namespace open2\amos\ticket\controllers;
 
 /**
  * Class TicketCategorieController
- * @package open20\amos\ticket\controllers
+ * @package open2\amos\ticket\controllers
  */
-class TicketCategorieController extends \open20\amos\ticket\controllers\base\TicketCategorieController
+class TicketCategorieController extends \open2\amos\ticket\controllers\base\TicketCategorieController
 {
 }

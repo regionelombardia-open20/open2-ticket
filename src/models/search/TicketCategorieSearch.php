@@ -5,13 +5,13 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\models\search
+ * @package    open2\amos\ticket\models\search
  * @category   CategoryName
  */
 
-namespace open20\amos\ticket\models\search;
+namespace open2\amos\ticket\models\search;
 
-use open20\amos\ticket\models\TicketCategorie;
+use open2\amos\ticket\models\TicketCategorie;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 
@@ -21,7 +21,6 @@ use yii\data\ActiveDataProvider;
 class TicketCategorieSearch extends TicketCategorie
 {
     /**
-     * @see    \yii\base\Model::rules()    for more info.
      */
     public function rules()
     {
@@ -32,7 +31,6 @@ class TicketCategorieSearch extends TicketCategorie
     }
 
     /**
-     * @see    \yii\base\Model::scenarios()    for more info.
      */
     public function scenarios()
     {

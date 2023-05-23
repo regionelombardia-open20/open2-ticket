@@ -5,12 +5,12 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\migrations
+ * @package    open2\amos\ticket\migrations
  * @category   CategoryName
  */
 
 use open20\amos\core\migration\AmosMigrationPermissions;
-use open20\amos\ticket\widgets\graphics\WidgetGraphicAssistance;
+use open2\amos\ticket\widgets\graphics\WidgetGraphicAssistance;
 use yii\rbac\Permission;
 
 /**

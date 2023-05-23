@@ -5,19 +5,19 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\widgets\icons
+ * @package    open2\amos\ticket\widgets\icons
  * @category   CategoryName
  */
 
-namespace open20\amos\ticket\widgets\icons;
+namespace open2\amos\ticket\widgets\icons;
 
 use open20\amos\core\widget\WidgetIcon;
-use open20\amos\ticket\AmosTicket;
+use open2\amos\ticket\AmosTicket;
 use yii\helpers\ArrayHelper;
 
 /**
  * Class WidgetIconTicketProcessing
- * @package open20\amos\ticket\widgets\icons
+ * @package open2\amos\ticket\widgets\icons
  */
 class WidgetIconTicketProcessing extends WidgetIcon
 {

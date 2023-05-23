@@ -5,11 +5,11 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\migrations
+ * @package    open2\amos\ticket\migrations
  * @category   CategoryName
  */
 
-use open20\amos\ticket\models\TicketCategorie;
+use open2\amos\ticket\models\TicketCategorie;
 use yii\db\Migration;
 
 /**

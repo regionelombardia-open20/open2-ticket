@@ -5,16 +5,16 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\models\base
+ * @package    open2\amos\ticket\models\base
  * @category   CategoryName
  */
 
-namespace open20\amos\ticket\models\base;
+namespace open2\amos\ticket\models\base;
 
 use open20\amos\admin\AmosAdmin;
 use open20\amos\core\interfaces\OrganizationsModuleInterface;
 use open20\amos\core\record\Record;
-use open20\amos\ticket\AmosTicket;
+use open2\amos\ticket\AmosTicket;
 
 /**
  * Class Ticket
@@ -48,12 +48,12 @@ use open20\amos\ticket\AmosTicket;
  * @property integer $updated_by
  * @property integer $deleted_by
  *
- * @property \open20\amos\ticket\models\TicketCategorie $ticketCategoria
+ * @property \open2\amos\ticket\models\TicketCategorie $ticketCategoria
  * @property \open20\amos\organizzazioni\models\Profilo|\open20\amos\core\interfaces\OrganizationsModelInterface $partnership
- * @property \open20\amos\ticket\models\TicketCategorie $forwardedFromTicket
- * @property \open20\amos\ticket\models\TicketCategorie $nextTicket
+ * @property \open2\amos\ticket\models\TicketCategorie $forwardedFromTicket
+ * @property \open2\amos\ticket\models\TicketCategorie $nextTicket
  *
- * @package open20\amos\ticket\models\base
+ * @package open2\amos\ticket\models\base
  */
 class Ticket extends Record
 {
@@ -122,7 +122,7 @@ class Ticket extends Record
             [[
                 'phone'
             ], 'number'],
-            [['ticket_categoria_id'], 'exist', 'skipOnError' => true, 'targetClass' => \open20\amos\ticket\models\TicketCategorie::className(), 'targetAttribute' => ['ticket_categoria_id' => 'id']],
+            [['ticket_categoria_id'], 'exist', 'skipOnError' => true, 'targetClass' => \open2\amos\ticket\models\TicketCategorie::className(), 'targetAttribute' => ['ticket_categoria_id' => 'id']],
         ];
 
         if ($this->ticketCategoria && $this->ticketCategoria->enable_phone) {
@@ -171,7 +171,7 @@ class Ticket extends Record
      */
     public function getTicketCategoria()
     {
-        return $this->hasOne(\open20\amos\ticket\models\TicketCategorie::className(), ['id' => 'ticket_categoria_id']);
+        return $this->hasOne(\open2\amos\ticket\models\TicketCategorie::className(), ['id' => 'ticket_categoria_id']);
     }
 
     /**
@@ -198,7 +198,7 @@ class Ticket extends Record
      */
     public function getForwardedFromTicket()
     {
-        return $this->hasOne(\open20\amos\ticket\models\Ticket::className(), ['id' => 'forwarded_from_id']);
+        return $this->hasOne(\open2\amos\ticket\models\Ticket::className(), ['id' => 'forwarded_from_id']);
     }
 
     /**
@@ -206,6 +206,6 @@ class Ticket extends Record
      */
     public function getNextTicket()
     {
-        return $this->hasOne(\open20\amos\ticket\models\Ticket::className(), ['forwarded_from_id' => 'id']);
+        return $this->hasOne(\open2\amos\ticket\models\Ticket::className(), ['forwarded_from_id' => 'id']);
     }
 }

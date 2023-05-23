@@ -5,22 +5,22 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\views\ticket
+ * @package    open2\amos\ticket\views\ticket
  * @category   CategoryName
  */
 
 use open20\amos\admin\widgets\UserCardWidget;
 use open20\amos\workflow\behaviors\WorkflowLogFunctionsBehavior;
-use open20\amos\ticket\AmosTicket;
-use open20\amos\ticket\models\Ticket;
-use open20\amos\ticket\models\TicketCategorie;
-use open20\amos\ticket\widgets\forms\ByAtWidget;
+use open2\amos\ticket\AmosTicket;
+use open2\amos\ticket\models\Ticket;
+use open2\amos\ticket\models\TicketCategorie;
+use open2\amos\ticket\widgets\forms\ByAtWidget;
 use yii\helpers\Html;
 use yii\helpers\Url;
 
 /**
  * @var yii\web\View $this
- * @var open20\amos\ticket\models\Ticket|WorkflowLogFunctionsBehavior $model
+ * @var open2\amos\ticket\models\Ticket|WorkflowLogFunctionsBehavior $model
  */
 
 $this->title = $model->titolo;

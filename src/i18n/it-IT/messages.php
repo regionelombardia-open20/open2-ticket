@@ -5,7 +5,7 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\i18n\it-IT
+ * @package    open2\amos\ticket\i18n\it-IT
  * @category   CategoryName
  */
 

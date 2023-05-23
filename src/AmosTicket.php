@@ -5,33 +5,33 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket
+ * @package    open2\amos\ticket
  * @category   CategoryName
  */
 
-namespace open20\amos\ticket;
+namespace open2\amos\ticket;
 
 use open20\amos\core\interfaces\CmsModuleInterface;
 use open20\amos\core\interfaces\SearchModuleInterface;
 use open20\amos\core\module\AmosModule;
 use open20\amos\core\module\ModuleInterface;
 use open20\amos\core\user\User;
-use open20\amos\ticket\models\search\TicketFaqSearch;
-use open20\amos\ticket\models\TicketFaq;
-use open20\amos\ticket\widgets\icons\WidgetIconTicketAdminFaq;
-use open20\amos\ticket\widgets\icons\WidgetIconTicketAll;
-use open20\amos\ticket\widgets\icons\WidgetIconTicketCategorie;
-use open20\amos\ticket\widgets\icons\WidgetIconTicketClosed;
-use open20\amos\ticket\widgets\icons\WidgetIconTicketDashboard;
-use open20\amos\ticket\widgets\icons\WidgetIconTicketFaq;
-use open20\amos\ticket\widgets\icons\WidgetIconTicketProcessing;
-use open20\amos\ticket\widgets\icons\WidgetIconTicketWaiting;
-use open20\amos\ticket\models\Ticket;
+use open2\amos\ticket\models\search\TicketFaqSearch;
+use open2\amos\ticket\models\TicketFaq;
+use open2\amos\ticket\widgets\icons\WidgetIconTicketAdminFaq;
+use open2\amos\ticket\widgets\icons\WidgetIconTicketAll;
+use open2\amos\ticket\widgets\icons\WidgetIconTicketCategorie;
+use open2\amos\ticket\widgets\icons\WidgetIconTicketClosed;
+use open2\amos\ticket\widgets\icons\WidgetIconTicketDashboard;
+use open2\amos\ticket\widgets\icons\WidgetIconTicketFaq;
+use open2\amos\ticket\widgets\icons\WidgetIconTicketProcessing;
+use open2\amos\ticket\widgets\icons\WidgetIconTicketWaiting;
+use open2\amos\ticket\models\Ticket;
 use Yii;
 
 /**
  * Class AmosTicket
- * @package open20\amos\ticket
+ * @package open2\amos\ticket
  */
 class AmosTicket extends AmosModule implements ModuleInterface, SearchModuleInterface, CmsModuleInterface
 {
@@ -60,10 +60,10 @@ class AmosTicket extends AmosModule implements ModuleInterface, SearchModuleInte
     public function init()
     {
         parent::init();
-        \Yii::setAlias('@open20/amos/' . static::getModuleName() . '/models', __DIR__ . '/models');
-        \Yii::setAlias('@open20/amos/' . static::getModuleName() . '/controllers', __DIR__ . '/controllers');
-        \Yii::setAlias('@open20/amos/' . static::getModuleName() . '/widgets/icons', __DIR__ . '/widgets/icons');
-        \Yii::setAlias('@open20/amos/' . static::getModuleName() . '/migrations', __DIR__ . '/migrations');
+        \Yii::setAlias('@open2/amos/' . static::getModuleName() . '/models', __DIR__ . '/models');
+        \Yii::setAlias('@open2/amos/' . static::getModuleName() . '/controllers', __DIR__ . '/controllers');
+        \Yii::setAlias('@open2/amos/' . static::getModuleName() . '/widgets/icons', __DIR__ . '/widgets/icons');
+        \Yii::setAlias('@open2/amos/' . static::getModuleName() . '/migrations', __DIR__ . '/migrations');
 
         // \Yii::configure($this, require(__DIR__ . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.php'));
         // 

@@ -5,17 +5,17 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\views\ticket-faq
+ * @package    open2\amos\ticket\views\ticket-faq
  * @category   CategoryName
  */
 
 use open20\amos\core\views\DataProviderView;
-use open20\amos\ticket\AmosTicket;
+use open2\amos\ticket\AmosTicket;
 
 /**
  * @var yii\web\View $this
  * @var yii\data\ActiveDataProvider $dataProvider
- * @var open20\amos\ticket\models\search\TicketFaqSearch $model
+ * @var open2\amos\ticket\models\search\TicketFaqSearch $model
  */
 
 $this->title = AmosTicket::t('amosticket', 'Gestione Faq');

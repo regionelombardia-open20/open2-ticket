@@ -5,23 +5,23 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\widgets\icons
+ * @package    open2\amos\ticket\widgets\icons
  * @category   CategoryName
  */
 
-namespace open20\amos\ticket\widgets\icons;
+namespace open2\amos\ticket\widgets\icons;
 
 use open20\amos\community\models\Community;
 use open20\amos\core\widget\WidgetIcon;
 use open20\amos\core\widget\WidgetAbstract;
 use open20\amos\core\icons\AmosIcons;
-use open20\amos\ticket\AmosTicket;
+use open2\amos\ticket\AmosTicket;
 use Yii;
 use yii\helpers\ArrayHelper;
 
 /**
  * Class WidgetIconTicketDashboard
- * @package open20\amos\ticket\widgets\icons
+ * @package open2\amos\ticket\widgets\icons
  */
 class WidgetIconTicketDashboard extends WidgetIcon
 {

@@ -5,15 +5,15 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\views\ticket-faq
+ * @package    open2\amos\ticket\views\ticket-faq
  * @category   CategoryName
  */
 
-use open20\amos\ticket\AmosTicket;
+use open2\amos\ticket\AmosTicket;
 
 /**
  * @var yii\web\View $this
- * @var open20\amos\ticket\models\TicketFaq $model
+ * @var open2\amos\ticket\models\TicketFaq $model
  */
 
 $this->title = AmosTicket::t('amosticket', 'Crea faq');

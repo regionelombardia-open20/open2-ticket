@@ -5,17 +5,17 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\widgets\forms
+ * @package    open2\amos\ticket\widgets\forms
  * @category   CategoryName
  */
 
-namespace open20\amos\ticket\widgets\forms;
+namespace open2\amos\ticket\widgets\forms;
 
 use open20\amos\admin\models\UserProfile;
 use open20\amos\core\helpers\Html;
 use open20\amos\core\icons\AmosIcons;
 use open20\amos\core\module\BaseAmosModule;
-use open20\amos\ticket\AmosTicket;
+use open2\amos\ticket\AmosTicket;
 use yii\base\Widget;
 use yii\db\ActiveRecord;
 
@@ -24,7 +24,7 @@ use yii\db\ActiveRecord;
  *
  * The widget requires only one parameter: the model
  *
- * @package open20\amos\ticket\widgets\forms
+ * @package open2\amos\ticket\widgets\forms
  */
 class ByAtWidget extends Widget
 {

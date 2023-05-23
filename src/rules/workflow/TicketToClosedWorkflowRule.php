@@ -5,20 +5,20 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\rules\workflow
+ * @package    open2\amos\ticket\rules\workflow
  * @category   CategoryName
  */
 
-namespace open20\amos\ticket\rules\workflow;
+namespace open2\amos\ticket\rules\workflow;
 
 //use yii\rbac\Rule;
 use open20\amos\core\rules\BasicContentRule;
-use open20\amos\ticket\models\Ticket;
-use open20\amos\ticket\models\TicketCategorie;
+use open2\amos\ticket\models\Ticket;
+use open2\amos\ticket\models\TicketCategorie;
 
 /**
  * Class TicketToClosedWorkflowRule
- * @package open20\amos\ticket\rules\workflow
+ * @package open2\amos\ticket\rules\workflow
  */
 class TicketToClosedWorkflowRule extends BasicContentRule
 {

@@ -4,20 +4,20 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\models\search
+ * @package    open2\amos\ticket\models\search
  * @category   CategoryName
  */
 
-namespace open20\amos\ticket\models\search;
+namespace open2\amos\ticket\models\search;
 
 use open20\amos\core\interfaces\CmsModelInterface;
 use open20\amos\core\interfaces\ContentModelSearchInterface;
 use open20\amos\core\interfaces\SearchModelInterface;
 use open20\amos\core\record\CmsField;
 use open20\amos\core\record\Record;
-use open20\amos\ticket\models\Ticket;
-use open20\amos\ticket\models\TicketCategorie;
-use open20\amos\ticket\models\TicketCategorieUsersMm;
+use open2\amos\ticket\models\Ticket;
+use open2\amos\ticket\models\TicketCategorie;
+use open2\amos\ticket\models\TicketCategorieUsersMm;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
@@ -27,8 +27,8 @@ use yii\db\Query;
 
 /**
  * Class TicketSearch
- * TicketSearch represents the model behind the search form about `open20\amos\ticket\models\Ticket`.
- * @package open20\amos\ticket\models\search
+ * TicketSearch represents the model behind the search form about `open2\amos\ticket\models\Ticket`.
+ * @package open2\amos\ticket\models\search
  */
 class TicketSearch extends Ticket implements SearchModelInterface, ContentModelSearchInterface, CmsModelInterface
 {
@@ -272,7 +272,7 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
     public function buildQuery($params, $queryType, $onlyStatus = false)
     {
         $query          = $this->baseSearch($params);
-        $classname      = \open20\amos\ticket\models\Ticket::className();
+        $classname      = \open2\amos\ticket\models\Ticket::className();
         $moduleCwh      = \Yii::$app->getModule('cwh');
         $cwhActiveQuery = null;
 
@@ -357,7 +357,7 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
         //check params to get orders value
         $this->setOrderVars($params);
         /** @var Record $className */
-        $className = \open20\amos\ticket\models\Ticket::className();
+        $className = \open2\amos\ticket\models\Ticket::className();
         return $className::find()->distinct();
     }
 
@@ -502,7 +502,7 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
             ->innerJoin('user u', 't.created_by = u.id')
             ->innerJoin('user_profile p', 'p.user_id = u.id')
             ->leftJoin('comment cm',
-                "t.id = cm.context_id and cm.context = 'open20\\\\amos\\\\ticket\\\\models\\\\Ticket'")
+                "t.id = cm.context_id and cm.context = 'open2\\\\amos\\\\ticket\\\\models\\\\Ticket'")
             ->leftJoin('comment_reply cr', 'cm.id = cr.comment_id')
             ->leftJoin('organizations o', 'p.prevalent_partnership_id = o.id')
             ->groupBy('t.id');

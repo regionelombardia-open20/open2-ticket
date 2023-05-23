@@ -5,13 +5,13 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\models\base
+ * @package    open2\amos\ticket\models\base
  * @category   CategoryName
  */
 
-namespace open20\amos\ticket\models\base;
+namespace open2\amos\ticket\models\base;
 
-use open20\amos\ticket\AmosTicket;
+use open2\amos\ticket\AmosTicket;
 
 /**
  * This is the base-model class for table "ticket_categorie_users_mm".
@@ -27,7 +27,7 @@ use open20\amos\ticket\AmosTicket;
  * @property integer $deleted_by
  *
  * @property \open20\amos\admin\models\ $user
- * @property \open20\amos\ticket\models\TicketCategorie $ticketCategoria
+ * @property \open2\amos\ticket\models\TicketCategorie $ticketCategoria
  */
 class TicketCategorieUsersMm extends \open20\amos\core\record\Record
 {
@@ -85,6 +85,6 @@ class TicketCategorieUsersMm extends \open20\amos\core\record\Record
      */
     public function getTicketCategoria()
     {
-        return $this->hasOne(\open20\amos\ticket\models\TicketCategorie::className(), ['id' => 'ticket_categoria_id']);
+        return $this->hasOne(\open2\amos\ticket\models\TicketCategorie::className(), ['id' => 'ticket_categoria_id']);
     }
 }

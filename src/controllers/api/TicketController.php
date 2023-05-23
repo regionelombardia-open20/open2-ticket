@@ -1,15 +1,6 @@
 <?php
 
-/**
- * Aria S.p.A.
- * OPEN 2.0
- *
- *
- * @package    Open20Package
- * @category   CategoryName
- */
-
-namespace open20\amos\ticket\controllers\api;
+namespace open2\amos\ticket\controllers\api;
 
 /**
 * This is the class for REST controller "TicketController".
@@ -20,5 +11,5 @@ use yii\helpers\ArrayHelper;
 
 class TicketController extends \yii\rest\ActiveController
 {
-public $modelClass = 'open20\amos\ticket\models\Ticket';
+public $modelClass = 'open2\amos\ticket\models\Ticket';
 }

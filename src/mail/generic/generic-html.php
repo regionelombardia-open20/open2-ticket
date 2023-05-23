@@ -5,11 +5,11 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\mail\generic
+ * @package    open2\amos\ticket\mail\generic
  * @category   CategoryName
  */
 
-use open20\amos\ticket\AmosTicket;
+use open2\amos\ticket\AmosTicket;
 
 /**
  * @var $this yii\web\View

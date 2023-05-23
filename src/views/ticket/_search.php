@@ -5,21 +5,21 @@
  * OPEN 2.0
  *
  *
- * @package    open20\amos\ticket\views\ticket
+ * @package    open2\amos\ticket\views\ticket
  * @category   CategoryName
  */
 
 use open20\amos\core\helpers\Html;
 use kartik\select2\Select2;
-use open20\amos\ticket\AmosTicket;
-use open20\amos\ticket\models\Ticket;
-use open20\amos\ticket\utility\TicketUtility;
+use open2\amos\ticket\AmosTicket;
+use open2\amos\ticket\models\Ticket;
+use open2\amos\ticket\utility\TicketUtility;
 use yii\helpers\ArrayHelper;
 use yii\widgets\ActiveForm;
 
 /**
  * @var yii\web\View $this
- * @var open20\amos\ticket\models\search\TicketSearch $model
+ * @var open2\amos\ticket\models\search\TicketSearch $model
  * @var yii\widgets\ActiveForm $form
  */
 
