@@ -134,9 +134,12 @@ return [
     '#widget_graphic_assistance_list_no_tickets' => 'Nessun ticket',
     'You are not authorized to delete this ticket category' => 'Non sei autorizzato a cancellare questa categoria',
     '#CLOSED_buttonLabel' => 'Chiudi',
+    '#CLOSED_description' => 'il ticket',
     '#CLOSED_label' => 'Chiuso',
     '#PROCESSING_label' => 'In corso',
     '#WAITING_label' => 'In attesa',
-    '#CLOSED_description' => 'il ticket',
+    '#WAITINGTECHNICALASSISTANCE_buttonLabel' => 'In attesa di assistenza tecnica',
+    '#WAITINGTECHNICALASSISTANCE_description' => 'In attesa di assistenza tecnica',
+    '#WAITINGTECHNICALASSISTANCE_label' => 'In attesa di assistenza tecnica',
     '#widget_assistance_list_no_tickets' => 'Nessun ticket presente'
 ];

@@ -137,4 +137,7 @@ return [
     '#CLOSED_label' => 'Closed',
     '#PROCESSING_label' => 'In progress',
     '#WAITING_label' => 'Pending',
+    '#WAITINGTECHNICALASSISTANCE_buttonLabel' => 'Waiting technical assistance',
+    '#WAITINGTECHNICALASSISTANCE_description' => 'Waiting technical assistance',
+    '#WAITINGTECHNICALASSISTANCE_label' => 'Waiting technical assistance',
 ];

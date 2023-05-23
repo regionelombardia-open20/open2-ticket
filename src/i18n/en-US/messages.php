@@ -134,4 +134,9 @@ return [
     'You are not authorized to delete this ticket category' => 'You are not authorized to delete this category',
     '#CLOSED_buttonLabel' => 'Close',
     '#CLOSED_description' => 'the ticket',
+    '#PROCESSING_label' => 'In progress',
+    '#WAITING_label' => 'Pending',
+    '#WAITINGTECHNICALASSISTANCE_buttonLabel' => 'Waiting technical assistance',
+    '#WAITINGTECHNICALASSISTANCE_description' => 'Waiting technical assistance',
+    '#WAITINGTECHNICALASSISTANCE_label' => 'Waiting technical assistance',
 ];
