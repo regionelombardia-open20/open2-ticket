@@ -80,6 +80,11 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
     
     public function getCloseCommentThread()
     {
+        // Comment Thread chiusa se lo stato del ticket è chiuso! Task 16984
+        if ($this->status == self::TICKET_WORKFLOW_STATUS_CLOSED){
+            return true;
+        }
+
         // i ticket GUEST debbono essere chiusi dopo il primo commento... e quindi nessuna risposta ulteriore è prevista
         if ($this->isGuestTicket() && $this->getFirstAnswer()) {
             return true;
