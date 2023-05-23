@@ -29,8 +29,8 @@ class WidgetIconTicketProcessing extends WidgetIcon
     {
         parent::init();
 
-        $this->setLabel(AmosTicket::tHtml('amosticket', 'Ticket in corso'));
-        $this->setDescription(AmosTicket::t('amosticket', 'Visualizza i ticket in corso'));
+        $this->setLabel(AmosTicket::tHtml('amosticket', '#ticket_processing_title'));
+        $this->setDescription(AmosTicket::t('amosticket', '#view_ticket_description'));
         $this->setIcon('feed');
         $this->setUrl(['/ticket/ticket/ticket-processing']);
         $this->setCode('TICKET_PROCESSING');

@@ -22,6 +22,7 @@ use open2\amos\ticket\models\base\UserProfileForm;
 use open2\amos\ticket\models\search\TicketCategorieSearch;
 use open2\amos\ticket\models\TicketCategorie;
 use open2\amos\ticket\models\TicketCategorieUsersMm;
+use open2\amos\ticket\utility\TicketUtility;
 use Yii;
 use yii\helpers\Url;
 
@@ -81,20 +82,75 @@ class TicketCategorieController extends CrudController
         
         $urlCreate = '/ticket/ticket-categorie/create';
         $urlManage = null;
+		
+		if (\Yii::$app->user->isGuest) {
+            $titleSection = AmosTicket::t('amosticket', '#ticket_category_title');
+            $urlLinkAll   = '';
+
+            $labelSigninOrSignup = AmosTicket::t('amosticket', '#beforeActionCtaLoginRegister');
+            $titleSigninOrSignup = AmosTicket::t('amosticket',
+                '#beforeActionCtaLoginRegisterTitle',
+                ['platformName' => \Yii::$app->name]
+            );
+            $labelSignin = AmosTicket::t('amosticket', '#beforeActionCtaLogin');
+            $titleSignin = AmosTicket::t('amosticket',
+                '#beforeActionCtaLoginTitle',
+                ['platformName' => \Yii::$app->name]
+            );
+
+            $labelLink = $labelSigninOrSignup;
+            $titleLink = $titleSigninOrSignup;
+            $socialAuthModule = Yii::$app->getModule('socialauth');
+            if ($socialAuthModule && ($socialAuthModule->enableRegister == false)) {
+                $labelLink = $labelSignin;
+                $titleLink = $titleSignin;
+            }
+
+            $ctaLoginRegister = Html::a(
+                $labelLink,
+                isset(\Yii::$app->params['linkConfigurations']['loginLinkCommon']) ? \Yii::$app->params['linkConfigurations']['loginLinkCommon']
+                    : \Yii::$app->params['platform']['backendUrl'] . '/' . AmosAdmin::getModuleName() . '/security/login',
+                [
+                    'title' => $titleLink
+                ]
+            );
+            $subTitleSection  = Html::tag(
+                'p',
+                AmosTicket::t('amosticket',
+                    '#beforeActionSubtitleSectionGuest',
+                    ['platformName' => \Yii::$app->name, 'ctaLoginRegister' => $ctaLoginRegister]
+                )
+            );
+        }else{
+            $titleSection = AmosTicket::t('amosticket', '#ticket_category_title');
+            $labelLinkAll = AmosTicket::t('amosticket', '#ticket_all_title');
+            if (Yii::$app->getUser()->can('REFERENTE_TICKET') || Yii::$app->getUser()->can('AMMINISTRATORE_TICKET')) {
+                $urlLinkAll = '/ticket/ticket/index';
+            }else{
+                $urlLinkAll = '/ticket/';
+            }
+            $titleLinkAll = AmosTicket::t('amosticket', '#ticket_all_description'); 
+
+            $subTitleSection = Html::tag('p', AmosTicket::t('amosticket', '#beforeActionSubtitleSectionLogged'));
+        }
+		$labelCreate = AmosTicket::t('amosticket', '#new_category');
+        $titleCreate = AmosTicket::t('amosticket', '#new_category');
+		$labelManage = AmosTicket::t('amosticket', '#manage');
+        $titleManage = AmosTicket::t('amosticket', '#manage');
         
         $this->view->params = [
-            'isGuest' => false,
-//            'modelLabel' => 'news',
-//            'titleSection' => $titleSection,
-//            'subTitleSection' => $subTitleSection,
-//            'urlLinkAll' => $urlLinkAll,
-//            'labelLinkAll' => $labelLinkAll,
-//            'titleLinkAll' => $titleLinkAll,
-//            'labelCreate' => $labelCreate,
-//            'titleCreate' => $titleCreate,
-//            'labelManage' => $labelManage,
-//            'titleManage' => $titleManage,
-            
+            'isGuest' => \Yii::$app->user->isGuest,
+            'modelLabel' => 'ticket',
+            'titleSection' => $titleSection,
+            'subTitleSection' => $subTitleSection,
+            'urlLinkAll' => $urlLinkAll,
+            //'hideCreate' => true,
+            'labelLinkAll' => $labelLinkAll,
+            'titleLinkAll' => $titleLinkAll,
+            'labelCreate' => $labelCreate,
+            'titleCreate' => $titleCreate,
+            'labelManage' => $labelManage,
+            'titleManage' => $titleManage,
             'urlCreate' => $urlCreate,
             'urlManage' => $urlManage,
         ];
@@ -117,11 +173,8 @@ class TicketCategorieController extends CrudController
     public function actionIndex($layout = null)
     {
         Url::remember();
-        Yii::$app->view->params['createNewBtnParams'] = [
-            'createNewBtnLabel' => AmosTicket::t('amosticket', '#new_category')
-        ];
+        $this->setDataProvider($this->modelSearch->search(Yii::$app->request->getQueryParams()));
         $this->view->params['currentDashboard'] = $this->getCurrentDashboard();
-        $this->setDataProvider($this->getModelSearch()->search(Yii::$app->request->getQueryParams()));
         return parent::actionIndex();
     }
     
@@ -340,5 +393,13 @@ class TicketCategorieController extends CrudController
             $this->model_referenti = new UserProfileForm();
         }
         $this->model_referenti->ids = $ids;
+    }
+	
+    /**
+     * @return array
+     */
+    public static function getManageLinks()
+    {
+        return TicketUtility::getManageLink();
     }
 }

@@ -12,6 +12,7 @@
 namespace open2\amos\ticket\utility;
 
 use open20\amos\admin\AmosAdmin;
+use open2\amos\ticket\AmosTicket;
 use open20\amos\admin\models\UserProfile;
 use open20\amos\admin\utility\UserProfileUtility;
 use open20\amos\core\helpers\Html;
@@ -23,6 +24,12 @@ use open20\amos\organizzazioni\models\ProfiloSedi;
 use open2\amos\ticket\models\Ticket;
 use open2\amos\ticket\models\TicketCategorie;
 use open2\amos\ticket\models\TicketCategorieUsersMm;
+use open2\amos\ticket\widgets\icons\WidgetIconTicketProcessing;
+use open2\amos\ticket\widgets\icons\WidgetIconTicketWaiting;
+use open2\amos\ticket\widgets\icons\WidgetIconTicketClosed;
+use open2\amos\ticket\widgets\icons\WidgetIconTicketCategorie;
+use open2\amos\ticket\widgets\icons\WidgetIconTicketFaq;
+use open2\amos\ticket\widgets\icons\WidgetIconTicketAll;
 use Yii;
 use yii\base\BaseObject;
 use yii\db\ActiveQuery;
@@ -333,5 +340,61 @@ class TicketUtility extends BaseObject
                 Html::BOOLEAN_FIELDS_VALUE_YES => BaseAmosModule::t('amoscore', 'Yes')
             ];
         }
+    }
+    
+    /**
+     * Return an array with all the manage links.
+     * @return array
+     */
+     public static function getManageLink()
+    {
+        if (\Yii::$app->user->can(WidgetIconTicketProcessing::class)) {
+            $links[] = [
+                'title' => AmosTicket::t('amosticket', '#ticket_processing_description'),
+                'label' => AmosTicket::t('amosticket', '#ticket_processing_title'),
+                'url' => '/ticket/ticket/ticket-processing'
+            ];
+        }
+        
+        if (\Yii::$app->user->can(WidgetIconTicketWaiting::class)) {
+            $links[] = [
+                'title' => AmosTicket::t('amosticket', '#ticket_waiting_description'),
+                'label' => AmosTicket::t('amosticket', '#ticket_waiting_title'),
+                'url' => '/ticket/ticket/ticket-waiting'
+            ];
+        }
+        
+        if (\Yii::$app->user->can(WidgetIconTicketClosed::class)) {
+            $links[] = [
+                'title' => AmosTicket::t('amosticket', '#ticket_closed_description'),
+                'label' => AmosTicket::t('amosticket', '#ticket_closed_title'),
+                'url' => '/ticket/ticket/ticket-closed'
+            ];
+        }
+        
+        if (\Yii::$app->user->can(WidgetIconTicketCategorie::class)) {
+            $links[] = [
+                'title' => AmosTicket::t('amosticket', '#ticket_category_description'),
+                'label' => AmosTicket::t('amosticket', '#ticket_category_title'),
+                'url' => '/ticket/ticket-categorie/index',
+            ];
+        }
+		if (\Yii::$app->user->can(WidgetIconTicketFaq::class)) {
+            $links[] = [
+                'title' => AmosTicket::t('amosticket', '#manage_faq'),
+                'label' => AmosTicket::t('amosticket', '#manage_faq_description'),
+                'url' => '/ticket/assistenza/cerca-faq',
+            ];
+        }
+
+        if (Yii::$app->user->can(WidgetIconTicketAll::class)) {
+            $links[] = [
+                'title' => AmosTicket::t('amosticket', '#ticket_all_description'),
+                'label' => AmosTicket::t('amosticket', '#ticket_all_title'),
+                'url' => '/ticket/ticket/index'
+            ];
+        }
+
+        return $links;
     }
 }

@@ -18,6 +18,7 @@ use open20\amos\dashboard\controllers\TabDashboardControllerTrait;
 use open2\amos\ticket\AmosTicket;
 use open2\amos\ticket\models\search\TicketFaqSearch;
 use open2\amos\ticket\models\TicketFaq;
+use open2\amos\ticket\utility\TicketUtility;
 use Yii;
 use yii\helpers\Url;
 
@@ -68,10 +69,29 @@ class TicketFaqController extends CrudController
         
         $urlCreate = '/ticket/ticket-faq/create';
         $labelCreate = AmosTicket::t('amosticket', 'Nuova FAQ');
+        $titleSection = AmosTicket::t('amosticket', 'Tutte le FAQ');
+        $labelLinkAll = AmosTicket::t('amosticket', 'Tutti i ticket');
+        if (Yii::$app->getUser()->can('REFERENTE_TICKET') || Yii::$app->getUser()->can('AMMINISTRATORE_TICKET')) {
+            $urlLinkAll = '/ticket/ticket/index';
+        }else{
+            $urlLinkAll = '/ticket/';
+        }
+        $labelManage = AmosTicket::t('amosticket', 'Gestisci');
+        $titleManage = AmosTicket::t('amosticket', 'Gestisci le FAQ');
+        $titleLinkAll = AmosTicket::t('amosticket', 'Visualizza la lista dei ticket'); 
+        $subTitleSection = Html::tag('p', AmosTicket::t('amosticket', '#beforeActionSubtitleSectionLogged'));
         $urlManage = null;
         
         $this->view->params = [
             'isGuest' => false,
+            'modelLabel' => 'ticket',
+            'titleSection' => $titleSection,
+            'titleLinkAll' => $titleLinkAll,
+            'labelLinkAll' => $labelLinkAll,
+            'urlLinkAll' => $urlLinkAll,
+            'labelManage' => $labelManage,
+            'titleManage' => $titleManage,
+            'subTitleSection' => $subTitleSection,
             'urlCreate' => $urlCreate,
             'labelCreate' => $labelCreate,
             'urlManage' => $urlManage,
@@ -189,6 +209,14 @@ class TicketFaqController extends CrudController
             Yii::$app->getSession()->addFlash('danger', Yii::t('amoscore', 'Item not found'));
         }
         return $this->redirect(['index']);
+    }
+    
+    /**
+     * @return array
+     */
+    public static function getManageLinks()
+    {
+        return TicketUtility::getManageLink();
     }
     
     

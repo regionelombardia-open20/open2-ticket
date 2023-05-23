@@ -39,8 +39,8 @@ class WidgetIconTicketDashboard extends WidgetIcon
             $scopeName = ' ' . $communityName;
         }
         
-        $this->setLabel(AmosTicket::t('amosticket', '#widget_icon_ticket_dashboard_label') . $scopeName);
-        $this->setDescription(AmosTicket::t('amosticket', '#widget_icon_ticket_dashboard_description'));
+        $this->setLabel(AmosTicket::t('amosticket', '#widget_icon_ticket_dashboard_label'));
+        $this->setDescription(AmosTicket::t('amosticket', '#widget_icon_ticket_dashboard_description') . ' ' . $scopeName);
 
         $paramsClassSpan = [
             'bk-backgroundIcon',

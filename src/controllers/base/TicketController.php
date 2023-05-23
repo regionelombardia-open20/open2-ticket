@@ -63,35 +63,7 @@ class TicketController extends CrudController
         
         parent::init();
     }
-    
-    /**
-     * @inheritdoc
-     */
-    public function beforeAction($action)
-    {
-        
-        $urlCreate = '/ticket/ticket/create';
-        $urlManage = null;
-        
-        $this->view->params = [
-            // il create non ha senso senza una categoria, la action da errore... da definire la logica per
-            // il create - per ora inibisco il pulsante
-            'hideCreate' => true,
-            'isGuest' => false,
-            'urlCreate' => $urlCreate,
-            'urlManage' => $urlManage,
-        ];
-        
-        if (!parent::beforeAction($action)) {
-            return false;
-        }
-        
-        // other custom code here
-        
-        return true;
-    }
-    
-    
+
     /**
      * Used for set page title and breadcrumbs.
      * @param string $newsPageTitle Ticket page title (

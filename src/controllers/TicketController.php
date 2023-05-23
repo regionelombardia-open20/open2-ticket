@@ -18,6 +18,7 @@ use open2\amos\ticket\models\search\TicketSearch;
 use open2\amos\ticket\models\Ticket;
 use open2\amos\ticket\models\TicketCategorie;
 use open2\amos\ticket\utility\EmailUtil;
+use open2\amos\ticket\utility\TicketUtility;
 use raoul2000\workflow\base\WorkflowException;
 use Yii;
 use yii\filters\AccessControl;
@@ -75,6 +76,98 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
         ]);
         return $behaviors;
     }
+	
+	
+    /**
+     * @inheritdoc
+     */
+    public function beforeAction($action)
+    {
+        if (\Yii::$app->user->isGuest) {
+            $titleSection = AmosTicket::t('amosticket', 'Tickets');
+            $urlLinkAll   = '';
+
+            $labelSigninOrSignup = AmosTicket::t('amosticket', '#beforeActionCtaLoginRegister');
+            $titleSigninOrSignup = AmosTicket::t('amosticket',
+                '#beforeActionCtaLoginRegisterTitle',
+                ['platformName' => \Yii::$app->name]
+            );
+            $labelSignin = AmosTicket::t('amosticket', '#beforeActionCtaLogin');
+            $titleSignin = AmosTicket::t('amosticket',
+                '#beforeActionCtaLoginTitle',
+                ['platformName' => \Yii::$app->name]
+            );
+
+            $labelLink = $labelSigninOrSignup;
+            $titleLink = $titleSigninOrSignup;
+            $socialAuthModule = Yii::$app->getModule('socialauth');
+            if ($socialAuthModule && ($socialAuthModule->enableRegister == false)) {
+                $labelLink = $labelSignin;
+                $titleLink = $titleSignin;
+            }
+
+            $ctaLoginRegister = Html::a(
+                $labelLink,
+                isset(\Yii::$app->params['linkConfigurations']['loginLinkCommon']) ? \Yii::$app->params['linkConfigurations']['loginLinkCommon']
+                    : \Yii::$app->params['platform']['backendUrl'] . '/' . AmosAdmin::getModuleName() . '/security/login',
+                [
+                    'title' => $titleLink
+                ]
+            );
+            $subTitleSection  = Html::tag(
+                'p',
+                AmosTicket::t('amosticket',
+                    '#beforeActionSubtitleSectionGuest',
+                    ['platformName' => \Yii::$app->name, 'ctaLoginRegister' => $ctaLoginRegister]
+                )
+            );
+        } else {
+            $urlLinkAll   = '';
+            $titleSection = AmosTicket::t('amosticket', 'Tutti i Tickets');
+            $labelLinkAll = AmosTicket::t('amosticket', 'Tutte le FAQ');
+            if (Yii::$app->getUser()->can('REFERENTE_TICKET') || Yii::$app->getUser()->can('AMMINISTRATORE_TICKET')) {
+                $urlLinkAll = '/ticket/ticket-faq/index';
+            }else{
+                $urlLinkAll = '/ticket/assistenza/cerca-faq';
+            }
+            
+            $titleLinkAll = AmosTicket::t('amosticket', 'Visualizza la lista deelle FAQ'); 
+
+            $subTitleSection = Html::tag('p', AmosTicket::t('amosticket', '#beforeActionSubtitleSectionLogged'));
+        }
+
+        $labelCreate = AmosTicket::t('amosticket', 'Nuovo');
+        $titleCreate = AmosTicket::t('amosticket', 'Crea una nuovo Ticket');
+        $labelManage = AmosTicket::t('amosticket', 'Gestisci');
+        $titleManage = AmosTicket::t('amosticket', 'Gestisci i tickets');
+        $urlCreate   = '/ticket/ticket-faq/index';
+        $urlManage   = null;
+
+        $this->view->params = [
+            'isGuest' => \Yii::$app->user->isGuest,
+            'modelLabel' => 'ticket',
+            'titleSection' => $titleSection,
+            'subTitleSection' => $subTitleSection,
+            'urlLinkAll' => $urlLinkAll,
+            'hideCreate' => true,
+            'labelLinkAll' => $labelLinkAll,
+            'titleLinkAll' => $titleLinkAll,
+            'labelCreate' => $labelCreate,
+            'titleCreate' => $titleCreate,
+            'labelManage' => $labelManage,
+            'titleManage' => $titleManage,
+            'urlCreate' => $urlCreate,
+            'urlManage' => $urlManage,
+        ];
+
+        if (!parent::beforeAction($action)) {
+            return false;
+        }
+
+        // other custom code here
+
+        return true;
+    }
     
     /**
      * Lists all Ticket models.
@@ -98,6 +191,10 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
      */
     public function actionTicketWaiting()
     {
+		$this->setTitleAndBreadcrumbs(AmosTicket::t('amosticket', 'Ticket in attesa'));
+		if (!\Yii::$app->user->isGuest) {
+            $this->view->params['titleSection'] = AmosTicket::t('amosticket', 'Ticket in attesa');
+        }
         $this->view->params['hideColumns'] = ['closed_at', 'closed_by', 'status'];
         $this->view->params['hideStatus'] = true;
         $this->view->params['hideCreatedBy'] = !Yii::$app->getUser()->can('AMMINISTRATORE_TICKET') && !Yii::$app->getUser()->can('REFERENTE_TICKET');
@@ -112,6 +209,10 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
      */
     public function actionTicketProcessing()
     {
+		$this->setTitleAndBreadcrumbs(AmosTicket::t('amosticket', 'Ticket in elaborazione'));
+		if (!\Yii::$app->user->isGuest) {
+            $this->view->params['titleSection'] = AmosTicket::t('amosticket', 'Ticket in elaborazione');
+        }
         $this->view->params['hideColumns'] = ['closed_at', 'closed_by', 'status'];
         $this->view->params['hideStatus'] = true;
         $this->view->params['hideCreatedBy'] = !Yii::$app->getUser()->can('AMMINISTRATORE_TICKET') && !Yii::$app->getUser()->can('REFERENTE_TICKET');
@@ -126,6 +227,10 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
      */
     public function actionTicketClosed()
     {
+		$this->setTitleAndBreadcrumbs(AmosTicket::t('amosticket', 'Ticket chiusi'));
+		if (!\Yii::$app->user->isGuest) {
+            $this->view->params['titleSection'] = AmosTicket::t('amosticket', 'Ticket chiusi');
+        }
         $this->view->params['hideColumns'] = ['status'];
         $this->view->params['hideStatus'] = true;
         $this->view->params['currentDashboard'] = $this->getCurrentDashboard();
@@ -479,5 +584,13 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
         $objWriter->save('/tmp/ticket-faq.xls');
         return \Yii::$app->response->sendFile('/tmp/ticket-faq.xls');
         die;
+    }
+	
+    /**
+     * @return array
+     */
+    public static function getManageLinks()
+    {
+        return TicketUtility::getManageLink();
     }
 }

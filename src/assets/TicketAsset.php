@@ -51,6 +51,7 @@ class TicketAsset extends AssetBundle
      */
     public $depends = [
         'yii\web\JqueryAsset',
+        'yii\jui\JuiAsset'
     ];
 
     public function init()

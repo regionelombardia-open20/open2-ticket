@@ -16,10 +16,14 @@ use open20\amos\dashboard\controllers\TabDashboardControllerTrait;
 use open2\amos\ticket\AmosTicket;
 use open2\amos\ticket\models\search\TicketCategorieSearch;
 use open2\amos\ticket\models\TicketCategorie;
+use open2\amos\ticket\utility\TicketUtility;
+use open20\amos\admin\AmosAdmin;
 use Yii;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
+use yii\helpers\Html;
+
 
 /**
  * Class AssistenzaController
@@ -66,6 +70,92 @@ class AssistenzaController extends CrudController
     /**
      * @inheritdoc
      */
+    public function beforeAction($action)
+    {
+        if (\Yii::$app->user->isGuest) {
+            $titleSection = AmosTicket::t('amosticket', 'Cerca FAQ');
+            $urlLinkAll   = '';
+
+            $labelSigninOrSignup = AmosTicket::t('amosticket', '#beforeActionCtaLoginRegister');
+            $titleSigninOrSignup = AmosTicket::t(
+                'amosticket',
+                '#beforeActionCtaLoginRegisterTitle',
+                ['platformName' => \Yii::$app->name]
+            );
+            $labelSignin = AmosTicket::t('amosticket', '#beforeActionCtaLogin');
+            $titleSignin = AmosTicket::t(
+                'amosticket',
+                '#beforeActionCtaLoginTitle',
+                ['platformName' => \Yii::$app->name]
+            );
+
+            $labelLink = $labelSigninOrSignup;
+            $titleLink = $titleSigninOrSignup;
+            $socialAuthModule = Yii::$app->getModule('socialauth');
+            if ($socialAuthModule && ($socialAuthModule->enableRegister == false)) {
+                $labelLink = $labelSignin;
+                $titleLink = $titleSignin;
+            }
+
+            $ctaLoginRegister = Html::a(
+                $labelLink,
+                isset(\Yii::$app->params['linkConfigurations']['loginLinkCommon']) ? \Yii::$app->params['linkConfigurations']['loginLinkCommon']
+                    : \Yii::$app->params['platform']['backendUrl'] . '/' . AmosAdmin::getModuleName() . '/security/login',
+                [
+                    'title' => $titleLink
+                ]
+            );
+            $subTitleSection  = Html::tag(
+                'p',
+                AmosTicket::t(
+                    'amosticket',
+                    '#beforeActionSubtitleSectionGuest',
+                    ['platformName' => \Yii::$app->name, 'ctaLoginRegister' => $ctaLoginRegister]
+                )
+            );
+        } else {
+            $titleSection = AmosTicket::t('amosticket', 'Tutte le FAQ');
+            $labelLinkAll = AmosTicket::t('amosticket', 'Categorie FAQ');
+            $urlLinkAll   = '/ticket/ticket-categorie/index';
+            $titleLinkAll = AmosTicket::t('amosticket', 'Visualizza la lista delle categorie FAQ');
+            $subTitleSection = Html::tag('p', AmosTicket::t('amosticket', '#beforeActionSubtitleSectionLogged'));
+        }
+
+        $labelCreate = AmosTicket::t('amosticket', 'Nuova');
+        $titleCreate = AmosTicket::t('amosticket', 'Crea una nuova FAQ');
+        $labelManage = AmosTicket::t('amosticket', 'Gestisci');
+        $titleManage = AmosTicket::t('amosticket', 'Gestisci le FAQ');
+        $urlCreate   = '/ticket/ticket/create';
+        $urlManage   = null;
+
+        $this->view->params = [
+            'isGuest' => \Yii::$app->user->isGuest,
+            'modelLabel' => 'ticket',
+            'titleSection' => $titleSection,
+            'subTitleSection' => $subTitleSection,
+            'urlLinkAll' => $urlLinkAll,
+            'hideCreate' => true,
+            'labelLinkAll' => $labelLinkAll,
+            'titleLinkAll' => $titleLinkAll,
+            'titleCreate' => $titleCreate,
+            'labelManage' => $labelManage,
+            //'hideManage' => true,
+            'hideSecondAction' => true,
+            'hideViewAll' => true
+        ];
+
+        if (!parent::beforeAction($action)) {
+            return false;
+        }
+
+        // other custom code here
+
+        return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function init()
     {
         $this->initDashboardTrait();
@@ -86,6 +176,14 @@ class AssistenzaController extends CrudController
         parent::init();
 
         $this->setUpLayout();
+    }
+    
+    /**
+     * @inheritdoc
+     */
+    public function actionIndex($layout = null)
+    {
+        return $this->redirect(['/ticket/assistenza/cerca-faq']);
     }
 
     /**
@@ -109,7 +207,7 @@ class AssistenzaController extends CrudController
         $ticketCategorieArray = $this->getFratelliConPadre($categoriaSelezionataId);
         $ticketCategorieArray = array_reverse($ticketCategorieArray);
 
-        return $this->render('cerca_faq', [
+        return $this->render('cerca_faq', [ 
             'ticketCategorieArray' => $ticketCategorieArray,
             'model' => $this->getModelSearch(),
             'categoriaSelezionata' => $categoriaSelezionata,
@@ -142,5 +240,13 @@ class AssistenzaController extends CrudController
             $res = array_merge($res, $this->getFratelliConPadre($catPadre->categoria_padre_id, $catPadre->id));
         }
         return $res;
+    }
+    
+    /**
+     * @return array
+     */
+    public static function getManageLinks()
+    {
+        return TicketUtility::getManageLink();
     }
 }
