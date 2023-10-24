@@ -59,7 +59,7 @@ class TicketAsset extends AssetBundle
         $moduleL = \Yii::$app->getModule('layout');
 
         if (!empty(\Yii::$app->params['dashboardEngine']) && \Yii::$app->params['dashboardEngine'] == WidgetAbstract::ENGINE_ROWS) {
-            $this->css = ['less/ticket_fullsize.less'];
+            $this->css = ['less/ticket_fullsize.less','less/ticket-bi.less'];
         }
 
         parent::init();

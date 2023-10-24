@@ -23,7 +23,7 @@ use open2\amos\ticket\assets\TicketAsset;
  * @var AmosTicket $module
  */
 
-\open2\amos\ticket\assets\TicketAsset::register($this);
+TicketAsset::register($this);
 
  
 /** @var AmosTicket $module */

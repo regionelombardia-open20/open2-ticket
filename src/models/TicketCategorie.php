@@ -115,7 +115,7 @@ class TicketCategorie extends \open2\amos\ticket\models\base\TicketCategorie
     /**
      * @return string
      */
-    public function getCategoryIconUrl($size = 'original', $protected = true, $url = '/img/img_default.jpg')
+    public function getCategoryIconUrl($size = 'original', $protected = true, $url = '/img/img_default_category_faq.png')
     {
         $categoryIcon = $this->getCategoryIcon();
         if (!is_null($categoryIcon)) {

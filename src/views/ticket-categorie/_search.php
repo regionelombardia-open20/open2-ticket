@@ -67,7 +67,7 @@ $module = \Yii::$app->getModule('ticket');
             <?php /*   <?= Html::resetButton(AmosTicket::t('amosticket', 'Annulla'), ['class' => 'btn btn-secondary']) ?> */ ?>
             <?= Html::a(AmosTicket::t('amosticket', 'Annulla'), [Yii::$app->controller->action->id, 'currentView' => Yii::$app->request->getQueryParam('currentView')], ['class' => 'btn btn-secondary'])
             ?>
-            <?= Html::submitButton(AmosTicket::t('amosticket', 'Cerca'), ['class' => 'btn btn-navigation-primary']) ?>
+            <?= Html::submitButton(AmosTicket::t('amosticket', 'Cerca'), ['class' => 'btn btn-primary']) ?>
         </div>
     </div>
 

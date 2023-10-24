@@ -68,7 +68,7 @@ class TicketFaqController extends CrudController
     {
         
         $urlCreate = '/ticket/ticket-faq/create';
-        $labelCreate = AmosTicket::t('amosticket', 'Nuova FAQ');
+        $labelCreate = AmosTicket::t('amosticket', 'Nuova');
         $titleSection = AmosTicket::t('amosticket', 'Tutte le FAQ');
         $labelLinkAll = AmosTicket::t('amosticket', 'Tutti i ticket');
         if (Yii::$app->getUser()->can('REFERENTE_TICKET') || Yii::$app->getUser()->can('AMMINISTRATORE_TICKET')) {

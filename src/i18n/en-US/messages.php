@@ -157,7 +157,7 @@ return [
     "#beforeActionCtaLoginRegisterTitle" => "Click here to log in or register on the platform {platformName}",
     "#beforeActionCtaLogin" => "log in on the platform",
     "#beforeActionCtaLoginTitle" => "Click here to log in on the platform {platformName}",
-    "#beforeActionSubtitleSectionGuest" => "To participate in the creation of new FAQs, {ctaLoginRegister}",
-    "#beforeActionSubtitleSectionLogged" => "",
+    "#beforeActionSubtitleSectionGuest" => "To participate in the creation of new FAQ, {ctaLoginRegister}",
+    "#beforeActionSubtitleSectionLogged" => "How can we help you?",
     '#widget_icon_ticket_dashboard_description' => 'Helpdesk',
 ];

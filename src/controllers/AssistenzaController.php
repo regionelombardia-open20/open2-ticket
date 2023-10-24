@@ -115,18 +115,17 @@ class AssistenzaController extends CrudController
             );
         } else {
             $titleSection = AmosTicket::t('amosticket', 'Tutte le FAQ');
-            $labelLinkAll = AmosTicket::t('amosticket', 'Categorie FAQ');
-            $urlLinkAll   = '/ticket/ticket-categorie/index';
-            $titleLinkAll = AmosTicket::t('amosticket', 'Visualizza la lista delle categorie FAQ');
+            $labelLinkAll = AmosTicket::t('amosticket', 'Tutti i ticket');
+            $urlLinkAll   = '/ticket/ticket/index';
+            $titleLinkAll = AmosTicket::t('amosticket', 'Visualizza la lista dei ticket');
             $subTitleSection = Html::tag('p', AmosTicket::t('amosticket', '#beforeActionSubtitleSectionLogged'));
         }
 
         $labelCreate = AmosTicket::t('amosticket', 'Nuova');
         $titleCreate = AmosTicket::t('amosticket', 'Crea una nuova FAQ');
+        $urlCreate   = '/ticket/ticket-faq/create';
         $labelManage = AmosTicket::t('amosticket', 'Gestisci');
         $titleManage = AmosTicket::t('amosticket', 'Gestisci le FAQ');
-        $urlCreate   = '/ticket/ticket/create';
-        $urlManage   = null;
 
         $this->view->params = [
             'isGuest' => \Yii::$app->user->isGuest,
@@ -134,14 +133,14 @@ class AssistenzaController extends CrudController
             'titleSection' => $titleSection,
             'subTitleSection' => $subTitleSection,
             'urlLinkAll' => $urlLinkAll,
-            'hideCreate' => true,
+            'labelCreate' => $labelCreate,
+            'titleCreate' => $titleCreate,
+            'urlCreate' => $urlCreate,
             'labelLinkAll' => $labelLinkAll,
             'titleLinkAll' => $titleLinkAll,
             'titleCreate' => $titleCreate,
             'labelManage' => $labelManage,
-            //'hideManage' => true,
-            'hideSecondAction' => true,
-            'hideViewAll' => true
+            'titleManage' => $titleManage,
         ];
 
         if (!parent::beforeAction($action)) {
@@ -170,14 +169,13 @@ class AssistenzaController extends CrudController
                      'iconaTabella' => AmosIcons::show('view-list-alt')
                  ]),
                  'url' => '?currentView=grid'
-             ],*/
-        ]);
+             ],*/]);
 
         parent::init();
 
         $this->setUpLayout();
     }
-    
+
     /**
      * @inheritdoc
      */
@@ -207,7 +205,11 @@ class AssistenzaController extends CrudController
         $ticketCategorieArray = $this->getFratelliConPadre($categoriaSelezionataId);
         $ticketCategorieArray = array_reverse($ticketCategorieArray);
 
-        return $this->render('cerca_faq', [ 
+        if (!\Yii::$app->user->isGuest) {
+            $this->view->params['titleSection'] = AmosTicket::t('amosticket', 'FAQ di assistenza');
+        }
+
+        return $this->render('cerca_faq', [
             'ticketCategorieArray' => $ticketCategorieArray,
             'model' => $this->getModelSearch(),
             'categoriaSelezionata' => $categoriaSelezionata,
@@ -241,7 +243,7 @@ class AssistenzaController extends CrudController
         }
         return $res;
     }
-    
+
     /**
      * @return array
      */

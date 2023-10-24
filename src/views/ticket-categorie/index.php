@@ -40,7 +40,7 @@ $fielsdToHide = (!empty($module) && is_array($module->categoryFieldsHide)) ? $mo
             'format' => 'html',
             'value' => function ($model) {
                 /** @var TicketCategorie $model */
-                $url = $model->getCategoryIconUrl();
+                $url = $model->getCategoryIconUrl('table_small');
                 $contentImage = Html::img($url, ['class' => 'gridview-image', 'alt' => $model->getAttributeLabel('categoryIcon')]);
                 return $contentImage;
             }

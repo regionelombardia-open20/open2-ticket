@@ -125,13 +125,14 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
             $urlLinkAll   = '';
             $titleSection = AmosTicket::t('amosticket', 'Tutti i Tickets');
             $labelLinkAll = AmosTicket::t('amosticket', 'Tutte le FAQ');
-            if (Yii::$app->getUser()->can('REFERENTE_TICKET') || Yii::$app->getUser()->can('AMMINISTRATORE_TICKET')) {
-                $urlLinkAll = '/ticket/ticket-faq/index';
-            }else{
-                $urlLinkAll = '/ticket/assistenza/cerca-faq';
-            }
+            // if (Yii::$app->getUser()->can('REFERENTE_TICKET') || Yii::$app->getUser()->can('AMMINISTRATORE_TICKET')) {
+            //     $urlLinkAll = '/ticket/ticket-faq/index';
+            // }else{
+            //     $urlLinkAll = '/ticket/assistenza/cerca-faq';
+            // }
+            $urlLinkAll = '/ticket/assistenza/cerca-faq';
             
-            $titleLinkAll = AmosTicket::t('amosticket', 'Visualizza la lista deelle FAQ'); 
+            $titleLinkAll = AmosTicket::t('amosticket', 'Visualizza la lista delle FAQ'); 
 
             $subTitleSection = Html::tag('p', AmosTicket::t('amosticket', '#beforeActionSubtitleSectionLogged'));
         }
@@ -140,7 +141,7 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
         $titleCreate = AmosTicket::t('amosticket', 'Crea una nuovo Ticket');
         $labelManage = AmosTicket::t('amosticket', 'Gestisci');
         $titleManage = AmosTicket::t('amosticket', 'Gestisci i tickets');
-        $urlCreate   = '/ticket/ticket-faq/index';
+        $urlCreate   = '';
         $urlManage   = null;
 
         $this->view->params = [
@@ -209,9 +210,9 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
      */
     public function actionTicketProcessing()
     {
-		$this->setTitleAndBreadcrumbs(AmosTicket::t('amosticket', 'Ticket in elaborazione'));
+		$this->setTitleAndBreadcrumbs(AmosTicket::t('amosticket', 'Ticket in lavorazione'));
 		if (!\Yii::$app->user->isGuest) {
-            $this->view->params['titleSection'] = AmosTicket::t('amosticket', 'Ticket in elaborazione');
+            $this->view->params['titleSection'] = AmosTicket::t('amosticket', 'Ticket in lavorazione');
         }
         $this->view->params['hideColumns'] = ['closed_at', 'closed_by', 'status'];
         $this->view->params['hideStatus'] = true;
@@ -529,7 +530,7 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
     {
         if (\Yii::$app->user->can('TICKET_EXPORT')) {
             $extract = Html::a(AmosTicket::t('amosticket', 'Esporta i ticket'), '/ticket/ticket/extract-tickets',
-                ['class' => 'btn btn-navigation-primary']);
+                ['class' => 'btn btn-outline-primary']);
             Yii::$app->view->params['additionalButtons'] = [
                 'htmlButtons' => [$extract]
             ];
