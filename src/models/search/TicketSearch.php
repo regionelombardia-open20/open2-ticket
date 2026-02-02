@@ -240,7 +240,7 @@ class TicketSearch extends Ticket implements SearchModelInterface, ContentModelS
 
         if (!empty($queryType)) {
             if ($queryType == 'all') {
-                if (Yii::$app->getUser()->can('AMMINISTRATORE_TICKET')) {
+                if (Yii::$app->getUser()->can('AMMINISTRATORE_TICKET') || Yii::$app->getUser()->can('TICKET_MANAGER_FOR_COMMUNITY')) {
 
                 } else if (Yii::$app->getUser()->can('REFERENTE_TICKET')) {
                     $queryType = 'menaged-by';

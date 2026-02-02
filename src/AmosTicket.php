@@ -35,7 +35,7 @@ use Yii;
 class AmosTicket extends AmosModule implements ModuleInterface, SearchModuleInterface, CmsModuleInterface
 {
     public static $CONFIG_FOLDER = 'config';
-    
+
     public $config = [];
     public $fieldsConfigurations = [
         'required' => [
@@ -44,50 +44,88 @@ class AmosTicket extends AmosModule implements ModuleInterface, SearchModuleInte
             'descrizione'
         ],
     ];
-    
+
     public $categoryFieldsHide = [
 //        For example...
 //        'attiva',
 //        'abilita_ticket',
     ];
-    
+    public $name = 'Tickets';
+
     public $categoryReferentsHide = false;
-    
+
     public $enableOrganizationNameString = false;
-    
+
     public $disableInfoFields = false;
-    
+
     public $disableCategory = false;
-    
+
     public $disableTicketOrganization = false;
-    
+
     public $disableForwardToAnotherCategory = false;
-    
+
     public $oneLevelCategories = false;
-    
+
     public $enableCategoryIcon = true;
-    
+
     public $searchTicketCreatorWithString = false;
-    
+
     public $hideUpdateButtonOnTickets = false;
-    
+
+    public $OnlyViewOnTickets = false;
+
+    public $disableTicketManagement = false;
+
     /**
      * @var array
      */
     public $ticketSearchFieldsHide = [
-    
+
     ];
-    
+
     /**
      * @var string emailUtilClass ClassName to make override of open2\amos\ticket\utility\EmailUtil
      */
     public $emailUtilClass = '';
-    
+
     /**
      * @var bool $enableAdministrativeTicketCategory
      */
     public $enableAdministrativeTicketCategory = false;
-    
+
+    /**
+     * @var bool $enableFaqRatingSystem
+     */
+    public $enableFaqRatingSystem = true;
+
+    /**
+     * @var bool $enableFaqEsSearch Abilita la ricerca in /ticket/assistenza/cerca-faq
+     */
+    public $enableFaqEsSearch = false;
+
+    /**
+     * @var int $faqDescriptionLimit Limitazione descrizione se necessaria
+     */
+    public $faqDescriptionLimit = 200;
+
+
+    /**
+     * @var bool
+     */
+    public $enablePrefixCommunity = true;
+
+    /**
+     * numero di richieste per unità di tempo definita dal parametro
+     * @var int $otp_num_of_requests
+     */
+    public $otp_num_of_requests = 3;
+
+    /**
+     * limitazione richieste per unità di tempo
+     * @var int $otp_requests_time_limit minutest
+     */
+    public $otp_requests_time_limit = 30;
+
     /**
      * @inheritdoc
      */
@@ -98,14 +136,14 @@ class AmosTicket extends AmosModule implements ModuleInterface, SearchModuleInte
         \Yii::setAlias('@open2/amos/' . static::getModuleName() . '/controllers', __DIR__ . '/controllers');
         \Yii::setAlias('@open2/amos/' . static::getModuleName() . '/widgets/icons', __DIR__ . '/widgets/icons');
         \Yii::setAlias('@open2/amos/' . static::getModuleName() . '/migrations', __DIR__ . '/migrations');
-        
+
         // \Yii::configure($this, require(__DIR__ . DIRECTORY_SEPARATOR . 'config' . DIRECTORY_SEPARATOR . 'config.php'));
-        // 
+        //
         // initialize the module with the configuration loaded from config.php
         $config = require(__DIR__ . DIRECTORY_SEPARATOR . self::$CONFIG_FOLDER . DIRECTORY_SEPARATOR . 'config.php');
         Yii::configure($this, $config);
     }
-    
+
     /**
      * @inheritdoc
      */
@@ -113,7 +151,7 @@ class AmosTicket extends AmosModule implements ModuleInterface, SearchModuleInte
     {
         return 'ticket';
     }
-    
+
     /**
      * @inheritdoc
      */
@@ -121,7 +159,7 @@ class AmosTicket extends AmosModule implements ModuleInterface, SearchModuleInte
     {
         return [];
     }
-    
+
     /**
      * @inheritdoc
      */
@@ -138,7 +176,7 @@ class AmosTicket extends AmosModule implements ModuleInterface, SearchModuleInte
             WidgetIconTicketWaiting::className(),
         ];
     }
-    
+
     /**
      * @inheritdoc
      */
@@ -154,7 +192,7 @@ class AmosTicket extends AmosModule implements ModuleInterface, SearchModuleInte
             'TicketCategorieSearch' => __NAMESPACE__ . '\\' . 'models\search\TicketCategorieSearch',
         ];
     }
-    
+
     /**
      * @inheritdoc
      */
@@ -166,7 +204,7 @@ class AmosTicket extends AmosModule implements ModuleInterface, SearchModuleInte
             return 'feed';
         }
     }
-    
+
     /**
      * @inheritdoc
      */
@@ -174,7 +212,7 @@ class AmosTicket extends AmosModule implements ModuleInterface, SearchModuleInte
     {
         return AmosTicket::instance()->model('TicketFaq');
     }
-    
+
     /**
      * @inheritdoc
      */
@@ -182,7 +220,7 @@ class AmosTicket extends AmosModule implements ModuleInterface, SearchModuleInte
     {
         return AmosTicket::instance()->model('TicketFaqSearch');
     }
-    
+
     /**
      * @param $model
      * @param $data
@@ -191,20 +229,20 @@ class AmosTicket extends AmosModule implements ModuleInterface, SearchModuleInte
     public static function createTicket($model, $data, $post)
     {
         $user = User::findByUsername($post['RecordDynamicModel']['email']);
-        
+
         $categoria_id = intval($post['RecordDynamicModel']['categoria']);
         $messageText = $post['RecordDynamicModel']['messaggio'];
         $styledMessageText = AmosTicket::createMessage($messageText);
-        
+
         $ticket = new Ticket();
         $ticket->ticket_categoria_id = $categoria_id;
         $ticket->titolo = $post['RecordDynamicModel']['oggetto'];
         $ticket->descrizione = $styledMessageText;
         $ticket->created_by = $user->id;
-        
+
         $ticket->save(false);
     }
-    
+
     /**
      * @param string $messageText
      * @return string

@@ -13,6 +13,7 @@ namespace open2\amos\ticket\utility;
 
 use open20\amos\attachments\models\File;
 use open20\amos\comments\models\Comment;
+use open20\amos\community\models\Community;
 use open20\amos\core\helpers\Html;
 use open20\amos\core\utilities\Email;
 use open2\amos\ticket\AmosTicket;
@@ -26,6 +27,8 @@ use yii\helpers\VarDumper;
  */
 class EmailUtil
 {
+
+
     /**
      * manda la mail di creazione del ticket ai referenti perché è un ticket nuovo
      *
@@ -38,7 +41,7 @@ class EmailUtil
     public static function sendEmailNewTicketReferenti($ticket, $model_ticket_categoria, $partnershipMsg)
     {
         $className = AmosTicket::instance()->emailUtilClass;
-        if (class_exists($className) && method_exists($className, __FUNCTION__)){
+        if (class_exists($className) && method_exists($className, __FUNCTION__)) {
             $functionName = __FUNCTION__;
             return $className::$functionName($ticket, $model_ticket_categoria, $partnershipMsg);
         }
@@ -55,6 +58,7 @@ class EmailUtil
         $to = $emailReferenti;
 
         $subject = AmosTicket::t("amosticket", 'Nuovo ticket id. ' . $ticket->id);
+        $subject = self::addPrefixCommunity($ticketCategoria, $subject);
 
         $body[] = '';
         $body[] = AmosTicket::t('amosticket', 'E\' stato aperto un nuovo ticket nel plugin assistenza');
@@ -72,9 +76,9 @@ class EmailUtil
         $body[] = $ticket->getAttributeLabel('titolo') . ': ' . $ticket->titolo;
         $body[] = $ticket->getAttributeLabel('descrizione') . ': ' . $ticket->descrizione;
         $body[] = '<strong>' . Html::a(
-            AmosTicket::t('amosticket', 'Clicca qui per visualizzarlo.'),
+                AmosTicket::t('amosticket', 'Clicca qui per visualizzarlo.'),
                 \Yii::$app->params['platform'] ['backendUrl'] . '/ticket/ticket/view?id=' . $ticket->id
-                // \Yii::$app->urlManager->createAbsoluteUrl(['/ticket/ticket/view?id=' . $ticket->id])
+            // \Yii::$app->urlManager->createAbsoluteUrl(['/ticket/ticket/view?id=' . $ticket->id])
             ) . '</strong><br />';
         $body[] = AmosTicket::t('amosticket', 'Ricordati di controllarlo.');
 
@@ -101,7 +105,7 @@ class EmailUtil
     public static function sendEmailForwardReferenti($ticket, $partnershipMsg)
     {
         $className = AmosTicket::instance()->emailUtilClass;
-        if (class_exists($className) && method_exists($className, __FUNCTION__)){
+        if (class_exists($className) && method_exists($className, __FUNCTION__)) {
             $functionName = __FUNCTION__;
             return $className::$functionName($ticket, $partnershipMsg);
         }
@@ -117,6 +121,7 @@ class EmailUtil
         $nameSurname = (!is_null($creatorUserProfile) ? $creatorUserProfile->getNomeCognome() : '-');
 
         $subject = AmosTicket::t("amosticket", 'Inoltro ticket id. ' . $ticket->id);
+        $subject = self::addPrefixCommunity($ticket->ticketCategoria, $subject);
 
         $body[] = '<br>';
         $body[] = AmosTicket::t('amosticket', "E' stato inoltrato un ticket che era stato aperto in un'altra categoria");
@@ -159,7 +164,7 @@ class EmailUtil
     public static function sendEmailForwardOperatore($ticket, $partnershipMsg)
     {
         $className = AmosTicket::instance()->emailUtilClass;
-        if (class_exists($className) && method_exists($className, __FUNCTION__)){
+        if (class_exists($className) && method_exists($className, __FUNCTION__)) {
             $functionName = __FUNCTION__;
             return $className::$functionName($ticket, $partnershipMsg);
         }
@@ -172,6 +177,7 @@ class EmailUtil
         $to = $creatorUserProfile->user->email;
 
         $subject = AmosTicket::t('amosticket', 'Inoltro ticket id. ' . $ticket->id);
+        $subject = self::addPrefixCommunity($ticket->ticketCategoria, $subject);
 
         $body[] = '';
         $body[] = AmosTicket::t('amosticket', 'Il ticket id.<strong> ' . $ticketPrecedente->id . '</strong>, aperto nella categoria ' . $ticketPrecedente->ticketCategoria->nomeCompleto . ", è stato inoltrato ad un'altra categoria e perciò chiuso.");
@@ -215,7 +221,7 @@ class EmailUtil
     public static function sendCloseTicketGuestAnsware($ticket, $answare)
     {
         $className = AmosTicket::instance()->emailUtilClass;
-        if (class_exists($className) && method_exists($className, __FUNCTION__)){
+        if (class_exists($className) && method_exists($className, __FUNCTION__)) {
             $functionName = __FUNCTION__;
             return $className::$functionName($ticket, $answare);
         }
@@ -224,9 +230,10 @@ class EmailUtil
 
         $userProfile['nome'] = $ticket->guest_name;
         $userProfile['cognome'] = $ticket->guest_surname;
-        $to =  $ticket->guest_email;
+        $to = $ticket->guest_email;
 
-        $subject = AmosTicket::t('amosticket', 'Richiesta informazioni ' . $ticket->id . ' - ' .$ticket->ticketCategoria->titolo);
+        $subject = AmosTicket::t('amosticket', 'Richiesta informazioni ' . $ticket->id . ' - ' . $ticket->ticketCategoria->titolo);
+        $subject = self::addPrefixCommunity($ticket->ticketCategoria, $subject);
 
         $body[] = AmosTicket::t('amosticket', 'in riferimento alla vostra richiesta informazioni nr. 
         {ticketId} sulla tematica {catName}, vi riportiamo la vostra domanda e la nostra risposta.', [
@@ -237,10 +244,10 @@ class EmailUtil
         $body[] = AmosTicket::t('amosticket', 'Domanda:');
         $description = \yii\helpers\HtmlPurifier::process($ticket->descrizione);
         echo nl2br($description);
-        $body[] = AmosTicket::t('amosticket', '<strong>'.$description.'</strong>');
+        $body[] = AmosTicket::t('amosticket', '<strong>' . $description . '</strong>');
 
         $body[] = AmosTicket::t('amosticket', 'Risposta:');
-        $body[] = AmosTicket::t('amosticket', '<strong>'.$answare->comment_text.'</strong>');
+        $body[] = AmosTicket::t('amosticket', '<strong>' . $answare->comment_text . '</strong>');
 
         $body[] = AmosTicket::t('amosticket', '');
         $body[] = AmosTicket::t('amosticket', 'Cordiali saluti');
@@ -257,9 +264,9 @@ class EmailUtil
         $files = [];
         /** @var File $file */
         foreach ($answare->hasMultipleFiles('commentAttachments')->all() as $file) {
-            $files[$file->name .'.'.$file->type] = $file->getPath();
+            $files[$file->name . '.' . $file->type] = $file->getPath();
         }
-        return self::sendEmail($to, $from, $subject, $params, $layout, null,[],[],$files);
+        return self::sendEmail($to, $from, $subject, $params, $layout, null, [], [], $files);
     }
 
     /**
@@ -273,14 +280,14 @@ class EmailUtil
     public static function sendEmailChiusuraOperatore($ticket, $partnershipMsg)
     {
         $className = AmosTicket::instance()->emailUtilClass;
-        if (class_exists($className) && method_exists($className, __FUNCTION__)){
+        if (class_exists($className) && method_exists($className, __FUNCTION__)) {
             $functionName = __FUNCTION__;
             return $className::$functionName($ticket, $partnershipMsg);
         }
 
         $from = \Yii::$app->params['supportEmail'];
 
-        if($ticket->isGuestTicket()) {
+        if ($ticket->isGuestTicket()) {
             $to = $ticket->guest_email;
             $userProfile['name'] = $ticket->guest_name;
             $userProfile['cognome'] = $ticket->guest_surname;
@@ -291,6 +298,7 @@ class EmailUtil
         }
 
         $subject = AmosTicket::t("amosticket", 'Chiusura ticket id. ' . $ticket->id);
+        $subject = self::addPrefixCommunity($ticket->ticketCategoria, $subject);
 
         $body[] = '';
         $body[] = AmosTicket::t('amosticket', 'Il ticket id.<strong>' . $ticket->id . "</strong> \"$ticket->titolo\" è stato chiuso");
@@ -320,7 +328,7 @@ class EmailUtil
     public static function sendEmailTecnicaOperatore($ticket)
     {
         $className = AmosTicket::instance()->emailUtilClass;
-        if (class_exists($className) && method_exists($className, __FUNCTION__)){
+        if (class_exists($className) && method_exists($className, __FUNCTION__)) {
             $functionName = __FUNCTION__;
             return $className::$functionName($ticket);
         }
@@ -331,6 +339,7 @@ class EmailUtil
         $to = $creatorUserProfile->user->email;
 
         $subject = AmosTicket::t("amosticket", 'Gestione esterna ticket id. ' . $ticket->id);
+        $subject = self::addPrefixCommunity($ticket->ticketCategoria, $subject);
 
         $body[] = '';
         $body[] = AmosTicket::t('amosticket', 'Il ticket id.<strong>' . $ticket->id . "</strong> \"$ticket->titolo\" è stato affidato a una gestione esterna");
@@ -359,7 +368,7 @@ class EmailUtil
     public static function sendEmailCategoriaTecnica($ticket, $model_ticket_categoria, $partnershipMsg)
     {
         $className = AmosTicket::instance()->emailUtilClass;
-        if (class_exists($className) && method_exists($className, __FUNCTION__)){
+        if (class_exists($className) && method_exists($className, __FUNCTION__)) {
             $functionName = __FUNCTION__;
             return $className::$functionName($ticket, $model_ticket_categoria, $partnershipMsg);
         }
@@ -375,6 +384,7 @@ class EmailUtil
         $creatorEmail = $creatorUser->email;
 
         $subject = AmosTicket::t("amosticket", 'Nuovo ticket id. ' . $ticket->id);
+        $subject = self::addPrefixCommunity($ticket->ticketCategoria, $subject);
 
         $body[] = '';
         $body[] = AmosTicket::t('amosticket', 'E\' stato aperto un nuovo ticket nel plugin assistenza');
@@ -418,6 +428,49 @@ class EmailUtil
         ];
 
         return self::sendEmail($to, $from, $subject, $params, $layout, null, $creatorEmail, $creatorEmail);
+    }
+
+    /**
+     * @param $ticket Ticket
+     * @return bool
+     * @throws \ReflectionException
+     */
+    public static function sendEmailClosedReferenti($ticket)
+    {
+        $className = AmosTicket::instance()->emailUtilClass;
+        if (class_exists($className) && method_exists($className, __FUNCTION__)) {
+            $functionName = __FUNCTION__;
+            return $className::$functionName($ticket);
+        }
+
+        $from = \Yii::$app->params['supportEmail'];
+
+        $noCommunity = true;
+        $ticketCategoria = $ticket->ticketCategoria;
+        if (!empty($ticketCategoria) && !empty($ticketCategoria->community_id)) {
+            $noCommunity = false;
+        }
+        $emailReferenti = TicketUtility::getEmailReferentiCategoria($ticket->ticket_categoria_id, $noCommunity, true);
+        $to = $emailReferenti;
+
+        /** @var \open20\amos\admin\models\UserProfile $creatorUserProfile */
+        $creatorUserProfile = $ticket->getCreatedUserProfile()->one();
+
+        $subject = \Yii::t('amosapp', 'Chiusura ticket id ' . $ticket->id);
+        $subject = self::addPrefixCommunity($ticket->ticketCategoria, $subject);
+
+        $body[] = '';
+        $body[] = \Yii::t('amosapp', 'Il ticket id <strong>' . $ticket->id . "</strong> \"$ticket->titolo\" aperto da $creatorUserProfile->nomeCognome è stato chiuso.");
+
+        $params = [
+            'body' => $body,
+        ];
+
+        $layout = [
+            'html' => '@vendor/open2/amos-ticket/src/mail/generic/generic-html',
+        ];
+
+        return self::sendEmail($to, $from, $subject, $params, $layout);
     }
 
     /**
@@ -513,9 +566,32 @@ class EmailUtil
         }
 
         if (!empty($elements[0]) && !empty($elements[1])) {
-            return $elements[0] . ' '. trim($elements[1]);
+            return $elements[0] . ' ' . trim($elements[1]);
         } else {
             return $from . ' ' . $fromName;
         }
+    }
+
+    /**
+     * @param $ticketCategoria
+     * @param $string
+     * @return mixed|string
+     */
+    public static function addPrefixCommunity($ticketCategoria, $string)
+    {
+        $module = \Yii::$app->getModule('ticket');
+        if($module && $module->enablePrefixCommunity) {
+            $str = '';
+            $community = null;
+            if (!empty($ticketCategoria) && !empty($ticketCategoria->community_id)) {
+                $community = Community::findOne($ticketCategoria->community_id);
+            }
+
+            if ($community) {
+                $str .= $community->name . ' - ' . $string;
+                return $str;
+            }
+        }
+        return $string;
     }
 }

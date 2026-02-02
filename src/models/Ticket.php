@@ -76,6 +76,7 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
         $this->on('afterChangeStatusFrom{' . self::TICKET_WORKFLOW_STATUS_PROCESSING . '}to{' . self::TICKET_WORKFLOW_STATUS_CLOSED . '}', [$this, 'goingFromProcessingToClosed']);
         $this->on('afterChangeStatusFrom{' . self::TICKET_WORKFLOW_STATUS_WAITING_TECHNICAL_ASSISTANCE . '}to{' . self::TICKET_WORKFLOW_STATUS_CLOSED . '}', [$this, 'goingFromProcessingToClosed']);
         $this->on('afterEnterStatus{' . self::TICKET_WORKFLOW_STATUS_WAITING . '}', [$this, 'goingToWaiting']);
+        $this->on('afterEnterStatus{' . self::TICKET_WORKFLOW_STATUS_CLOSED . '}', [$this, 'goingToClosed']);
     }
     
     public function getCloseCommentThread()
@@ -153,6 +154,16 @@ class Ticket extends \open2\amos\ticket\models\base\Ticket implements CommentInt
         } else {
             EmailUtil::sendEmailNewTicketReferenti($this, $categoria, $partnershipMsg);
         }
+    }
+
+    /**
+     * @param $event
+     * @return void
+     * @throws \ReflectionException
+     */
+    public function goingToClosed($event)
+    {
+        EmailUtil::sendEmailClosedReferenti($this);
     }
     
     /**

@@ -160,7 +160,13 @@ class TicketFaqSearch extends TicketFaq implements CmsModelInterface
         if (!empty($params["conditionSearch"])) {
             $commands = explode(";", $params["conditionSearch"]);
             foreach ($commands as $command) {
-                $query->andWhere(eval("return " . $command . ";"));
+                // added fix to php 8 since the function is called in multiple instances
+                // fix only adds '' to array keys that arrives as search conditions
+                $fixCommand = preg_replace_callback('/\b(\w+)\s*=>/', function($matches) {
+                    return "'" . $matches[1] . "' =>";
+                }, $command);
+
+                $query->andWhere(eval("return $fixCommand;"));
             }
         }
         return $dataProvider;

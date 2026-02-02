@@ -19,6 +19,7 @@ use open2\amos\ticket\AmosTicket;
 use open2\amos\ticket\utility\TicketUtility;
 use yii\helpers\ArrayHelper;
 use yii\web\View;
+use open20\amos\core\forms\TextEditorWidget;
 
 /**
  * @var yii\web\View $this
@@ -132,16 +133,21 @@ $this->registerJs($js, View::POS_READY);
             ?>
             <div class="col-lg-12 col-sm-12">
                 <?=
-                $form->field($model, 'descrizione')->widget(\yii\redactor\widgets\Redactor::className(),
+                $form->field($model, 'descrizione')->widget(
+                    TextEditorWidget::className(),
                     [
-                    'clientOptions' => [
-                        'buttonsHide' => [
-                            'image',
-                            'file'
+                        'options' => ['placeholder' => AmosTicket::t('amosticket', 'Inserisci...')],
+                        'clientOptions' => [
+                            'lang' => substr(Yii::$app->language, 0, 2),
+                            /*'plugins' => $rtePlugins,
+                            'toolbar' => $rteToolbar,*/
+                            'buttonsHide' => [
+                                'file'
+                            ],
                         ],
-                        'lang' => substr(Yii::$app->language, 0, 2)
                     ]
-                ])
+                )
+             
                 ?>
             </div>
             <?php

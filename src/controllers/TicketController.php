@@ -20,6 +20,7 @@ use open2\amos\ticket\models\TicketCategorie;
 use open2\amos\ticket\utility\EmailUtil;
 use open2\amos\ticket\utility\TicketUtility;
 use raoul2000\workflow\base\WorkflowException;
+use open20\amos\community\models\Community;
 use Yii;
 use yii\filters\AccessControl;
 use yii\helpers\ArrayHelper;
@@ -251,9 +252,24 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
         $this->setUpLayout('form');
         $this->model = $this->findModel($id);
         $ticket = $this->model; //Ticket::findOne($id);
+
+        $moduleCwh = \Yii::$app->getModule('cwh');
+        $moduleCommunity = \Yii::$app->getModule('community');
+        $isCommuntyManager = false;
+        if (isset($moduleCwh) && isset($moduleCommunity) && !empty($moduleCwh->getCwhScope())) {
+            $scope = $moduleCwh->getCwhScope();
+            if (isset($scope['community'])) {
+                $community = Community::findOne(['id' => $scope['community']]);
+                if (!empty($community)) {
+                    $isCommuntyManager = $community->isCommunityManager(\Yii::$app->user->id);
+                }
+            }
+        }
         if ($ticket->status == Ticket::TICKET_WORKFLOW_STATUS_WAITING) {
+            
             $firstAnswer = $ticket->getFirstAnswer();
-            if (!is_null($firstAnswer) and Yii::$app->getUser()->can('REFERENTE_TICKET')) { //è stato preso in carico
+            if (!is_null($firstAnswer) && (Yii::$app->getUser()->can('REFERENTE_TICKET') || $isCommuntyManager)) { //è stato preso in carico
+
                 try {
                     if ($ticket->isGuestTicket()) {
                         EmailUtil::sendCloseTicketGuestAnsware($ticket, $firstAnswer);
@@ -372,7 +388,7 @@ class TicketController extends \open2\amos\ticket\controllers\base\TicketControl
             $this->model->sendToStatus(Ticket::TICKET_WORKFLOW_STATUS_CLOSED);
             if ($this->model->status == Ticket::TICKET_WORKFLOW_STATUS_CLOSED && $oldStatus != Ticket::TICKET_WORKFLOW_STATUS_CLOSED) {
                 $this->model->closed_by = Yii::$app->getUser()->id;
-                $this->model->closed_at = $this->model->updated_at;
+                $this->model->closed_at = date('Y-m-d H:i:s');
             }
             $ok = $this->model->save(false);
             if ($ok) {

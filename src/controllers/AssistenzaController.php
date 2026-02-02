@@ -16,6 +16,7 @@ use open20\amos\dashboard\controllers\TabDashboardControllerTrait;
 use open2\amos\ticket\AmosTicket;
 use open2\amos\ticket\models\search\TicketCategorieSearch;
 use open2\amos\ticket\models\TicketCategorie;
+use open2\amos\ticket\models\TicketFaq;
 use open2\amos\ticket\utility\TicketUtility;
 use open20\amos\admin\AmosAdmin;
 use Yii;
@@ -60,6 +61,18 @@ class AssistenzaController extends CrudController
                             'cerca-faq',
                         ],
                         'roles' => ['OPERATORE_TICKET']
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => [
+                            'ajax-faq-star-rating',
+                            'view',
+                            'index'
+                        ],
+                        'roles' => [
+                            '@',
+                            '?'
+                        ]
                     ],
                 ]
             ],
@@ -114,11 +127,22 @@ class AssistenzaController extends CrudController
                 )
             );
         } else {
-            $titleSection = AmosTicket::t('amosticket', 'Tutte le FAQ');
-            $labelLinkAll = AmosTicket::t('amosticket', 'Tutti i ticket');
-            $urlLinkAll   = '/ticket/ticket/index';
-            $titleLinkAll = AmosTicket::t('amosticket', 'Visualizza la lista dei ticket');
-            $subTitleSection = Html::tag('p', AmosTicket::t('amosticket', '#beforeActionSubtitleSectionLogged'));
+
+            $module = \Yii::$app->getModule('ticket');
+            $disableTicketManagement = (!empty($module) ? $module->disableTicketManagement : false);
+
+            if (!$disableTicketManagement) {
+                $titleSection = AmosTicket::t('amosticket', 'Tutte le FAQ');
+                $labelLinkAll = AmosTicket::t('amosticket', 'Tutti i ticket');
+                $urlLinkAll   = '/ticket/ticket/index';
+                $titleLinkAll = AmosTicket::t('amosticket', 'Visualizza la lista dei ticket');
+                $subTitleSection = Html::tag('p', AmosTicket::t('amosticket', '#beforeActionSubtitleSectionLogged'));
+            } else {
+                $labelLinkAll = AmosTicket::t('amosticket', 'Gestisci FAQ');
+                $urlLinkAll = '/ticket/ticket-faq/index';
+                $titleLinkAll = AmosTicket::t('amosticket', 'Gestisci FAQ');
+                $hideManage = true;
+            }
         }
 
         $labelCreate = AmosTicket::t('amosticket', 'Nuova');
@@ -250,5 +274,31 @@ class AssistenzaController extends CrudController
     public static function getManageLinks()
     {
         return TicketUtility::getManageLink();
+    }
+
+    public function actionAjaxFaqStarRating() {
+        if(!\Yii::$app->request->isAjax) return false;
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+        $post = \Yii::$app->request->post();
+
+        /** @var TicketFaq $ticketFaqModel */
+        $ticketFaqModel = TicketFaq::findOne($post['faqId']);
+        $ticketFaqModel->total_rating += $post['starValue'];
+        $ticketFaqModel->total_votes += 1;
+        
+        return $ticketFaqModel->save();
+    }
+
+    /**
+     * Displays a single TicketFaq model.
+     * @param integer $id
+     * @return string|\yii\web\Response
+     * @throws \yii\web\NotFoundHttpException
+     */
+    public function actionView($id)
+    {
+        $this->model = TicketFaq::findOne($id);
+        $this->setUpLayout('form');
+        return $this->render('view', ['model' => $this->model]);
     }
 }

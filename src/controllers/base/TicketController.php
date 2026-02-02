@@ -18,6 +18,7 @@ use open20\amos\dashboard\controllers\TabDashboardControllerTrait;
 use open2\amos\ticket\AmosTicket;
 use open2\amos\ticket\models\search\TicketSearch;
 use open2\amos\ticket\models\Ticket;
+use yii\web\ForbiddenHttpException;
 use Yii;
 use yii\helpers\Url;
 
@@ -191,6 +192,9 @@ class TicketController extends CrudController
      */
     public function actionUpdate($id)
     {
+        if (AmosTicket::instance()->OnlyViewOnTickets && !Yii::$app->user->can('AMMINISTRATORE_TICKET')) {
+            throw new ForbiddenHttpException(Yii::t('amoscore', 'Non sei autorizzato a visualizzare questa pagina'));
+        }
         $this->setUpLayout('form');
         $this->model = $this->findModel($id);
         $oldStatus = $this->model->status;
@@ -224,6 +228,9 @@ class TicketController extends CrudController
     public function actionDelete($id)
     {
         $this->model = $this->findModel($id);
+        if (AmosTicket::instance()->OnlyViewOnTickets && !Yii::$app->user->can('AMMINISTRATORE_TICKET')) {
+            throw new ForbiddenHttpException(Yii::t('amoscore', 'Non sei autorizzato a visualizzare questa pagina'));
+        }
         if ($this->model) {
             $this->model->delete();
             if (!$this->model->hasErrors()) {

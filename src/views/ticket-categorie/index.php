@@ -37,7 +37,7 @@ $fielsdToHide = (!empty($module) && is_array($module->categoryFieldsHide)) ? $mo
     if ($module->enableCategoryIcon) {
         $columns[] = [
             'label' => $model->getAttributeLabel('categoryIcon'),
-            'format' => 'html',
+            'format' => 'raw',
             'value' => function ($model) {
                 /** @var TicketCategorie $model */
                 $url = $model->getCategoryIconUrl('table_small');

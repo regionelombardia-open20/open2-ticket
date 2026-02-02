@@ -32,7 +32,10 @@ $disableTicketOrganization = (!empty($module) ? $module->disableTicketOrganizati
 
 $template = '{view}{update}{delete}';
 if (AmosTicket::instance()->hideUpdateButtonOnTickets) {
+ 
     $template = '{view}{delete}';
+}if (AmosTicket::instance()->OnlyViewOnTickets && !Yii::$app->user->can('AMMINISTRATORE_TICKET')) {
+    $template = '{view}';
 }
 
 /** @var TicketCategorie $emptyTicketCategorie */

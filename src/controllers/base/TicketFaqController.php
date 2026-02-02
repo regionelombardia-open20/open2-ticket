@@ -37,17 +37,17 @@ class TicketFaqController extends CrudController
      * Trait used for initialize the ticket dashboard
      */
     use TabDashboardControllerTrait;
-    
+
     /**
      * @inheritdoc
      */
     public function init()
     {
         $this->initDashboardTrait();
-        
+
         $this->setModelObj(new TicketFaq());
         $this->setModelSearch(new TicketFaqSearch());
-        
+
         $this->setAvailableViews([
             'grid' => [
                 'name' => 'grid',
@@ -57,31 +57,44 @@ class TicketFaqController extends CrudController
                 'url' => '?currentView=grid'
             ],
         ]);
-        
+
         parent::init();
     }
-    
+
     /**
      * @inheritdoc
      */
     public function beforeAction($action)
     {
-        
+
         $urlCreate = '/ticket/ticket-faq/create';
         $labelCreate = AmosTicket::t('amosticket', 'Nuova');
-        $titleSection = AmosTicket::t('amosticket', 'Tutte le FAQ');
-        $labelLinkAll = AmosTicket::t('amosticket', 'Tutti i ticket');
-        if (Yii::$app->getUser()->can('REFERENTE_TICKET') || Yii::$app->getUser()->can('AMMINISTRATORE_TICKET')) {
-            $urlLinkAll = '/ticket/ticket/index';
-        }else{
-            $urlLinkAll = '/ticket/';
+        $titleSection = AmosTicket::t('amosticket', 'Gestione FAQ');
+
+        $module = \Yii::$app->getModule('ticket');
+        $disableTicketManagement = (!empty($module) ? $module->disableTicketManagement : false);
+
+        if (!$disableTicketManagement) {
+            $labelLinkAll = AmosTicket::t('amosticket', 'Gestione ticket');
+            if (Yii::$app->getUser()->can('REFERENTE_TICKET') || Yii::$app->getUser()->can('AMMINISTRATORE_TICKET')) {
+                $urlLinkAll = '/ticket/ticket/index';
+            } else {
+                $urlLinkAll = '/ticket';
+            }
+            $labelManage = AmosTicket::t('amosticket', 'Gestisci');
+            $titleManage = AmosTicket::t('amosticket', 'Gestione FAQ');
+            $titleLinkAll = AmosTicket::t('amosticket', 'Visualizza la lista dei ticket');
+            $hideManage = false;
+        } else {
+            $labelLinkAll = AmosTicket::t('amosticket', 'Tutte le FAQ');
+            $urlLinkAll = '/ticket/assistenza/cerca-faq';
+            $titleLinkAll = AmosTicket::t('amosticket', 'Tutte le FAQ');
+            $hideManage = true;
         }
-        $labelManage = AmosTicket::t('amosticket', 'Gestisci');
-        $titleManage = AmosTicket::t('amosticket', 'Gestisci le FAQ');
-        $titleLinkAll = AmosTicket::t('amosticket', 'Visualizza la lista dei ticket'); 
-        $subTitleSection = Html::tag('p', AmosTicket::t('amosticket', '#beforeActionSubtitleSectionLogged'));
+
+        // $subTitleSection = Html::tag('p', AmosTicket::t('amosticket', '#beforeActionSubtitleSectionLogged'));
         $urlManage = null;
-        
+
         $this->view->params = [
             'isGuest' => false,
             'modelLabel' => 'ticket',
@@ -91,22 +104,25 @@ class TicketFaqController extends CrudController
             'urlLinkAll' => $urlLinkAll,
             'labelManage' => $labelManage,
             'titleManage' => $titleManage,
-            'subTitleSection' => $subTitleSection,
+            // 'subTitleSection' => $subTitleSection,
             'urlCreate' => $urlCreate,
             'labelCreate' => $labelCreate,
             'urlManage' => $urlManage,
+            'hideManage' => $hideManage
         ];
-        
+
+        // var_dump((\Yii::$app->user->can(WidgetIconTicketFaq::class)));die;
+
         if (!parent::beforeAction($action)) {
             return false;
         }
-        
+
         // other custom code here
-        
+
         return true;
     }
-    
-    
+
+
     /**
      * Lists all TicketFaq models.
      * @param string|null $layout
@@ -118,9 +134,11 @@ class TicketFaqController extends CrudController
         Url::remember();
         $this->setDataProvider($this->modelSearch->search(Yii::$app->request->getQueryParams()));
         $this->view->params['currentDashboard'] = $this->getCurrentDashboard();
+
+
         return parent::actionIndex();
     }
-    
+
     /**
      * Displays a single TicketFaq model.
      * @param integer $id
@@ -133,7 +151,7 @@ class TicketFaqController extends CrudController
         $this->model = $this->findModel($id);
         return $this->render('view', ['model' => $this->model]);
     }
-    
+
     /**
      * Creates a new TicketFaq model.
      * If creation is successful, the browser will be redirected to the 'view' page.
@@ -142,9 +160,9 @@ class TicketFaqController extends CrudController
     public function actionCreate()
     {
         $this->setUpLayout('form');
-        
+
         $this->model = new TicketFaq();
-        
+
         if ($this->model->load(Yii::$app->request->post()) && $this->model->validate()) {
             if ($this->model->save()) {
                 Yii::$app->getSession()->addFlash('success', Yii::t('amoscore', 'Item created'));
@@ -153,12 +171,12 @@ class TicketFaqController extends CrudController
                 Yii::$app->getSession()->addFlash('danger', Yii::t('amoscore', 'Item not created, check data'));
             }
         }
-        
+
         return $this->render('create', [
             'model' => $this->model,
         ]);
     }
-    
+
     /**
      * Updates an existing TicketFaq model.
      * If update is successful, the browser will be redirected to the 'view' page.
@@ -169,9 +187,9 @@ class TicketFaqController extends CrudController
     public function actionUpdate($id)
     {
         $this->setUpLayout('form');
-        
+
         $this->model = $this->findModel($id);
-        
+
         if ($this->model->load(Yii::$app->request->post()) && $this->model->validate()) {
             if ($this->model->save()) {
                 Yii::$app->getSession()->addFlash('success', Yii::t('amoscore', 'Item updated'));
@@ -180,12 +198,12 @@ class TicketFaqController extends CrudController
                 Yii::$app->getSession()->addFlash('danger', Yii::t('amoscore', 'Item not updated, check data'));
             }
         }
-        
+
         return $this->render('update', [
             'model' => $this->model,
         ]);
     }
-    
+
     /**
      * Deletes an existing TicketFaq model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
@@ -210,7 +228,7 @@ class TicketFaqController extends CrudController
         }
         return $this->redirect(['index']);
     }
-    
+
     /**
      * @return array
      */
@@ -218,6 +236,4 @@ class TicketFaqController extends CrudController
     {
         return TicketUtility::getManageLink();
     }
-    
-    
 }

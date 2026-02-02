@@ -21,6 +21,8 @@ use open2\amos\ticket\AmosTicket;
  * @property string $risposta
  * @property integer $ticket_categoria_id
  * @property integer $version
+ * @property integer $total_rating
+ * @property integer $total_votes
  * @property string $created_at
  * @property string $updated_at
  * @property string $deleted_at

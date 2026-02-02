@@ -11,11 +11,15 @@
 
 namespace open2\amos\ticket\models;
 
+use open20\amos\core\behaviors\TaggableBehavior;
 use open20\amos\core\interfaces\ContentModelInterface;
 use open20\amos\seo\behaviors\SeoContentBehavior;
 use open20\amos\seo\interfaces\SeoModelInterface;
+use open2\amos\ticket\AmosTicket;
+use open2\amos\ticket\i18n\grammar\TicketFaqGrammar;
 use open2\amos\ticket\widgets\icons\WidgetIconTicketDashboard;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 
 /**
  * Class TicketFaq
@@ -41,12 +45,15 @@ class TicketFaq extends \open2\amos\ticket\models\base\TicketFaq implements Cont
     {
         return ArrayHelper::merge(parent::behaviors(), [
             'SeoContentBehavior' => [
-                'class' => SeoContentBehavior::className(),
+                'class' => SeoContentBehavior::class,
                 'titleAttribute' => 'domanda',
                 'descriptionAttribute' => 'risposta',
                 'imageAttribute' => null,
                 'defaultOgType' => 'article',
                 'schema' => null
+            ],
+            'TaggableBehavior' => [
+                'class' => TaggableBehavior::class
             ]
         ]);
     }
@@ -110,7 +117,7 @@ class TicketFaq extends \open2\amos\ticket\models\base\TicketFaq implements Cont
      */
     public function getPublicatedFrom()
     {
-        return $this->publication_startdate;
+        return $this->created_at;
     }
     
     /**
@@ -118,7 +125,7 @@ class TicketFaq extends \open2\amos\ticket\models\base\TicketFaq implements Cont
      */
     public function getPublicatedAt()
     {
-        return $this->publication_enddate;
+        return $this->created_at;
     }
     
     /**
@@ -150,7 +157,7 @@ class TicketFaq extends \open2\amos\ticket\models\base\TicketFaq implements Cont
      */
     public function getShortDescription()
     {
-        return $this->domanda;
+        return $this->getDescription(true);
     }
     
     /**
@@ -158,7 +165,15 @@ class TicketFaq extends \open2\amos\ticket\models\base\TicketFaq implements Cont
      */
     public function getDescription($truncate)
     {
-        return $this->title;
+        /** @var AmosTicket $ticketModule */
+        $ticketModule = \Yii::$app->getModule(AmosTicket::getModuleName());
+        $ret = $this->risposta;
+
+        if ($truncate) {
+            $ret = $this->__shortText($this->risposta, $ticketModule->faqDescriptionLimit);
+        }
+
+        return $ret;
     }
     
     /**
@@ -174,7 +189,7 @@ class TicketFaq extends \open2\amos\ticket\models\base\TicketFaq implements Cont
      */
     public function getGrammar()
     {
-        return null;
+        return new TicketFaqGrammar();
     }
     
     /**
@@ -215,5 +230,28 @@ class TicketFaq extends \open2\amos\ticket\models\base\TicketFaq implements Cont
     public function getValidatorRole()
     {
         return null;
+    }
+
+    public function getStarValutation() {
+        if($this->total_votes == 0) {
+            return 0;
+        }
+        return number_format($this->total_rating / $this->total_votes, 1);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getViewUrl()
+    {
+        return 'ticket/assistenza/cerca-faq';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getFullViewUrl()
+    {
+        return Url::toRoute(['/' . $this->getViewUrl(), 'categoriaSelezionataId' => $this->ticketCategoria->id, 'faqId' => $this->id]);
     }
 }

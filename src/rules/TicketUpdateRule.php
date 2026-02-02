@@ -32,13 +32,14 @@ class TicketUpdateRule extends BasicContentRule
         if (!$model->id) {
             return true;
         }
-        $modelWorkflowStatus = $model->getWorkflowStatus();
+        return false;
+    /*    $modelWorkflowStatus = $model->getWorkflowStatus();
         if (!empty($modelWorkflowStatus)) {
             return (
                 ($modelWorkflowStatus->getId() == Ticket::TICKET_WORKFLOW_STATUS_WAITING) &&
                 (($model->created_by == $user) || $model->isReferente($user))
             );
         }
-        return false;
+        return false; */
     }
 }

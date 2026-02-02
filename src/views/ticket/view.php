@@ -85,7 +85,7 @@ $disableForwardToAnotherCategory = (!empty($module) ? $module->disableForwardToA
                 <div class="ticket-label"><?= AmosTicket::t('amosticket', '#ticket_status') . ':' ?></div>
                 <div class="ticket-content <?= $classState ?>">
                     <span><?= $model->hasWorkflowStatus() ? $model->getWorkflowStatus()->getLabel() : '--' ?></span>
-                    <?php if ($ticketIsProcessing && $theUser->can(Ticket::TICKET_WORKFLOW_STATUS_CLOSED)) { ?>
+                    <?php if (($ticketIsProcessing && ($theUser->can(Ticket::TICKET_WORKFLOW_STATUS_CLOSED) || $model->created_by == $theUser->id))) { ?>
                         <?php
                         echo Html::a(AmosTicket::t('amosticket', 'Chiudi il ticket'), Url::toRoute(['/ticket/ticket/closing-ticket', 'id' => $model->id]), ['class' => "btn btn-action-primary"]);
                         ?>

@@ -131,7 +131,7 @@ $enableAutoOpenSearchPanel = !isset(\Yii::$app->params['enableAutoOpenSearchPane
                             'allowClear' => true,
                             'minimumInputLength' => 3,
                             'ajax' => [
-                                'url' => \yii\helpers\Url::to(['/admin/user-profile-ajax/ajax-user-list']),
+                                'url' => \yii\helpers\Url::to(['/amosadmin/user-profile-ajax/ajax-user-list']),
                                 'dataType' => 'json',
                                 'data' => new \yii\web\JsExpression('function(params) { return {q:params.term}; }')
                             ],
