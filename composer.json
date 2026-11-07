@@ -1,5 +1,6 @@
 {
     "name": "open2/amos-ticket",
+    "license": "GPL-3.0-or-later",
     "description": "Amos Ticket",
     "type": "component",
     "keywords": [
